@@ -2,7 +2,7 @@
 
 For understanding the basics of the code in here, some helpful resources on computation expressions are:
 
-- the Microsoft "Computation Expressions" [documentation](https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/computation-expressions)
+- the Microsoft ["Computation Expressions" documentation](https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/computation-expressions)
 - the corresponding Fun & Profit ["Computation Expressions" series](https://fsharpforfunandprofit.com/series/computation-expressions/)
 
 The Fun & Profit series is more helpful, the Microsoft documentation is more formal and ultimatly more complete.
