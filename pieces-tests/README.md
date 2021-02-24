@@ -6,6 +6,7 @@ This project was created by running following `dotnet` commands in the solution 
 ```
 dotnet new console -lang "F#" -o pieces-tests
 dotnet sln add pieces-tests
+dotnet add pieces-tests reference pieces
 dotnet add pieces-tests package Expecto
 ```
 

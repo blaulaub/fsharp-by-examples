@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\pieces\pieces.fsproj" />
     <PackageReference Include="Expecto" Version="9.0.2" />
     <Compile Include="Main.fs" />
   </ItemGroup>
