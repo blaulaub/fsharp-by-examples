@@ -1,3 +1,5 @@
+open Expecto
+
 [<EntryPoint>]
-let main argv =
-    0 // return an integer exit code
+let main args =
+    runTestsInAssemblyWithCLIArgs [] args
