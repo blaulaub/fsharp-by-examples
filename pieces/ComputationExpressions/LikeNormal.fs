@@ -9,30 +9,12 @@ namespace ChPatchcode.FSharpByExamples.ComputationExpressions
 *)
 module LikeNormal =
 
-    (* Below is the definition of the builder*)
-
+    (*
+        Regarding custom builder types, see
+        https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/computation-expressions#creating-a-new-type-of-computation-expression
+    *)
     type LikeNormalBuilder() =
-        // QUESTION when declaring class members in F#, should the prefix be "this", "_", or just anything?
         member _.Bind(x, f) = f x
         member _.Return(x) = x
 
-    // QUESTION "Fun & Profit" often uses the "new" keyword, is this now obsolete or optional?
-    // ANSWER https://stackoverflow.com/questions/4520640/f-new-keyword-what-is-it-for
     let likeNormal = LikeNormalBuilder()
-
-
-    (* anything below is some code to exercise the builder *)
-
-    let private normalWorkflow = likeNormal {
-        // NOTE the compiler translates "let!" to LikeNormalBuilder.Bind
-        let! x = 42
-        let! y = 43
-        let! z = x + y
-        // NOTE the compiler translates "return" to LikeNormalBuilder.Return
-        return z
-    }
-
-    // this is like a self-check at the end of a module-open
-    // QUESTION is it ok to have (pure) sanity checks at the end of a module (replacing or at least forestalling any unit tests)?
-    // QUESTION if a module has any sanity checks at the end, can they be made impure (printing, logging, reporting) in an acceptable way?
-    if normalWorkflow <> 85 then failwith "normalWorkflow should return 85"

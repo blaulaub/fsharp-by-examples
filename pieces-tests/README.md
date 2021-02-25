@@ -12,7 +12,7 @@ dotnet add pieces-tests package Expecto
 
 Tests can be run from the solution folder via `dotnet`
 ```
-dotnet run pieces-tests
+dotnet run -p pieces-tests
 ```
 *or* using the test runner executable (the precise binary path may vary), e.g.
 ```
