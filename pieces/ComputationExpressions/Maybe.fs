@@ -3,6 +3,7 @@ namespace ChPatchcode.FSharpByExamples.ComputationExpressions
 module Maybe =
 
     type MaybeBuilder() =
+
         member _.Bind(x, f) =
             match x with
             | None -> None

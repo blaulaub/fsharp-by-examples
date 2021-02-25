@@ -5,6 +5,11 @@ open Maybe
 
 module MaybeTest =
 
+    let divideBy divisor dividend =
+        if divisor = 0
+        then None
+        else Some(dividend/divisor)
+
     [<Tests>]
     let tests =
         testList "Workflow Maybe" [
@@ -14,13 +19,9 @@ module MaybeTest =
             *)
             test "Bind and Return" {
 
-                let divideBy bottom top =
-                    if bottom = 0
-                    then None
-                    else Some(top/bottom)
-
                 let divideThreeTimes dividend divisor1 divisor2 divisor3 =
                     maybe {
+                        // NOTE lhs is "normal", rhs is "elevated"
                         let! a = Some dividend
                         let! b = a |> divideBy divisor1
                         let! c = b |> divideBy divisor2
