@@ -9,6 +9,7 @@
     <ProjectReference Include="..\pieces\pieces.fsproj" />
     <PackageReference Include="Expecto" Version="9.0.2" />
     <Compile Include="ComputationExpressions/LikeNormalTest.fs" />
+    <Compile Include="ComputationExpressions/MaybeTest.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
 

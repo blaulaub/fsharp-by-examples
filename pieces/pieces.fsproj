@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Include="ComputationExpressions/LikeNormal.fs" />
+    <Compile Include="ComputationExpressions/Maybe.fs" />
   </ItemGroup>
 
 </Project>
