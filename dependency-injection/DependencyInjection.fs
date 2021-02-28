@@ -2,6 +2,7 @@
 open NodaTime
 open Serilog
 
+
 module LowLevelCore =
 
     let pauseOneSecond =
@@ -15,6 +16,7 @@ module LowLevelCore =
             do pauseOneSecond
         log.Information "awake again"
 
+
 module HighLevelServices =
 
     type MyService(log: ILogger, clock: IClock) =
@@ -27,16 +29,30 @@ module HighLevelServices =
             waitUntil inFiveSeconds
 
 
+open Microsoft.Extensions.DependencyInjection
+open Microsoft.Extensions.Hosting
+
+
 [<EntryPoint>]
 let main args =
 
-    // setup external dependencies
-    let log = LoggerConfiguration().WriteTo.Console().CreateLogger()
-    let clock = NodaTime.SystemClock.Instance
+    let hostBuilder = (Host
+        .CreateDefaultBuilder(args)
+        .ConfigureServices(fun serviceCollection ->
+            do serviceCollection.AddSingleton<IClock>(SystemClock.Instance) |> ignore
+            do serviceCollection.AddSingleton<ILogger>(LoggerConfiguration().WriteTo.Console().CreateLogger()) |> ignore
+            do serviceCollection.AddSingleton<HighLevelServices.MyService>() |> ignore
+        )
+    )
 
-    // constructor injection
-    let service = HighLevelServices.MyService(log, clock)
+    let host = hostBuilder.Build()
 
-    // execution
-    service.SleepFiveSeconds()
+    let scope = host.Services.CreateScope()
+
+    let provider = scope.ServiceProvider
+
+    let service = provider.GetRequiredService<HighLevelServices.MyService>()
+
+    do service.SleepFiveSeconds()
+
     0
