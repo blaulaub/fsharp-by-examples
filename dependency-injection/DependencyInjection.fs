@@ -76,14 +76,17 @@ module BoundaryServices =
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 
+let addSingletonInstance<'TService when 'TService : not struct> (serviceCollection: IServiceCollection) (instance: 'TService) =
+    do serviceCollection.AddSingleton<'TService>(instance) |> ignore
+
 // this is just the .NET top-level glue logic to get our system running
 //   (bringing heavenly code down to earth always requires some unexplainable rain-making ritual)
 [<EntryPoint>]
 let main args =
 
     let injectionConfig (serviceCollection: IServiceCollection) =
-        do serviceCollection.AddSingleton<IClock>(SystemClock.Instance) |> ignore
-        do serviceCollection.AddSingleton<ILogger>(LoggerConfiguration().WriteTo.Console().CreateLogger()) |> ignore
+        do addSingletonInstance<IClock> serviceCollection SystemClock.Instance
+        do addSingletonInstance<ILogger> serviceCollection (LoggerConfiguration().WriteTo.Console().CreateLogger())
         do serviceCollection.AddSingleton<BoundaryServices.MyService>() |> ignore
 
     let hostBuilder = Host.CreateDefaultBuilder(args).ConfigureServices(injectionConfig)

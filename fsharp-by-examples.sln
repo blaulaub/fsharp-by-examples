@@ -9,6 +9,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "pieces-tests", "pieces-test
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "dependency-injection", "dependency-injection\dependency-injection.fsproj", "{D96F8B8B-E548-49B4-8D95-73D2DEFBB6EF}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "entity-framework-demo", "entity-framework-demo\entity-framework-demo.fsproj", "{03AEE4CE-A4C8-4E03-907C-86EB6299E76E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,5 +60,17 @@ Global
 		{D96F8B8B-E548-49B4-8D95-73D2DEFBB6EF}.Release|x64.Build.0 = Release|Any CPU
 		{D96F8B8B-E548-49B4-8D95-73D2DEFBB6EF}.Release|x86.ActiveCfg = Release|Any CPU
 		{D96F8B8B-E548-49B4-8D95-73D2DEFBB6EF}.Release|x86.Build.0 = Release|Any CPU
+		{03AEE4CE-A4C8-4E03-907C-86EB6299E76E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03AEE4CE-A4C8-4E03-907C-86EB6299E76E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03AEE4CE-A4C8-4E03-907C-86EB6299E76E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{03AEE4CE-A4C8-4E03-907C-86EB6299E76E}.Debug|x64.Build.0 = Debug|Any CPU
+		{03AEE4CE-A4C8-4E03-907C-86EB6299E76E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{03AEE4CE-A4C8-4E03-907C-86EB6299E76E}.Debug|x86.Build.0 = Debug|Any CPU
+		{03AEE4CE-A4C8-4E03-907C-86EB6299E76E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03AEE4CE-A4C8-4E03-907C-86EB6299E76E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03AEE4CE-A4C8-4E03-907C-86EB6299E76E}.Release|x64.ActiveCfg = Release|Any CPU
+		{03AEE4CE-A4C8-4E03-907C-86EB6299E76E}.Release|x64.Build.0 = Release|Any CPU
+		{03AEE4CE-A4C8-4E03-907C-86EB6299E76E}.Release|x86.ActiveCfg = Release|Any CPU
+		{03AEE4CE-A4C8-4E03-907C-86EB6299E76E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
