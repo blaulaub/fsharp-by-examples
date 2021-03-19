@@ -6,8 +6,8 @@
 
 // what does a boolean do?
 // a boolean makes a choice
-let True x y = x
-let False x y = y
+let True<'a>  (x:'a) (y:'a) = x
+let False<'a> (x:'a) (y:'a) = y
 
 // we can define if-then-else as follows
 let IfTe bool t e = bool t e
@@ -80,7 +80,6 @@ let eval integer: int = integer ((+)1) 0
 // (remember the concept of integers here, its a loop count for any loop)
 let isZero integer = integer (ignore >> fun () -> False) True
 
-isZero (prod two one)
-
-
-let incr<'a> (a:('a ->'a)->'a->'a) iter x = iter (a iter x)
+// now we can evaluate such things:
+isZero zero "yes" "no"   // writes "yes"
+isZero five "yes" "no"   // writes "no"
