@@ -71,3 +71,16 @@ let eval integer: int = integer ((+)1) 0
 
 // combine some things
 (eval (sum one (prod two two))) = (eval (five))
+
+
+// BOOLEANS and INTEGERS combined
+
+
+// some predicate to test for zero
+// (remember the concept of integers here, its a loop count for any loop)
+let isZero integer = integer (ignore >> fun () -> False) True
+
+isZero (prod two one)
+
+
+let incr<'a> (a:('a ->'a)->'a->'a) iter x = iter (a iter x)
