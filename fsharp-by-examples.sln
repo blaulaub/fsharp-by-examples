@@ -13,6 +13,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "entity-framework-demo", "en
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "property-based-testing-demo", "property-based-testing-demo\property-based-testing-demo.fsproj", "{5C04C4BF-F42F-43DE-A3A0-5429A4F85646}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "async-demo", "async-demo\async-demo.fsproj", "{C2063BE9-9534-4805-8E59-A06B90473AA9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,5 +88,17 @@ Global
 		{5C04C4BF-F42F-43DE-A3A0-5429A4F85646}.Release|x64.Build.0 = Release|Any CPU
 		{5C04C4BF-F42F-43DE-A3A0-5429A4F85646}.Release|x86.ActiveCfg = Release|Any CPU
 		{5C04C4BF-F42F-43DE-A3A0-5429A4F85646}.Release|x86.Build.0 = Release|Any CPU
+		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Debug|x64.Build.0 = Debug|Any CPU
+		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Debug|x86.Build.0 = Debug|Any CPU
+		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Release|x64.ActiveCfg = Release|Any CPU
+		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Release|x64.Build.0 = Release|Any CPU
+		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Release|x86.ActiveCfg = Release|Any CPU
+		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
