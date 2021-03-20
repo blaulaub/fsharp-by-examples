@@ -84,3 +84,22 @@ let isZero integer = integer (ignore >> fun () -> False) True
 // now we can evaluate such things:
 isZero zero "yes" "no"   // writes "yes"
 isZero five "yes" "no"   // writes "no"
+
+// we can generate lists of things:
+let fiveAs = five (fun ls -> "a" :: ls) []                 // gives ["a"; "a"; "a"; "a"; "a"]
+let fiveAsAndOneB = five (fun ls -> "a" :: ls) [] @ ["b"]  // gives ["a"; "a"; "a"; "a"; "a"; "b"]
+
+// we can generate a list of our integers
+let countTo integer =
+    let step (last, ls) =
+        let next = sum last one
+        (next, next :: ls)
+    let initial = (zero<int>, [zero<int>])
+    let (_, result) = integer step initial
+    result
+
+// and look at them
+countTo five |> List.map eval
+
+// (looking at 'countTo five', we are quite close to the 'fact' example
+// shown around minute six in https://www.youtube.com/watch?v=XrNdvWqxBvA)
