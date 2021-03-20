@@ -91,8 +91,8 @@ let fiveAsAndOneB = five (fun ls -> "a" :: ls) [] @ ["b"]  // gives ["a"; "a"; "
 
 // we can generate a list of our integers
 let countTo integer =
-    let step (last, ls) =
-        let next = sum last one
+    let step (counter, ls) =
+        let next = sum counter one
         (next, next :: ls)
     let initial = (zero<int>, [zero<int>])
     let (_, result) = integer step initial
@@ -100,6 +100,18 @@ let countTo integer =
 
 // and look at them
 countTo five |> List.map eval
+
+// we can count forward and thus find the predecessor
+let decr integer =
+    let step (counter, last) =
+        let next = sum counter one
+        (next, counter)
+    let initial = (zero, zero)
+    let (_, result) = integer step initial
+    result
+
+// and look at it
+decr five |> eval
 
 // (looking at 'countTo five', we are quite close to the 'fact' example
 // shown around minute six in https://www.youtube.com/watch?v=XrNdvWqxBvA)
