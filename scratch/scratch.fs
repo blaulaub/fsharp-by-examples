@@ -25,8 +25,8 @@ do    // just an illustration, 'do ... ()' ensures it will have no effect
     ()
 
 // with explicit typing, to ensure uniform type signature
-let zero<'a> (iter:'a->'a) x :'a = x
-let one<'a>  (iter:'a->'a) x = iter x
+let zero<'a> (incr:'a->'a) (neutral:'a) :'a = neutral
+let one<'a>  (incr:'a->'a) (neutral:'a) :'a = incr neutral
 
 // we can evaluate the integer
 // (given an inc-by-one as iter function and 0 as input value)
@@ -38,7 +38,7 @@ do    // just an illustration, 'do ... ()' ensures it will have no effect
     ()
 
 // with explicit typing for uniform type signatures
-let sum<'a> (a:('a ->'a)->'a->'a) (b:('a ->'a)->'a->'a) iter x = b iter (a iter x)
+let sum<'a> (a:('a ->'a)->'a->'a) (b:('a ->'a)->'a->'a) (incr:'a->'a) (neutral:'a) = b incr (a incr neutral)
 
 // we can construct more integers using sums
 let two<'a>   = sum<'a> one one
@@ -47,12 +47,13 @@ let five<'a>  = sum<'a> two three
 let seven<'a> = sum<'a> two five
 
 // and recover the integer value
+two   ((+)1) 0
 three ((+)1) 0
 five  ((+)1) 0
 seven ((+)1) 0
 
 // we can compute products
-let prod<'a> (a:('a ->'a)->'a->'a) (b:('a ->'a)->'a->'a) iter x = b (a iter) x
+let prod<'a> (a:('a ->'a)->'a->'a) (b:('a ->'a)->'a->'a) (incr:'a->'a) (neutral:'a) = b (a incr) neutral
 
 // we can construct more integers using products
 let four<'a>  = prod<'a> two two
