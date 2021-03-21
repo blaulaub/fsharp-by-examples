@@ -12,12 +12,6 @@ let isEmpty (board: Board) =
                      | Some _ -> false
                      | None -> true) true) true
 
-let setNum row col num (board: Board) : Board =
-    let copy = Array.copy board
-    copy.[row] <- Array.copy copy.[row]
-    copy.[row].[col] <- num
-    copy
-
 let getNum row col (board: Board) : int option =
     board.[row].[col]
 
@@ -46,6 +40,7 @@ let getMissingForList (numbers: int option array) (expected: int list) =
     [ for num in expected do if not (numbers |> Array.contains (Some num)) then num ]
 
 // looks vertically, horizontally and in the subsquare and returns missing possible numbers
+// (this is the actual sudoku rule for insertions, but without check that the field must be empty)
 let getMissingFromBoard row col (board: Board) =
     [ 1 .. 9 ]
     |> getMissingForList (getRow row board)

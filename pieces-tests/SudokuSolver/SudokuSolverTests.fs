@@ -33,13 +33,6 @@ let easyBoard : Board =
 let tests =
     testList "Sudoku solver tests" [
 
-        let getReturnsSet row col num =
-            emptyBoard() |> setNum row col num |> getNum row col = num
-
-        test "set and get" {
-            Expect.isTrue (getReturnsSet 2 3 (Some 5)) ""
-        }
-
         test "get row 0" {
             Expect.equal (getRow 0 difficultBoard) [| None; None; Some 9; Some 4; None; Some 6; Some 1; None; None |] ""
         }
