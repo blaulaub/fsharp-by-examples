@@ -54,7 +54,7 @@ let getMissingFromBoard row col (board: Board) =
 
 // looks for empty fields that have an obvious solution
 // and returns only the newly found values
-let obviouslyMissingOn (board: Board) =
+let obviouslyMissingOn (board: Board) : Board =
     [| for row in 0 .. 8 ->
         [| for col in 0 .. 8 ->
             match getNum row col board with
@@ -66,10 +66,14 @@ let obviouslyMissingOn (board: Board) =
         |]
     |]
 
-let rec trySolveWithObviouslyMissing board =
-    let missings = obviouslyMissingOn board
+// recursive meta-solver that recursively tries to add
+// missing values using some finder method
+let rec trySolveWith missingFinder board =
+    let missings = missingFinder board
     if (missings |> isEmpty)
     then board
     else
         let newBoard = mergeBoards board missings
-        newBoard |> trySolveWithObviouslyMissing
+        newBoard |> trySolveWith missingFinder
+
+let trySolveWithObviouslyMissing = trySolveWith obviouslyMissingOn
