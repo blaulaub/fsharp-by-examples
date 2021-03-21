@@ -99,7 +99,18 @@ let tests =
 
         test "try solve easy board with obviously missing" {
             let solution = trySolveWithObviouslyMissing easyBoard
-            printfn "%A" solution
+            printfn "%s" (
+                solution
+                    |> Array.map (fun row ->
+                        row
+                        |> Array.map (fun field ->
+                            match field with
+                            | Some n -> sprintf "%d" n
+                            | None -> " "
+                            )
+                        |> String.concat " " )
+                    |> String.concat "\n"
+                    )
             Expect.isTrue true "dummy test"
         }
     ]
