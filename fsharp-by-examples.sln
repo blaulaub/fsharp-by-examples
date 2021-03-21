@@ -15,6 +15,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "property-based-testing-demo
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "async-demo", "async-demo\async-demo.fsproj", "{C2063BE9-9534-4805-8E59-A06B90473AA9}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "sudoku-solver", "sudoku-solver\sudoku-solver.fsproj", "{B4F070B6-5C08-4CA0-AC91-F9BCB05CB8B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -100,5 +102,17 @@ Global
 		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Release|x64.Build.0 = Release|Any CPU
 		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Release|x86.ActiveCfg = Release|Any CPU
 		{C2063BE9-9534-4805-8E59-A06B90473AA9}.Release|x86.Build.0 = Release|Any CPU
+		{B4F070B6-5C08-4CA0-AC91-F9BCB05CB8B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4F070B6-5C08-4CA0-AC91-F9BCB05CB8B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4F070B6-5C08-4CA0-AC91-F9BCB05CB8B0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B4F070B6-5C08-4CA0-AC91-F9BCB05CB8B0}.Debug|x64.Build.0 = Debug|Any CPU
+		{B4F070B6-5C08-4CA0-AC91-F9BCB05CB8B0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B4F070B6-5C08-4CA0-AC91-F9BCB05CB8B0}.Debug|x86.Build.0 = Debug|Any CPU
+		{B4F070B6-5C08-4CA0-AC91-F9BCB05CB8B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4F070B6-5C08-4CA0-AC91-F9BCB05CB8B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4F070B6-5C08-4CA0-AC91-F9BCB05CB8B0}.Release|x64.ActiveCfg = Release|Any CPU
+		{B4F070B6-5C08-4CA0-AC91-F9BCB05CB8B0}.Release|x64.Build.0 = Release|Any CPU
+		{B4F070B6-5C08-4CA0-AC91-F9BCB05CB8B0}.Release|x86.ActiveCfg = Release|Any CPU
+		{B4F070B6-5C08-4CA0-AC91-F9BCB05CB8B0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -7,9 +7,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\pieces\pieces.fsproj" />
+    <ProjectReference Include="..\sudoku-solver\sudoku-solver.fsproj" />
     <PackageReference Include="Expecto" Version="9.0.2" />
     <Compile Include="ComputationExpressions/LikeNormalTest.fs" />
     <Compile Include="ComputationExpressions/MaybeTest.fs" />
+    <Compile Include="ComputationExpressions/MaybeTest.fs" />
+    <Compile Include="SudokuSolver/SudokuSolverTests.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
 
