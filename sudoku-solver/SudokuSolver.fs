@@ -6,11 +6,7 @@ let emptyBoard () : Board =
     [| for _ in 0 .. 9 -> [| for _ in 0..9 -> None |] |]
 
 let isEmpty (board: Board) =
-    board |> Seq.fold (fun state row ->
-        state && row |> Seq.fold (fun state num ->
-            state && match num with
-                     | Some _ -> false
-                     | None -> true) true) true
+    board |> Seq.forall(Seq.forall(Option.isNone))
 
 let getNum row col (board: Board) : int option =
     board.[row].[col]
