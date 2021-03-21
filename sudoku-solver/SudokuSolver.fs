@@ -32,3 +32,17 @@ let getMissingFromBoard row col (board: Board) =
     |> getMissingForList (getRow row board)
     |> getMissingForList (getCol col board)
     |> getMissingForList (getSquare (row/3) (col/3) board)
+
+// looks for empty fields that have an obvious solution
+// and returns only the newly found values
+let obviouslyMissingOn (board: Board) =
+    [| for row in 0 .. 8 ->
+        [| for col in 0 .. 8 ->
+            match getNum row col board with
+            | Some num -> None
+            | None ->
+                match getMissingFromBoard row col board with
+                | [ num ] -> Some num
+                | _ -> None
+        |]
+    |]

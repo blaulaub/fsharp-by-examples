@@ -16,6 +16,19 @@ let difficultBoard : Board =
         [| None  ; None  ; Some 1; Some 8; None  ; Some 4; Some 3; None  ; None   |]
     |]
 
+let easyBoard : Board =
+    [|
+        [|Some 5; Some 4; None; None; Some 3; None; None; Some 9; Some 2|];
+        [|Some 2; None; Some 3; Some 7; None; Some 5; Some 1; None; Some 6|];
+        [|None; Some 9; None; Some 4; None; Some 6; None; Some 5; None|];
+        [|None; Some 2; Some 9; None; None; None; Some 5; Some 1; None|];
+        [|Some 1; None; None; None; None; None; None; None; Some 9|];
+        [|None; Some 7; Some 5; None; None; None; Some 3; Some 6; None|];
+        [|None; Some 1; None; Some 2; None; Some 9; None; Some 3; None|];
+        [|Some 9; None; Some 7; Some 8; None; Some 3; Some 4; None; Some 1|];
+        [|Some 3; Some 5; None; None; Some 4; None; None; Some 7; Some 8|]
+    |]
+
 [<Tests>]
 let tests =
     testList "Sudoku solver tests" [
@@ -73,5 +86,17 @@ let tests =
 
         test "get missing 7 7 for difficultBoard" {
             Expect.equal (getMissingFromBoard 7 7 difficultBoard) [ 4;5;6;7 ] ""
+        }
+
+        test "estimate obviously missing on difficult board" {
+            let missings = obviouslyMissingOn difficultBoard
+            printfn "%A" missings
+            Expect.isTrue true "dummy test"
+        }
+
+        test "estimate obviously missing on easy board" {
+            let missings = obviouslyMissingOn easyBoard
+            printfn "%A" missings
+            Expect.isTrue true "dummy test"
         }
     ]
