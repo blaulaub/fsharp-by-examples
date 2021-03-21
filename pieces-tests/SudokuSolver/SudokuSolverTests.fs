@@ -50,4 +50,16 @@ let tests =
         test "get square 2 2" {
             Expect.equal (getSquare 2 2 difficultBoard) [| None; None; Some 8; None; None; None; Some 3; None; None |] ""
         }
+
+        test "get missing" {
+            Expect.equal (getMissing [| Some 5; Some 3; None; Some 7 |]) [1;2;4;6;8;9] ""
+        }
+
+        test "get no missing for 1..9" {
+            Expect.equal (getMissing ([| 1 .. 9 |] |> Array.map (fun x -> Some x))) [] ""
+        }
+
+        test "get 1..9 missing for empty" {
+            Expect.equal (getMissing ([| 1 .. 9 |] |> Array.map (fun x -> None))) [ 1 .. 9 ] ""
+        }
     ]

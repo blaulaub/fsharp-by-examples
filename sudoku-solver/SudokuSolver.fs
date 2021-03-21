@@ -22,3 +22,6 @@ let getCol col (board: Board) : int option array =
 
 let getSquare squareRow squareCol (board: Board) : int option array =
     [| for row in 0 .. 2 do for col in 0 .. 2 do yield board.[squareRow*3+row].[squareCol*3+col] |]
+
+let getMissing (numbers: int option array) =
+    [ for num in 1 .. 9 do if not (numbers |> Array.contains (Some num)) then num ]
