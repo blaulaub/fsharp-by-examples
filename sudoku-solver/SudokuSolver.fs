@@ -1,4 +1,4 @@
-﻿module SudokuSolver
+module SudokuSolver
 
 type Board = int option array array
 
@@ -23,7 +23,12 @@ let getCol col (board: Board) : int option array =
 let getSquare squareRow squareCol (board: Board) : int option array =
     [| for row in 0 .. 2 do for col in 0 .. 2 do yield board.[squareRow*3+row].[squareCol*3+col] |]
 
-let getMissingFrom (expected: int list) (numbers: int option array) =
+let getMissingForList (numbers: int option array) (expected: int list) =
     [ for num in expected do if not (numbers |> Array.contains (Some num)) then num ]
 
-let getMissing = getMissingFrom [ 1 .. 9 ]
+// looks vertically, horizontally and in the subsquare and returns missing possible numbers
+let getMissingFromBoard row col (board: Board) =
+    [ 1 .. 9 ]
+    |> getMissingForList (getRow row board)
+    |> getMissingForList (getCol col board)
+    |> getMissingForList (getSquare (row/3) (col/3) board)

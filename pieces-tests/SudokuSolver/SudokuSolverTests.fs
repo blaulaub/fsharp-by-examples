@@ -52,14 +52,26 @@ let tests =
         }
 
         test "get missing" {
-            Expect.equal (getMissing [| Some 5; Some 3; None; Some 7 |]) [1;2;4;6;8;9] ""
+            Expect.equal (getMissingForList [| Some 5; Some 3; None; Some 7 |] [ 1.. 9 ]) [1;2;4;6;8;9] ""
         }
 
         test "get no missing for 1..9" {
-            Expect.equal (getMissing ([| 1 .. 9 |] |> Array.map (fun x -> Some x))) [] ""
+            Expect.equal (getMissingForList ([| 1 .. 9 |] |> Array.map (fun x -> Some x)) [ 1.. 9 ]) [] ""
         }
 
         test "get 1..9 missing for empty" {
-            Expect.equal (getMissing ([| 1 .. 9 |] |> Array.map (fun x -> None))) [ 1 .. 9 ] ""
+            Expect.equal (getMissingForList ([| 1 .. 9 |] |> Array.map (fun x -> None)) [ 1.. 9 ]) [ 1 .. 9 ] ""
+        }
+
+        test "get missing 0 0 for difficultBoard" {
+            Expect.equal (getMissingFromBoard 0 0 difficultBoard) [ 2;3;7;8 ] ""
+        }
+
+        test "get missing 1 4 for difficultBoard" {
+            Expect.equal (getMissingFromBoard 1 4 difficultBoard) [ 1;2;3;9 ] ""
+        }
+
+        test "get missing 7 7 for difficultBoard" {
+            Expect.equal (getMissingFromBoard 7 7 difficultBoard) [ 4;5;6;7 ] ""
         }
     ]
