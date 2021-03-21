@@ -5,6 +5,13 @@ type Board = int option array array
 let emptyBoard () : Board =
     [| for _ in 0 .. 9 -> [| for _ in 0..9 -> None |] |]
 
+let isEmpty (board: Board) =
+    board |> Seq.fold (fun state row ->
+        state && row |> Seq.fold (fun state num ->
+            state && match num with
+                     | Some _ -> false
+                     | None -> true) true) true
+
 let setNum row col num (board: Board) : Board =
     let copy = Array.copy board
     copy.[row] <- Array.copy copy.[row]

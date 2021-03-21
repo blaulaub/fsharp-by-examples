@@ -88,15 +88,13 @@ let tests =
             Expect.equal (getMissingFromBoard 7 7 difficultBoard) [ 4;5;6;7 ] ""
         }
 
-        test "estimate obviously missing on difficult board" {
-            let missings = obviouslyMissingOn difficultBoard
-            printfn "%A" missings
-            Expect.isTrue true "dummy test"
+        test "none obviously missing on difficult board" {
+            Expect.isTrue (obviouslyMissingOn difficultBoard |> isEmpty) "dummy test"
         }
 
         test "estimate obviously missing on easy board" {
             let missings = obviouslyMissingOn easyBoard
             printfn "%A" missings
-            Expect.isTrue true "dummy test"
+            Expect.isFalse (missings |> isEmpty) "dummy test"
         }
     ]
