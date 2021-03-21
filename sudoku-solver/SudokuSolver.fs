@@ -13,3 +13,12 @@ let setNum row col num (board: Board) : Board =
 
 let getNum row col (board: Board) : int option =
     board.[row].[col]
+
+let getRow row (board: Board) : int option array =
+    [| for col in 0 .. 8 -> board.[row].[col] |]
+
+let getCol col (board: Board) : int option array =
+    [| for row in 0 .. 8 -> board.[row].[col] |]
+
+let getSquare squareRow squareCol (board: Board) : int option array =
+    [| for row in 0 .. 2 do for col in 0 .. 2 do yield board.[squareRow*3+row].[squareCol*3+col] |]
