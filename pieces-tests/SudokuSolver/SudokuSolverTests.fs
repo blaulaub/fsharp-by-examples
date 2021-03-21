@@ -89,12 +89,17 @@ let tests =
         }
 
         test "none obviously missing on difficult board" {
-            Expect.isTrue (obviouslyMissingOn difficultBoard |> isEmpty) "dummy test"
+            Expect.isTrue (obviouslyMissingOn difficultBoard |> isEmpty) ""
         }
 
         test "estimate obviously missing on easy board" {
             let missings = obviouslyMissingOn easyBoard
-            printfn "%A" missings
-            Expect.isFalse (missings |> isEmpty) "dummy test"
+            Expect.isFalse (missings |> isEmpty) ""
+        }
+
+        test "try solve easy board with obviously missing" {
+            let solution = trySolveWithObviouslyMissing easyBoard
+            printfn "%A" solution
+            Expect.isTrue true "dummy test"
         }
     ]

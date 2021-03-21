@@ -21,6 +21,18 @@ let setNum row col num (board: Board) : Board =
 let getNum row col (board: Board) : int option =
     board.[row].[col]
 
+let mergeBoards (board1: Board) (board2: Board) =
+    [| for row in 0 .. 8 ->
+        [| for col in 0 .. 8 ->
+            match (getNum row col board1, getNum row col board2) with
+            | (None, None) -> None
+            | (Some num, None) -> Some num
+            | (None, Some num) -> Some num
+            | (Some num1, Some num2) when num1 = num2 -> Some num1
+            | _ -> failwith "cannot merge boards"
+        |]
+    |]
+
 let getRow row (board: Board) : int option array =
     [| for col in 0 .. 8 -> board.[row].[col] |]
 
@@ -53,3 +65,11 @@ let obviouslyMissingOn (board: Board) =
                 | _ -> None
         |]
     |]
+
+let rec trySolveWithObviouslyMissing board =
+    let missings = obviouslyMissingOn board
+    if (missings |> isEmpty)
+    then board
+    else
+        let newBoard = mergeBoards board missings
+        newBoard |> trySolveWithObviouslyMissing
