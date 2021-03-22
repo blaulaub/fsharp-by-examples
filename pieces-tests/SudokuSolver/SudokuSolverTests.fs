@@ -3,7 +3,7 @@ module SudokuSolverTests
 open Expecto
 open SudokuSolver
 
-let difficultBoard : Board =
+let difficultBoard : KnownValues =
     [|
         [| None  ; None  ; Some 9; Some 4; None  ; Some 6; Some 1; None  ; None   |];
         [| None  ; None  ; None  ; Some 5; None  ; Some 7; None  ; None  ; None   |];
@@ -16,7 +16,7 @@ let difficultBoard : Board =
         [| None  ; None  ; Some 1; Some 8; None  ; Some 4; Some 3; None  ; None   |]
     |]
 
-let easyBoard : Board =
+let easyBoard : KnownValues =
     [|
         [|Some 5; Some 4; None; None; Some 3; None; None; Some 9; Some 2|];
         [|Some 2; None; Some 3; Some 7; None; Some 5; Some 1; None; Some 6|];
@@ -33,77 +33,108 @@ let easyBoard : Board =
 let tests =
     testList "Sudoku solver tests" [
 
-        test "get row 0" {
-            Expect.equal (getRow 0 difficultBoard) [| None; None; Some 9; Some 4; None; Some 6; Some 1; None; None |] ""
+        test "try solve difficult board" {
+
+            let initialBoard = difficultBoard
+
+            // initially, each field in row 0..8 col 0..8 either has a precise
+            // value from the initial board, or it can have any value 1..9
+            let possibilities : int list array array =
+                [| for row in 0..8 ->
+                    [| for col in 0..8 ->
+                        match initialBoard.[row].[col] with
+                        | Some num -> [ num ]  // restrict to the
+                        | None -> [1..9]
+                    |]
+                |]
+
+            // initially, the solution is plain empty (the data from the initial
+            // board is in the initial possibilities)
+            let solution : int option array array =
+                [| for row in 0..8 ->
+                    [| for col in 0..8 ->
+                        None
+                    |]
+                |]
+
+            // build niner groups (rows, cols, sub-blocks) for analysis
+            // note: the actual lists are returned by-reference,
+            // i.e., updates are shared (visible to others)
+            let ninerRowGroups =
+                [|
+                    for row in 0..8 -> NinerRowGroup {
+                        Row = row
+                        Values = [| for col in 0..8 -> possibilities.[row].[col] |]
+                    }
+                |]
+            let ninerColGroups =
+                [|
+                    for col in 0..8 -> NinerColGroup {
+                        Col = col
+                        Values = [| for row in 0..8 -> possibilities.[row].[col] |]
+                    }
+                |]
+            let ninerSubBlock =
+                [|
+                    for subRow in 0..2 do
+                    for subCol in 0..2 -> NinerSubBlock {
+                        SubRow = subRow
+                        SubCol = subCol
+                        Values = [| for row in 0..2 do for col in 0..2 -> possibilities.[row + 3*subRow].[col+3*subCol] |]
+                    }
+                |]
+
+            //=============================
+            // Eliminate obvious solutions
+            //=============================
+
+            // if a possibilities field contains a single value, that value must be the solution
+            // (also eliminate it from all groups)
+            let obviousUpdates = seq {
+                for row in 0..8 do
+                for col in 0..8 do
+                match possibilities.[row].[col] with
+                | [ num ] ->
+                    yield {
+                        Update = { Row = row; Col = col; Value = num }
+                        Reductions = [
+                            RemoveFromRow { Row = row; Value = num }
+                            RemoveFromCol { Col = col; Value = num }
+                            RemoveFromSubBlock { SupRow = row/3; SupCol = col/3; Value = num}
+                        ]
+                    }
+                | _ -> ()  // do nothing
+            }
+
+            //======================
+            // Analyze Niner Groups
+            //======================
+
+
+            let ninerGroups = seq {
+                yield! ninerRowGroups
+                yield! ninerColGroups
+                yield! ninerSubBlock
+            }
+
+            seq {
+                for ninerGroup in ninerGroups do
+                    // get the values (regardless of group type) for analysis
+                    let values =
+                        match ninerGroup with
+                        | NinerRowGroup { Values = values }
+                        | NinerColGroup { Values = values }
+                        | NinerSubBlock { Values = values } -> values
+                    // count occurences
+                    let occurences = [ for num in 1..9 -> values |> Seq.filter (fun x -> x |> List.contains num) |> Seq.length ]
+                    occurences |> ignore
+            }
+            // for now, ignore it
+            |> ignore
+
+
+
+            Expect.isTrue true "dummy"
         }
 
-        test "get row 8" {
-            Expect.equal (getRow 8 difficultBoard) [| None; None; Some 1; Some 8; None; Some 4; Some 3; None; None |] ""
-        }
-
-        test "get col 0" {
-            Expect.equal (getCol 0 difficultBoard) [| None; None; Some 5; Some 4; None; Some 1; Some 9; None; None |] ""
-        }
-
-        test "get col 8" {
-            Expect.equal (getCol 8 difficultBoard) [| None; None; Some 3; Some 9; None; Some 4; Some 8; None  ; None |] ""
-        }
-
-        test "get square 0 1" {
-            Expect.equal (getSquare 0 1 difficultBoard) [| Some 4; None; Some 6; Some 5; None; Some 7; None; Some 8; None |] ""
-        }
-
-        test "get square 2 2" {
-            Expect.equal (getSquare 2 2 difficultBoard) [| None; None; Some 8; None; None; None; Some 3; None; None |] ""
-        }
-
-        test "get missing" {
-            Expect.equal (getMissingForList [| Some 5; Some 3; None; Some 7 |] [ 1.. 9 ]) [1;2;4;6;8;9] ""
-        }
-
-        test "get no missing for 1..9" {
-            Expect.equal (getMissingForList ([| 1 .. 9 |] |> Array.map (fun x -> Some x)) [ 1.. 9 ]) [] ""
-        }
-
-        test "get 1..9 missing for empty" {
-            Expect.equal (getMissingForList ([| 1 .. 9 |] |> Array.map (fun x -> None)) [ 1.. 9 ]) [ 1 .. 9 ] ""
-        }
-
-        test "get missing 0 0 for difficultBoard" {
-            Expect.equal (getMissingFromBoard 0 0 difficultBoard) [ 2;3;7;8 ] ""
-        }
-
-        test "get missing 1 4 for difficultBoard" {
-            Expect.equal (getMissingFromBoard 1 4 difficultBoard) [ 1;2;3;9 ] ""
-        }
-
-        test "get missing 7 7 for difficultBoard" {
-            Expect.equal (getMissingFromBoard 7 7 difficultBoard) [ 4;5;6;7 ] ""
-        }
-
-        test "none obviously missing on difficult board" {
-            Expect.isTrue (obviouslyMissingOn difficultBoard |> isEmpty) ""
-        }
-
-        test "estimate obviously missing on easy board" {
-            let missings = obviouslyMissingOn easyBoard
-            Expect.isFalse (missings |> isEmpty) ""
-        }
-
-        test "try solve easy board with obviously missing" {
-            let solution = trySolveWithObviouslyMissing easyBoard
-            printfn "%s" (
-                solution
-                    |> Array.map (fun row ->
-                        row
-                        |> Array.map (fun field ->
-                            match field with
-                            | Some n -> sprintf "%d" n
-                            | None -> " "
-                            )
-                        |> String.concat " " )
-                    |> String.concat "\n"
-                    )
-            Expect.isTrue true "dummy test"
-        }
     ]
