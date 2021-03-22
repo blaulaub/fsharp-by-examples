@@ -7,7 +7,7 @@ type KnownValues = int option array array
 type UpdateKnownValues = { Row: int; Col: int; Value: int }
 
 // a board with remaing Possibilities
-type Possiblities = int list array array
+type Possibilities = int list array array
 
 // actions on a board of possibilities
 type RemovePossibilityFromRow = { Row: int; Value: int }
@@ -22,7 +22,7 @@ type PossibilityReduction =
 
 type SolutionState = {
     Board: KnownValues
-    Possibilities: Possiblities
+    Possibilities: Possibilities
 }
 
 // a solution update for both
