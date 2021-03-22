@@ -145,8 +145,31 @@ let tests =
                 let newPossibilities = reductions |> List.fold applyPossibilityUpdate oldPossibilities
                 { Board = newBoard; Possibilities = newPossibilities }
 
+            //====================================
+            // Put this so far to the test
+            //====================================
+
+            let recoveredInitialSudoku initialSudoku =
+                let state0 = initialState initialSudoku
+                let { Board = _; Possibilities = possibilities0 } = state0
+                let updates0 = obviousUpdates possibilities0
+                let state1 = updates0 |> Seq.fold applySolutionUpdate state0
+                let { Board = board1; Possibilities = _ } = state1
+                board1
+            Expect.equal (recoveredInitialSudoku easySudoku) easySudoku ""
+            Expect.equal (recoveredInitialSudoku difficultSudoku) difficultSudoku ""
 
 
+// =======================================================================================
+// so far, so good..
+// we have covered the case where a single-possible-value is recognized as solution
+// ---
+// but that's not the way
+// what should be done is to eliminate possibilites
+// (that comes below)
+// ---
+// when everything is done: cleanup and shorten the code
+// ======================================================================================
 
             // build niner groups (rows, cols, sub-blocks) for analysis
             // note: the actual lists are returned by-reference,
