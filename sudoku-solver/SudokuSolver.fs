@@ -2,7 +2,7 @@ module SudokuSolver
 
 type Sudoku = int option array array
 
-let print (sudoku: Sudoku) =
+let print (sudoku: Sudoku): unit =
     let multilineOutput =
         sudoku
         |> Seq.map (fun line ->
@@ -29,7 +29,7 @@ let options (sudoku: Sudoku): Options =
 
 type NinerRow = { Row: int; Values: int list array }
 
-let ninerRows (opts: Options) = seq {
+let ninerRows (opts: Options): NinerRow seq = seq {
     for row in 0..8 -> {
         Row = row
         Values = [| for col in 0..8 -> opts.[row].[col] |]
@@ -38,7 +38,7 @@ let ninerRows (opts: Options) = seq {
 
 type NinerColumn = { Col: int; Values: int list array }
 
-let ninerColumns (opts: Options) = seq {
+let ninerColumns (opts: Options): NinerColumn seq = seq {
     for col in 0..8 -> {
         Col = col
         Values = [| for row in 0..8 -> opts.[row].[col] |]
@@ -47,7 +47,7 @@ let ninerColumns (opts: Options) = seq {
 
 type NinerSubblock = { SupRow: int; SupCol: int; Values: int list array }
 
-let ninerSubblocks (opts: Options) = seq {
+let ninerSubblocks (opts: Options): NinerSubblock seq = seq {
     for supRow in 0..2 do
     for supCol in 0..2 -> {
         SupRow = supRow
@@ -61,15 +61,46 @@ type NinerGroups =
 | Column of NinerColumn
 | Subblock of NinerSubblock
 
-let ninerGroups (opts: Options) = seq {
+let ninerGroups (opts: Options): NinerGroups seq = seq {
     yield! ninerRows opts |> Seq.map Row
     yield! ninerColumns opts |> Seq.map Column
     yield! ninerSubblocks opts |> Seq.map Subblock
 }
 
+type SingularOption = { Row: int; Col: int; Value: int }
+
+let singularOptions (opts: Options): SingularOption seq = seq {
+    for row in 0..8 do
+    for col in 0..8 do
+    match opts.[row].[col] with
+    | [ num ] -> yield { Row = row; Col = col; Value = num }
+    | _ -> ()
+}
+
+type SolutionState = { Board: Sudoku; Options: Options }
+
+let emptySudoku (): Sudoku =
+    [| for row in 0..8 ->
+        [| for col in 0..8 ->
+            None
+        |]
+    |]
+
+let initialSolutionState (sudoku: Sudoku): SolutionState =
+    {
+        Board = emptySudoku ()
+        Options = options sudoku
+    }
+
+type SolutionStep =
+| ApplySingularOption of SingularOption
+
 let solve sudoku : Sudoku =
 
-    let opts = options sudoku
-    let groups = ninerGroups opts
+    let initialState = initialSolutionState sudoku
+
+    let singularOptions = singularOptions initialState.Options
+
+    let groups = ninerGroups initialState.Options
 
     sudoku
