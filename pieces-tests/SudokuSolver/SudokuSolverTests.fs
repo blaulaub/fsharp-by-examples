@@ -36,7 +36,7 @@ let tests =
         test "try solve some board" {
             let initial = easySudoku
             let final = SudokuSolver.solve initial
-            SudokuSolver.print final
+            SudokuSolver.toString final |> printfn "%s"
             Expect.equal final initial "no progress (yet)"
         }
     ]

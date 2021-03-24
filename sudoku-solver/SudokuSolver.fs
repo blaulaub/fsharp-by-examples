@@ -1,23 +1,39 @@
 module SudokuSolver
 
+/// <summary>
+/// A Sudoku board. Some of the fields contain an integer value,
+/// some of them are empty.
+/// </summary>
 type Sudoku = int option array array
 
-let print (sudoku: Sudoku): unit =
-    let multilineOutput =
-        sudoku
-        |> Seq.map (fun line ->
-            line
-            |> Seq.map (fun field ->
-                match field with
-                | Some digit -> sprintf "%d" digit
-                | None -> " ")
-            |> String.concat " "
-            )
-        |> String.concat "\n"
-    printfn "%s" multilineOutput
+/// <summary>
+/// Dump the Sudoku into a nine-line-nine-column string.
+/// </summary>
+let toString (sudoku: Sudoku): string =
+    sudoku
+    |> Seq.map (fun line ->
+        line
+        |> Seq.map (fun field ->
+            match field with
+            | Some digit -> sprintf "%d" digit
+            | None -> " ")
+        |> String.concat " "
+        )
+    |> String.concat "\n"
 
+/// <summary>
+/// A Sudoku board not with the solution, but with the possible
+/// numbers.
+/// </summary>
+/// <remarks>
+/// Instead of an algorithm trying to make <see cref="Sudoku"/> complete,
+/// we will look for an algorithm trying to make <see cref="Options"/> empty.
+/// </remarks>
 type Options = int list array array
 
+/// <summary>
+/// Derives initial options from a given <see cref="Sudoku"/> setup.
+/// </summary>
 let options (sudoku: Sudoku): Options =
     [| for row in 0..8 ->
         [| for col in 0..8 ->
