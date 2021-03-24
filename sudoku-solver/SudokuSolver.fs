@@ -6,6 +6,13 @@ module SudokuSolver
 /// </summary>
 type Sudoku = int option array array
 
+let mapForRowAndColBy action source =
+    [| for row in 0..8 ->
+        [| for col in 0..8 ->
+            action source row col
+        |]
+    |]
+
 /// <summary>
 /// Dump the Sudoku into a nine-line-nine-column string.
 /// </summary>
@@ -35,13 +42,12 @@ type Options = int list array array
 /// Derives initial options from a given <see cref="Sudoku"/> setup.
 /// </summary>
 let options (sudoku: Sudoku): Options =
-    [| for row in 0..8 ->
-        [| for col in 0..8 ->
-            match sudoku.[row].[col] with
+    sudoku
+    |> mapForRowAndColBy (fun source row col ->
+            match source.[row].[col] with
             | Some num -> [ num ]
             | None -> [ 1..9]
-        |]
-    |]
+        )
 
 type NinerRow = { Row: int; Values: int list array }
 
