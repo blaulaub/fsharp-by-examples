@@ -1,32 +1,37 @@
 module SudokuSolver
 
-/// <summary>
-/// A Sudoku board. Some of the fields contain an integer value,
-/// some of them are empty.
-/// </summary>
-type Sudoku = int option array array
+type RowAndColumnBoard<'T> = 'T array array
 
-let mapForRowAndColBy action source =
+let mapForRowAndColBy<'In, 'Out> action (source: 'In RowAndColumnBoard): 'Out RowAndColumnBoard =
     [| for row in 0..8 ->
         [| for col in 0..8 ->
             action source row col
         |]
     |]
 
+let boardToString<'T> (fieldToString: 'T -> string) (board: 'T RowAndColumnBoard) =
+    board
+    |> Seq.map (fun line ->
+        line
+        |> Seq.map fieldToString
+        |> String.concat ""
+        )
+    |> String.concat "\n"
+
+/// <summary>
+/// A Sudoku board. Some of the fields contain an integer value,
+/// some of them are empty.
+/// </summary>
+type Sudoku = int option RowAndColumnBoard
+
 /// <summary>
 /// Dump the Sudoku into a nine-line-nine-column string.
 /// </summary>
-let toString (sudoku: Sudoku): string =
-    sudoku
-    |> Seq.map (fun line ->
-        line
-        |> Seq.map (fun field ->
-            match field with
-            | Some digit -> sprintf "%d" digit
-            | None -> " ")
-        |> String.concat " "
-        )
-    |> String.concat "\n"
+let toString = boardToString (fun x ->
+    match x with
+    | Some value -> sprintf " %d " value
+    | None -> "   "
+    )
 
 /// <summary>
 /// A Sudoku board not with the solution, but with the possible
@@ -36,7 +41,7 @@ let toString (sudoku: Sudoku): string =
 /// Instead of an algorithm trying to make <see cref="Sudoku"/> complete,
 /// we will look for an algorithm trying to make <see cref="Options"/> empty.
 /// </remarks>
-type Options = int list array array
+type Options = int list RowAndColumnBoard
 
 /// <summary>
 /// Derives initial options from a given <see cref="Sudoku"/> setup.
@@ -134,14 +139,13 @@ let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
             |]
         let oldOptions = oldState.Options
         let newOptions =
-            [| for row in 0..8 ->
-                [| for col in 0..8 ->
-                    oldOptions.[row].[col]
-                    |> Seq.filter (fun value ->
-                        value <> num || row <> targetRow || col <> targetCol || (row/3) <> (targetRow/3) || (col/3)<>(targetCol/3))
-                    |> Seq.toList
-                |]
-            |]
+            oldOptions
+            |> mapForRowAndColBy (fun source row col ->
+                source.[row].[col]
+                |> Seq.filter (fun value ->
+                    value <> num || row <> targetRow || col <> targetCol || (row/3) <> (targetRow/3) || (col/3)<>(targetCol/3))
+                |> Seq.toList
+            )
         { Board = newBoard; Options = newOptions }
 
 let solve sudoku : Sudoku =
