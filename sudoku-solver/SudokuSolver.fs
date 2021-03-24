@@ -9,6 +9,9 @@ let mapForRowAndColBy<'In, 'Out> action (source: 'In RowAndColumnBoard): 'Out Ro
         |]
     |]
 
+let mapEachFieldBy<'In, 'Out> action (source: 'In RowAndColumnBoard): 'Out RowAndColumnBoard =
+    mapForRowAndColBy (fun source row col -> action source.[row].[col]) source
+
 let boardToString<'T> (fieldToString: 'T -> string) (board: 'T RowAndColumnBoard) =
     board
     |> Seq.map (fun line ->
@@ -48,8 +51,8 @@ type Options = int list RowAndColumnBoard
 /// </summary>
 let options (sudoku: Sudoku): Options =
     sudoku
-    |> mapForRowAndColBy (fun source row col ->
-            match source.[row].[col] with
+    |> mapEachFieldBy (fun field ->
+            match field with
             | Some num -> [ num ]
             | None -> [ 1..9]
         )
