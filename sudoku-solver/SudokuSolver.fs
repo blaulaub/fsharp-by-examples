@@ -95,6 +95,27 @@ let initialSolutionState (sudoku: Sudoku): SolutionState =
 type SolutionStep =
 | ApplySingularOption of SingularOption
 
+let applyStep (step: SolutionStep) (oldState: SolutionState): SolutionState =
+    match step with
+    | ApplySingularOption { Row = targetRow; Col = targetCol; Value = num } ->
+        let oldBoard = oldState.Board
+        let newBoard =
+            [| for row in 0..8 ->
+                if row <> targetRow
+                then oldBoard.[row]
+                else
+                    [| for col in 0..8 ->
+                        if col <> targetCol
+                        then oldBoard.[row].[col]
+                        else Some num
+                    |]
+            |]
+        let oldOptions = oldState.Options
+        let newOptions =
+            oldOptions // not correct; remove from row, col, subgroup
+
+        { Board = newBoard; Options = newOptions }
+
 let solve sudoku : Sudoku =
 
     let initialState = initialSolutionState sudoku
