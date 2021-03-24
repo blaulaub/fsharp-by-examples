@@ -34,6 +34,9 @@ let easySudoku =
 let tests =
     testList "Sudoku solver tests" [
         test "try solve some board" {
-            SudokuSolver.print (SudokuSolver.solve easySudoku)
+            let initial = easySudoku
+            let final = SudokuSolver.solve initial
+            SudokuSolver.print final
+            Expect.equal final initial "no progress (yet)"
         }
     ]

@@ -95,7 +95,7 @@ let initialSolutionState (sudoku: Sudoku): SolutionState =
 type SolutionStep =
 | ApplySingularOption of SingularOption
 
-let applyStep (step: SolutionStep) (oldState: SolutionState): SolutionState =
+let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
     match step with
     | ApplySingularOption { Row = targetRow; Col = targetCol; Value = num } ->
         let oldBoard = oldState.Board
@@ -112,8 +112,14 @@ let applyStep (step: SolutionStep) (oldState: SolutionState): SolutionState =
             |]
         let oldOptions = oldState.Options
         let newOptions =
-            oldOptions // not correct; remove from row, col, subgroup
-
+            [| for row in 0..8 ->
+                [| for col in 0..8 ->
+                    oldOptions.[row].[col]
+                    |> Seq.filter (fun value ->
+                        value <> num || row <> targetRow || col <> targetCol || (row/3) <> (targetRow/3) || (col/3)<>(targetCol/3))
+                    |> Seq.toList
+                |]
+            |]
         { Board = newBoard; Options = newOptions }
 
 let solve sudoku : Sudoku =
@@ -124,4 +130,9 @@ let solve sudoku : Sudoku =
 
     let groups = ninerGroups initialState.Options
 
-    sudoku
+    let finalState =
+        singularOptions
+        |> Seq.map ApplySingularOption
+        |> Seq.fold applyStep initialState
+
+    finalState.Board
