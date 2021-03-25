@@ -2,9 +2,11 @@ module SudokuSolver
 
 type RowAndColumnBoard<'T> = 'T array array
 
+let indices (data: 'T array) : int seq = seq { 0..(data.Length-1) }
+
 let mapForRowAndColBy<'In, 'Out> action (source: 'In RowAndColumnBoard): 'Out RowAndColumnBoard =
-    [| for row in 0..8 ->
-        [| for col in 0..8 ->
+    [| for row in indices source ->
+        [| for col in indices source.[row] ->
             action source row col
         |]
     |]
@@ -54,7 +56,7 @@ let options (sudoku: Sudoku): Options =
     |> mapEachFieldBy (fun field ->
             match field with
             | Some num -> [ num ]
-            | None -> [ 1..9]
+            | None -> [1..9]
         )
 
 type NinerRow = { Row: int; Values: int list array }
@@ -97,9 +99,17 @@ let ninerGroups (opts: Options): NinerGroups seq = seq {
     yield! ninerSubblocks opts |> Seq.map Subblock
 }
 
+/// <summary>
+/// A singular option is a field on the board where
+/// only one value can possibly be the solution.
+/// </summary>
 type SingularOption = { Row: int; Col: int; Value: int }
 
-let singularOptions (opts: Options): SingularOption seq = seq {
+/// <summary>
+/// Find and return all fields that have a
+/// single possible solution.
+/// </summary>
+let findSingularOptions (opts: Options): SingularOption seq = seq {
     for row in 0..8 do
     for col in 0..8 do
     match opts.[row].[col] with
@@ -122,12 +132,14 @@ let initialSolutionState (sudoku: Sudoku): SolutionState =
         Options = options sudoku
     }
 
+/// <summary>
+/// Union of all considered kinds of solution steps.
+/// </summary>
 type SolutionStep =
 | ApplySingularOption of SingularOption
 
-let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
-    match step with
-    | ApplySingularOption { Row = targetRow; Col = targetCol; Value = num } ->
+let applySingularOption { Row = targetRow; Col = targetCol; Value = num } oldState =
+        printfn "field row %d col %d has single option %d" targetRow targetCol num
         let oldBoard = oldState.Board
         let newBoard =
             [| for row in 0..8 ->
@@ -151,17 +163,57 @@ let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
             )
         { Board = newBoard; Options = newOptions }
 
+let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
+    match step with
+    | ApplySingularOption option -> applySingularOption option oldState
+
+/// <summary>
+/// A number of field indices that is occupied by an equal number of values,
+/// meaning that no other value can be on these indices without overflowing.
+/// </summary>
+type ExclussivelyOccupiedFields = {
+    values: int array
+    indices: int array
+}
+
+let eachAsZero (values: 'T array) = [| for _ in values -> 0 |]
+let count      (values: int list) length = [| for idx in 0..(length-1) -> if (values |> List.contains idx) then 1 else 0 |]
+
+let findOccupiedCells (values: int list array) =
+    let up = values.Length - 1
+    values |> Array.fold (fun state l ->
+        l |> List.fold (fun state v ->
+            // note: we may create a lots of arrays here, maybe that is not cheap...
+            [| for idx in 0..up -> state.[idx] + if idx = v then 1 else 0 |]
+        ) state
+    ) [| for _ in 0..up -> 0 |]
+
 let solve sudoku : Sudoku =
 
     let initialState = initialSolutionState sudoku
 
-    let singularOptions = singularOptions initialState.Options
-
-    let groups = ninerGroups initialState.Options
-
-    let finalState =
-        singularOptions
+    let findAndEliminateSingularOptions state =
+        let options = findSingularOptions state.Options
+        options
         |> Seq.map ApplySingularOption
-        |> Seq.fold applyStep initialState
+        |> Seq.fold applyStep state
+
+    let state2 =
+        initialState
+        |> findAndEliminateSingularOptions
+
+    let groups = ninerGroups state2.Options
+
+    for group in groups do
+        match group with
+        | Row { Row = targetRow; Values = values } ->
+            ()
+        | Column { Col = targetCol; Values = values } ->
+            ()
+        | Subblock { SupRow = supRow; SupCol = supCol; Values = values } ->
+            ()
+
+
+    let finalState = state2
 
     finalState.Board
