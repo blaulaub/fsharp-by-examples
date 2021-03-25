@@ -176,9 +176,6 @@ type ExclussivelyOccupiedFields = {
     indices: int array
 }
 
-let eachAsZero (values: 'T array) = [| for _ in values -> 0 |]
-let count      (values: int list) length = [| for idx in 0..(length-1) -> if (values |> List.contains idx) then 1 else 0 |]
-
 let findOccupiedCells (values: int list array) =
     let up = values.Length - 1
     values |> Array.fold (fun state l ->
