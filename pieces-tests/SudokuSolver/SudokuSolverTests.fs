@@ -34,7 +34,7 @@ let easySudoku =
 let tests =
     testList "Sudoku solver tests" [
 
-        test "verify findOccupiedCells" {
+        test "verify countPerValue" {
             Expect.equal [| |] (SudokuSolver.countPerValue [| |]) "empty of zero"
             Expect.equal [| 0 |] (SudokuSolver.countPerValue [| [] |]) "empty of one"
             Expect.equal [| 1 |] (SudokuSolver.countPerValue [| [1] |]) "one of one"
@@ -43,6 +43,18 @@ let tests =
             Expect.equal [| 0; 2 |] (SudokuSolver.countPerValue [| [2]; [2] |]) "second of two twice"
             Expect.equal [| 2; 2; 2 |] (SudokuSolver.countPerValue [| [1;2]; [2;3]; [3;1] |]) "circular with two from three"
             Expect.equal [| 1; 2; 3 |] (SudokuSolver.countPerValue [| [1;2;3]; [2;3]; [3] |]) "descending with three"
+        }
+
+        test "verify toOrderedPresence" {
+            let subSorted = Array.map (List.sort)
+            Expect.equal (subSorted [| |]) (SudokuSolver.toOrderedPresence [| |] |> subSorted) "empty of zero"
+            Expect.equal (subSorted [| [] |]) (SudokuSolver.toOrderedPresence [| [] |] |> subSorted) "empty of one"
+            Expect.equal (subSorted [| [0] |]) (SudokuSolver.toOrderedPresence [| [1] |] |> subSorted) "one of one"
+            Expect.equal (subSorted [| [0]; [1] |]) (SudokuSolver.toOrderedPresence [| [1]; [2] |] |> subSorted) "one of two each"
+            Expect.equal (subSorted [| [1;0]; [] |]) (SudokuSolver.toOrderedPresence [| [1]; [1] |] |> subSorted) "first of two twice"
+            Expect.equal (subSorted [| []; [1;0] |]) (SudokuSolver.toOrderedPresence [| [2]; [2] |] |> subSorted) "second of two twice"
+            Expect.equal (subSorted [| [2;0]; [1;0]; [2;1] |]) (SudokuSolver.toOrderedPresence [| [1;2]; [2;3]; [3;1] |] |> subSorted) "circular with two from three"
+            Expect.equal (subSorted [| [0]; [1;0]; [2;1;0] |]) (SudokuSolver.toOrderedPresence [| [1;2;3]; [2;3]; [3] |] |> subSorted) "descending with three"
         }
 
         test "try solve some board" {
