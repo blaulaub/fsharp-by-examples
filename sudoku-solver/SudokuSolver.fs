@@ -176,12 +176,12 @@ type ExclussivelyOccupiedFields = {
     indices: int array
 }
 
-let findOccupiedCells (values: int list array) =
+let countPerValue (values: int list array) : int array =
     let up = values.Length - 1
     values |> Array.fold (fun state l ->
         l |> List.fold (fun state v ->
             // note: we may create a lots of arrays here, maybe that is not cheap...
-            [| for idx in 0..up -> state.[idx] + if idx = v then 1 else 0 |]
+            [| for idx in 0..up -> state.[idx] + if idx = (v-1) then 1 else 0 |]
         ) state
     ) [| for _ in 0..up -> 0 |]
 
@@ -204,11 +204,14 @@ let solve sudoku : Sudoku =
     for group in groups do
         match group with
         | Row { Row = targetRow; Values = values } ->
-            ()
+            countPerValue values
+            |> ignore
         | Column { Col = targetCol; Values = values } ->
-            ()
+            countPerValue values
+            |> ignore
         | Subblock { SupRow = supRow; SupCol = supCol; Values = values } ->
-            ()
+            countPerValue values
+            |> ignore
 
 
     let finalState = state2

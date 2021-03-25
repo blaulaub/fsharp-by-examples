@@ -35,12 +35,14 @@ let tests =
     testList "Sudoku solver tests" [
 
         test "verify findOccupiedCells" {
-            Expect.equal [| |] (SudokuSolver.findOccupiedCells [| |]) "empty of zero"
-            Expect.equal [| 0 |] (SudokuSolver.findOccupiedCells [| [] |]) "empty of one"
-            Expect.equal [| 1 |] (SudokuSolver.findOccupiedCells [| [0] |]) "one of one"
-            Expect.equal [| 1; 1 |] (SudokuSolver.findOccupiedCells [| [0]; [1] |]) "one of two each"
-            Expect.equal [| 2; 0 |] (SudokuSolver.findOccupiedCells [| [0]; [0] |]) "first of two twice"
-            Expect.equal [| 0; 2 |] (SudokuSolver.findOccupiedCells [| [1]; [1] |]) "second of two twice"
+            Expect.equal [| |] (SudokuSolver.countPerValue [| |]) "empty of zero"
+            Expect.equal [| 0 |] (SudokuSolver.countPerValue [| [] |]) "empty of one"
+            Expect.equal [| 1 |] (SudokuSolver.countPerValue [| [1] |]) "one of one"
+            Expect.equal [| 1; 1 |] (SudokuSolver.countPerValue [| [1]; [2] |]) "one of two each"
+            Expect.equal [| 2; 0 |] (SudokuSolver.countPerValue [| [1]; [1] |]) "first of two twice"
+            Expect.equal [| 0; 2 |] (SudokuSolver.countPerValue [| [2]; [2] |]) "second of two twice"
+            Expect.equal [| 2; 2; 2 |] (SudokuSolver.countPerValue [| [1;2]; [2;3]; [3;1] |]) "circular with two from three"
+            Expect.equal [| 1; 2; 3 |] (SudokuSolver.countPerValue [| [1;2;3]; [2;3]; [3] |]) "descending with three"
         }
 
         test "try solve some board" {
