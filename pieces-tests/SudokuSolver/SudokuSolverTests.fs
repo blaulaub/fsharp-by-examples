@@ -46,15 +46,15 @@ let tests =
         }
 
         test "verify toOrderedPresence" {
-            let subSorted = Array.map (List.sort)
-            Expect.equal (subSorted [| |]) (SudokuSolver.toOrderedPresence [| |] |> subSorted) "empty of zero"
-            Expect.equal (subSorted [| [] |]) (SudokuSolver.toOrderedPresence [| [] |] |> subSorted) "empty of one"
-            Expect.equal (subSorted [| [0] |]) (SudokuSolver.toOrderedPresence [| [1] |] |> subSorted) "one of one"
-            Expect.equal (subSorted [| [0]; [1] |]) (SudokuSolver.toOrderedPresence [| [1]; [2] |] |> subSorted) "one of two each"
-            Expect.equal (subSorted [| [1;0]; [] |]) (SudokuSolver.toOrderedPresence [| [1]; [1] |] |> subSorted) "first of two twice"
-            Expect.equal (subSorted [| []; [1;0] |]) (SudokuSolver.toOrderedPresence [| [2]; [2] |] |> subSorted) "second of two twice"
-            Expect.equal (subSorted [| [2;0]; [1;0]; [2;1] |]) (SudokuSolver.toOrderedPresence [| [1;2]; [2;3]; [3;1] |] |> subSorted) "circular with two from three"
-            Expect.equal (subSorted [| [0]; [1;0]; [2;1;0] |]) (SudokuSolver.toOrderedPresence [| [1;2;3]; [2;3]; [3] |] |> subSorted) "descending with three"
+            let subSorted = Array.map List.sort
+            Expect.equal ([| |]                     |> SudokuSolver.toOrderedPresence) [| |]                        "empty of zero"
+            Expect.equal ([| [] |]                  |> SudokuSolver.toOrderedPresence) [| [] |]                     "empty of one"
+            Expect.equal ([| [1] |]                 |> SudokuSolver.toOrderedPresence) [| [0] |]                    "one of one"
+            Expect.equal ([| [1]; [2] |]            |> SudokuSolver.toOrderedPresence) [| [0]; [1] |]               "one of two each"
+            Expect.equal ([| [1]; [1] |]            |> SudokuSolver.toOrderedPresence) [| [0; 1]; [] |]             "first of two twice"
+            Expect.equal ([| [2]; [2] |]            |> SudokuSolver.toOrderedPresence) [| []; [0; 1] |]             "second of two twice"
+            Expect.equal ([| [1;2]; [2;3]; [3;1] |] |> SudokuSolver.toOrderedPresence) [| [0; 2]; [0; 1]; [1; 2] |] "circular with two from three"
+            Expect.equal ([| [1;2;3]; [2;3]; [3] |] |> SudokuSolver.toOrderedPresence) [| [0]; [0; 1]; [0; 1; 2] |] "descending with three"
         }
 
         test "try solve some board" {
