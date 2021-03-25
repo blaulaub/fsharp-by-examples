@@ -167,15 +167,6 @@ let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
     match step with
     | ApplySingularOption option -> applySingularOption option oldState
 
-/// <summary>
-/// A number of field indices that is occupied by an equal number of values,
-/// meaning that no other value can be on these indices without overflowing.
-/// </summary>
-type ExclussivelyOccupiedFields = {
-    values: int array
-    indices: int array
-}
-
 let countPerValue (values: int list array) : int array =
     let up = values.Length - 1
     values |> Array.fold (fun state l ->
