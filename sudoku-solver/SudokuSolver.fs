@@ -186,9 +186,6 @@ let toOrderedPresence (values: int list array) : int list array =
         )
     ) (up, [| for _ in 0..up -> [] |]) |> snd
 
-let countPerValue (values: int list array) : int array =
-    values |> toOrderedPresence |> Array.map (fun l -> l.Length)
-
 let solve sudoku : Sudoku =
 
     let initialState = initialSolutionState sudoku
@@ -208,13 +205,13 @@ let solve sudoku : Sudoku =
     for group in groups do
         match group with
         | Row { Row = targetRow; Values = values } ->
-            countPerValue values
+            toOrderedPresence values
             |> ignore
         | Column { Col = targetCol; Values = values } ->
-            countPerValue values
+            toOrderedPresence values
             |> ignore
         | Subblock { SupRow = supRow; SupCol = supCol; Values = values } ->
-            countPerValue values
+            toOrderedPresence values
             |> ignore
 
 
