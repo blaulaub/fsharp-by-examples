@@ -167,20 +167,6 @@ let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
     match step with
     | ApplySingularOption option -> applySingularOption option oldState
 
-let countPerValue (values: int list array) : int array =
-    let up = values.Length - 1
-    values |> Array.fold (fun state l ->
-        l |> List.fold (fun state v ->
-            // note: we may create a lots of arrays here, maybe that is not cheap...
-            [|
-                for idx in 0..up ->
-                    if idx = (v-1)
-                    then state.[idx] + 1
-                    else state.[idx]
-            |]
-        ) state
-    ) [| for _ in 0..up -> 0 |]
-
 let toOrderedPresence (values: int list array) : int list array =
     let up = values.Length - 1
     values
@@ -199,6 +185,20 @@ let toOrderedPresence (values: int list array) : int list array =
             ) state
         )
     ) (up, [| for _ in 0..up -> [] |]) |> snd
+
+let countPerValue (values: int list array) : int array =
+    let up = values.Length - 1
+    values |> Array.fold (fun state l ->
+        l |> List.fold (fun state v ->
+            // note: we may create a lots of arrays here, maybe that is not cheap...
+            [|
+                for idx in 0..up ->
+                    if idx = (v-1)
+                    then state.[idx] + 1
+                    else state.[idx]
+            |]
+        ) state
+    ) [| for _ in 0..up -> 0 |]
 
 let solve sudoku : Sudoku =
 

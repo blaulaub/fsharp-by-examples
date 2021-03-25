@@ -34,17 +34,6 @@ let easySudoku =
 let tests =
     testList "Sudoku solver tests" [
 
-        test "verify countPerValue" {
-            Expect.equal [| |] (SudokuSolver.countPerValue [| |]) "empty of zero"
-            Expect.equal [| 0 |] (SudokuSolver.countPerValue [| [] |]) "empty of one"
-            Expect.equal [| 1 |] (SudokuSolver.countPerValue [| [1] |]) "one of one"
-            Expect.equal [| 1; 1 |] (SudokuSolver.countPerValue [| [1]; [2] |]) "one of two each"
-            Expect.equal [| 2; 0 |] (SudokuSolver.countPerValue [| [1]; [1] |]) "first of two twice"
-            Expect.equal [| 0; 2 |] (SudokuSolver.countPerValue [| [2]; [2] |]) "second of two twice"
-            Expect.equal [| 2; 2; 2 |] (SudokuSolver.countPerValue [| [1;2]; [2;3]; [3;1] |]) "circular with two from three"
-            Expect.equal [| 1; 2; 3 |] (SudokuSolver.countPerValue [| [1;2;3]; [2;3]; [3] |]) "descending with three"
-        }
-
         test "verify toOrderedPresence" {
             let subSorted = Array.map List.sort
             Expect.equal ([| |]                     |> SudokuSolver.toOrderedPresence) [| |]                        "empty of zero"
@@ -55,6 +44,17 @@ let tests =
             Expect.equal ([| [2]; [2] |]            |> SudokuSolver.toOrderedPresence) [| []; [0; 1] |]             "second of two twice"
             Expect.equal ([| [1;2]; [2;3]; [3;1] |] |> SudokuSolver.toOrderedPresence) [| [0; 2]; [0; 1]; [1; 2] |] "circular with two from three"
             Expect.equal ([| [1;2;3]; [2;3]; [3] |] |> SudokuSolver.toOrderedPresence) [| [0]; [0; 1]; [0; 1; 2] |] "descending with three"
+        }
+
+        test "verify countPerValue" {
+            Expect.equal ([| |]                     |> SudokuSolver.countPerValue) [| |]         "empty of zero"
+            Expect.equal ([| [] |]                  |> SudokuSolver.countPerValue) [| 0 |]       "empty of one"
+            Expect.equal ([| [1] |]                 |> SudokuSolver.countPerValue) [| 1 |]       "one of one"
+            Expect.equal ([| [1]; [2] |]            |> SudokuSolver.countPerValue) [| 1; 1 |]    "one of two each"
+            Expect.equal ([| [1]; [1] |]            |> SudokuSolver.countPerValue) [| 2; 0 |]    "first of two twice"
+            Expect.equal ([| [2]; [2] |]            |> SudokuSolver.countPerValue) [| 0; 2 |]    "second of two twice"
+            Expect.equal ([| [1;2]; [2;3]; [3;1] |] |> SudokuSolver.countPerValue) [| 2; 2; 2 |] "circular with two from three"
+            Expect.equal ([| [1;2;3]; [2;3]; [3] |] |> SudokuSolver.countPerValue) [| 1; 2; 3 |] "descending with three"
         }
 
         test "try solve some board" {
