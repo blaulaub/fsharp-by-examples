@@ -46,6 +46,7 @@ let tests =
             Expect.equal ([| [1;2;3]; [2;3]; [3] |] |> SudokuSolver.toOrderedPresence) [| [0]; [0; 1]; [0; 1; 2] |] "descending with three"
         }
 
+        // kind of redundant now, "countPerValue" simply maps "toOrderedPresence" from [ list ] to [ length of list ]
         test "verify countPerValue" {
             Expect.equal ([| |]                     |> SudokuSolver.countPerValue) [| |]         "empty of zero"
             Expect.equal ([| [] |]                  |> SudokuSolver.countPerValue) [| 0 |]       "empty of one"

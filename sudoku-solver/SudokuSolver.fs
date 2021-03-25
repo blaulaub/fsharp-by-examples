@@ -187,18 +187,7 @@ let toOrderedPresence (values: int list array) : int list array =
     ) (up, [| for _ in 0..up -> [] |]) |> snd
 
 let countPerValue (values: int list array) : int array =
-    let up = values.Length - 1
-    values |> Array.fold (fun state l ->
-        l |> List.fold (fun state v ->
-            // note: we may create a lots of arrays here, maybe that is not cheap...
-            [|
-                for idx in 0..up ->
-                    if idx = (v-1)
-                    then state.[idx] + 1
-                    else state.[idx]
-            |]
-        ) state
-    ) [| for _ in 0..up -> 0 |]
+    values |> toOrderedPresence |> Array.map (fun l -> l.Length)
 
 let solve sudoku : Sudoku =
 
