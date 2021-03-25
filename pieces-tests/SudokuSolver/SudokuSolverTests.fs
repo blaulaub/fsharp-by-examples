@@ -33,6 +33,16 @@ let easySudoku =
 [<Tests>]
 let tests =
     testList "Sudoku solver tests" [
+
+        test "verify findOccupiedCells" {
+            Expect.equal [| |] (SudokuSolver.findOccupiedCells [| |]) "empty of zero"
+            Expect.equal [| 0 |] (SudokuSolver.findOccupiedCells [| [] |]) "empty of one"
+            Expect.equal [| 1 |] (SudokuSolver.findOccupiedCells [| [0] |]) "one of one"
+            Expect.equal [| 1; 1 |] (SudokuSolver.findOccupiedCells [| [0]; [1] |]) "one of two each"
+            Expect.equal [| 2; 0 |] (SudokuSolver.findOccupiedCells [| [0]; [0] |]) "first of two twice"
+            Expect.equal [| 0; 2 |] (SudokuSolver.findOccupiedCells [| [1]; [1] |]) "second of two twice"
+        }
+
         test "try solve some board" {
             let initial = easySudoku
             let final = SudokuSolver.solve initial
