@@ -125,6 +125,9 @@ let initialSolutionState (sudoku: Sudoku): SolutionState =
 /// </summary>
 type SolutionStep =
 | ApplySingularOption of SingularOption
+| SingleInRow of SingularOption
+| SingleInColumn of SingularOption
+| SingleInBlock of SingularOption
 
 /// <summary>
 /// Find and return all fields that have a
@@ -139,9 +142,19 @@ let findSingularOptions (opts: Options): SolutionStep seq = seq {
 }
 
 let eliminateOption (source: int list) row col targetRow targetCol targetNum: int list =
+    if row>8 then failwith "bad row"
+    if col>8 then failwith "bad col"
+    if targetRow>8 then failwith "bad targetRow"
+    if targetCol>8 then failwith "bad targetCol"
+    if targetNum<1 then failwith "bad targetNum"
     if row <> targetRow && col <> targetCol && (row/3 <> targetRow/3 || col/3 <> targetCol/3)
     then source
-    else [ for num in source do if num <> targetNum then num ]
+    else
+        [
+            for num in source do
+                if num<1 then failwith "bad num"
+                if num <> targetNum then num
+        ]
 
 let applySingularOption { Row = targetRow; Col = targetCol; Value = num } (options: Options) : Options =
     options
@@ -169,7 +182,18 @@ let applySingularOptionToState { Row = targetRow; Col = targetCol; Value = num }
 
 let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
     match step with
-    | ApplySingularOption option -> applySingularOptionToState option oldState
+    | ApplySingularOption option ->
+        printfn "(singular option)"
+        applySingularOptionToState option oldState
+    | SingleInRow option ->
+        printfn "(singular in row)"
+        applySingularOptionToState option oldState
+    | SingleInColumn option ->
+        printfn "(singular in column)"
+        applySingularOptionToState option oldState
+    | SingleInBlock option ->
+        printfn "(singular in block)"
+        applySingularOptionToState option oldState
 
 let toOrderedPresence (values: int list array) : int list array =
     let up = values.Length - 1
@@ -201,7 +225,7 @@ let analyse (group : NinerGroup) : SolutionStep seq =
                 for i in 0..up do
                     match values.[i] with
                     | [ col ] ->
-                        yield ApplySingularOption { Row = targetRow; Col = col; Value = i+1 }
+                        yield SingleInRow { Row = targetRow; Col = col; Value = i+1 }
                     | _ -> ()
                 // TODO: also find multiple presence
                 }
@@ -213,7 +237,7 @@ let analyse (group : NinerGroup) : SolutionStep seq =
                 for i in 0..up do
                     match values.[i] with
                     | [ row ] ->
-                        yield ApplySingularOption { Row = row; Col = targetCol; Value = i+1 }
+                        yield SingleInColumn { Row = row; Col = targetCol; Value = i+1 }
                     | _ -> ()
                 // TODO: also find multiple presence
                 }
@@ -227,7 +251,7 @@ let analyse (group : NinerGroup) : SolutionStep seq =
                     | [ block ] ->
                         let subRow = block/3
                         let subCol = block%3
-                        yield ApplySingularOption { Row = supRow*3+subRow; Col = supCol*3+subCol; Value = i+1 }
+                        yield SingleInBlock { Row = supRow*3+subRow; Col = supCol*3+subCol; Value = i+1 }
                     | _ -> ()
                 // TODO: also find multiple presence
                 }
@@ -249,29 +273,3 @@ let rec solveState state preAction =
     match next with
     | Some newState -> solveState newState preAction
     | None -> state
-
-let solve sudoku : Sudoku =
-
-    let findAndEliminateSingularOptions state =
-        findSingularOptions state.Options
-        |> Seq.fold applyStep state
-
-    let analyseAndEliminateGroups state2 =
-        let groups2 = ninerGroups state2.Options
-        let steps2 = seq {
-            for group in groups2 do
-                yield! analyse group
-            }
-        steps2 |> Seq.fold applyStep state2
-
-    let initialState = initialSolutionState sudoku
-
-    let finalState =
-        initialState
-        |> findAndEliminateSingularOptions
-        |> analyseAndEliminateGroups
-        |> findAndEliminateSingularOptions
-//        |> analyseAndEliminateGroups
-//        |> findAndEliminateSingularOptions
-
-    finalState.Board
