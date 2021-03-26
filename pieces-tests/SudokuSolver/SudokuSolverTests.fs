@@ -126,9 +126,13 @@ let tests =
         }
 
         test "try solve some board" {
-            let initial = easySudoku
-            let final = SudokuSolver.solve initial
-            SudokuSolver.toString final |> printfn "%s"
-            Expect.isTrue true "dummy"
+            let initialState =
+                SudokuSolver.initialSolutionState easySudoku
+            let finalState =
+                SudokuSolver.solveState initialState (fun state ->
+                    printfn "-----------------"
+                    SudokuSolver.toString state.Board |> printfn "%s"
+                )
+            ()
         }
     ]

@@ -232,6 +232,24 @@ let analyse (group : NinerGroup) : SolutionStep seq =
                 // TODO: also find multiple presence
                 }
 
+let steps options = seq {
+    // first try eliminating singular options
+    yield! findSingularOptions options
+    // next try checking groups
+    for group in ninerGroups options do
+        yield! analyse group
+}
+
+let rec solveState state preAction =
+    preAction state
+    let next =
+        steps state.Options
+        |> Seq.tryHead
+        |> Option.map (applyStep state)
+    match next with
+    | Some newState -> solveState newState preAction
+    | None -> state
+
 let solve sudoku : Sudoku =
 
     let findAndEliminateSingularOptions state =
