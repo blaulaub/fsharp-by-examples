@@ -60,15 +60,15 @@ let tests =
         test "verify analyse for everything possible" {
             let values =
                 [|
-                    [0..9];
-                    [0..9];
-                    [0..9];
-                    [0..9];
-                    [0..9];
-                    [0..9];
-                    [0..9];
-                    [0..9];
-                    [0..9]
+                    [1..9];
+                    [1..9];
+                    [1..9];
+                    [1..9];
+                    [1..9];
+                    [1..9];
+                    [1..9];
+                    [1..9];
+                    [1..9]
                 |]
 
             let rowSteps = SudokuSolver.analyse (SudokuSolver.Row { Row = 0; Values = values }) |> Seq.toList
@@ -84,15 +84,15 @@ let tests =
         test "verify analyse for one possible" {
             let values =
                 [|
-                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
-                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
-                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
-                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
-                    [0..9];
-                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
-                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
-                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
-                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
+                    [1; 2; 3; 4;   6; 7; 8; 9];
+                    [1; 2; 3; 4;   6; 7; 8; 9];
+                    [1; 2; 3; 4;   6; 7; 8; 9];
+                    [1; 2; 3; 4;   6; 7; 8; 9];
+                    [1..9];
+                    [1; 2; 3; 4;   6; 7; 8; 9];
+                    [1; 2; 3; 4;   6; 7; 8; 9];
+                    [1; 2; 3; 4;   6; 7; 8; 9];
+                    [1; 2; 3; 4;   6; 7; 8; 9];
                 |]
 
             let rowSteps = SudokuSolver.analyse (SudokuSolver.Row { Row = 0; Values = values }) |> Seq.toList
@@ -103,6 +103,26 @@ let tests =
 
             let blockSteps = SudokuSolver.analyse (SudokuSolver.Subblock { SupRow = 0; SupCol = 0; Values = values }) |> Seq.toList
             Expect.equal blockSteps [SudokuSolver.ApplySingularOption { Row = 1; Col = 1; Value = 5 }] "find solution 5 in block"
+        }
+
+        test "verify applySingularOption" {
+
+            let initialOptions () = [| for _ in 0..8 -> [| for _ in 0..8 -> [1..9] |] |]
+
+            let singularOption : SudokuSolver.SingularOption = { Row = 0; Col = 4; Value = 5 }
+            let remainingOptions = SudokuSolver.applySingularOption singularOption (initialOptions())
+
+            for row in 0..8 do
+            for col in 0..8 do
+                match (row, col) with
+                | (0, _) ->
+                    Expect.equal (remainingOptions.[row].[col]) [1;2;3;4; 6;7;8;9] (sprintf "in row at row %d col %d" row col)
+                | (_, 4) ->
+                    Expect.equal (remainingOptions.[row].[col]) [1;2;3;4; 6;7;8;9] (sprintf "in column at row %d col %d" row col)
+                | (_, _) when (row/3=0 && col/3=1) ->
+                    Expect.equal (remainingOptions.[row].[col]) [1;2;3;4; 6;7;8;9] (sprintf "in block at row %d col %d" row col)
+                | _ ->
+                    Expect.equal (remainingOptions.[row].[col]) [1..9]             (sprintf "elsewhere at row %d col %d" row col)
         }
 
         test "try solve some board" {
