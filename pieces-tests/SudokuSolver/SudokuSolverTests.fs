@@ -243,6 +243,97 @@ let tests =
 
         }
 
+        test "verify niner groups to ordered presence" {
+            let initialOptions () = [| for _ in 0..8 -> [| for _ in 0..8 -> [1..9] |] |]
+            for { Values = niner } in SudokuSolver.ninerColumns (initialOptions()) do
+                Expect.equal niner [| for _ in 0..8 -> [1..9] |] "initial match"
+
+            let singularOption : SudokuSolver.SingularOption = { Row = 0; Col = 4; Value = 5 }
+            let remainingOptions = SudokuSolver.applySingularOption singularOption (initialOptions())
+
+            let ninerRows = SudokuSolver.ninerRows remainingOptions |> Seq.toArray
+            for row in 0..8 do
+                let ninerRow = ninerRows.[row].Values |> SudokuSolver.toOrderedPresence
+                Expect.equal ninerRow (
+                    match row with
+                    | 0 ->
+                        [|
+                            [0..8];[0..8];[0..8]
+                            [0..8];[]    ;[0..8]
+                            [0..8];[0..8];[0..8]
+                        |]
+                    | 1 | 2 ->
+                        [|
+                            [0..8];[0..8]       ;[0..8]
+                            [0..8];[0..2]@[6..8];[0..8]
+                            [0..8];[0..8]       ;[0..8]
+                        |]
+                    | _ ->
+                        [|
+                            [0..8];[0..8]       ;[0..8]
+                            [0..8];[0..3]@[5..8];[0..8]
+                            [0..8];[0..8]       ;[0..8]
+                        |]
+                ) (sprintf "row %d after match" row)
+
+            let ninerColumns = SudokuSolver.ninerColumns remainingOptions |> Seq.toArray
+            for col in 0..8 do
+                let ninerColumn = ninerColumns.[col].Values |> SudokuSolver.toOrderedPresence
+                Expect.equal ninerColumn (
+                    match col with
+                    | 4 ->
+                        [|
+                            [0..8];[0..8];[0..8]
+                            [0..8];[]    ;[0..8]
+                            [0..8];[0..8];[0..8]
+                        |]
+                    | 3 | 5 ->
+                        [|
+                            [0..8];[0..8];[0..8]
+                            [0..8];[3..8];[0..8]
+                            [0..8];[0..8];[0..8]
+                        |]
+                    | _ ->
+                        [|
+                            [0..8];[0..8];[0..8]
+                            [0..8];[1..8];[0..8]
+                            [0..8];[0..8];[0..8]
+                        |]
+                ) (sprintf "column %d after match" col)
+
+            let ninerSubblocks = SudokuSolver.ninerSubblocks remainingOptions |> Seq.toArray
+            for block in 0..8 do
+                let ninerSubblock = ninerSubblocks.[block].Values |> SudokuSolver.toOrderedPresence
+                Expect.equal ninerSubblock (
+                    match block with
+                    | 1 ->
+                        [|
+                            [0..8];[0..8];[0..8]
+                            [0..8];[]    ;[0..8]
+                            [0..8];[0..8];[0..8]
+                        |]
+                    | 0 | 2 ->
+                        [|
+                            [0..8];[0..8];[0..8]
+                            [0..8];[3..8];[0..8]
+                            [0..8];[0..8];[0..8]
+                        |]
+                    | 4 | 7 ->
+                        [|
+                            [0..8];[0..8]       ;[0..8]
+                            [0..8];[0;2;3;5;6;8];[0..8]
+                            [0..8];[0..8]       ;[0..8]
+                        |]
+                    | _ ->
+                        [|
+                            [0..8];[0..8];[0..8]
+                            [0..8];[0..8];[0..8]
+                            [0..8];[0..8];[0..8]
+                        |]
+                ) (sprintf "block %d after match" block)
+
+        }
+
         test "try solve some board" {
             let initialState =
                 SudokuSolver.initialSolutionState difficultSudoku
