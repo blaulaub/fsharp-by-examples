@@ -127,6 +127,14 @@ type ExclussivePresence = {
     RowsAndColumns: (int * int) list
 }
 
+/// <summary>
+/// A list of values that are definetly not present in a list of fields.
+/// </summary>
+type ConclussiveAbsence = {
+    Numbers: int list
+    RowsAndColumns: (int * int) list
+}
+
 type SolutionState = { Board: Sudoku; Options: Options }
 
 let emptySudoku (): Sudoku =
@@ -148,6 +156,7 @@ let initialSolutionState (sudoku: Sudoku): SolutionState =
 type SolutionStep =
 | ApplySingularOption of SingularOption
 | ExclussiveInGroup of ExclussivePresence
+| AbsentInGroup of ConclussiveAbsence
 
 /// <summary>
 /// Find and return all fields that have a
@@ -174,11 +183,20 @@ let applySingularOption { Row = targetRow; Col = targetCol; Value = targetNum } 
         |]
     |]
 
-let applyExclussivePresence { Numbers = numbers; RowsAndColumns = rowsAndCols } (options: Options) : Options =
+let applyExclussivePresence (presence: ExclussivePresence) (options: Options) : Options =
     [| for row in 0..8 ->
         [| for col in 0..8 ->
-            if rowsAndCols |> List.contains (row, col)
-            then [ for num in options.[row].[col] do if numbers |> List.contains num then num ]
+            if presence.RowsAndColumns |> List.contains (row, col)
+            then [ for num in options.[row].[col] do if presence.Numbers |> List.contains num then num ]
+            else options.[row].[col]
+        |]
+    |]
+
+let applyConclusiveAbsence (absence: ConclussiveAbsence) (options: Options) : Options =
+    [| for row in 0..8 ->
+        [| for col in 0..8 ->
+            if absence.RowsAndColumns |> List.contains (row, col)
+            then [ for num in options.[row].[col] do if not (absence.Numbers |> List.contains num) then num ]
             else options.[row].[col]
         |]
     |]
@@ -203,9 +221,14 @@ let applySingularOptionToState { Row = targetRow; Col = targetCol; Value = num }
             |> applySingularOption { Row = targetRow; Col = targetCol; Value = num }
         { Board = newBoard; Options = newOptions }
 
-let applyExlussivePresenceToState { Numbers = numbers; RowsAndColumns = rowsAndCols } oldState = {
+let applyExlussivePresenceToState (presence: ExclussivePresence) oldState = {
     Board = oldState.Board  // board is not updated
-    Options = oldState.Options |> applyExclussivePresence { Numbers = numbers; RowsAndColumns = rowsAndCols }
+    Options = oldState.Options |> applyExclussivePresence presence
+}
+
+let applyConclusiveAbsenceToState (absence: ConclussiveAbsence) oldState = {
+    Board = oldState.Board  // board is not updated
+    Options = oldState.Options |> applyConclusiveAbsence absence
 }
 
 let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
@@ -216,6 +239,9 @@ let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
     | ExclussiveInGroup presence ->
         printfn "(exclussive values %A at %A)" presence.Numbers presence.RowsAndColumns
         applyExlussivePresenceToState presence oldState
+    | AbsentInGroup absence ->
+        printfn "(absent values %A at %A)" absence.Numbers absence.RowsAndColumns
+        applyConclusiveAbsenceToState absence oldState
 
 let toOrderedPresence (values: int list array) : int list array =
     let up = values.Length - 1
@@ -268,7 +294,7 @@ let matchTwice (mapper: int -> (int * int)) (presence: int list array) = seq {
                     |> Seq.distinct
                     |> Seq.exists (fun p -> places |> List.contains p)
 
-                if canEliminateOthers then yield { Numbers = [ first+1; second+1 ]; RowsAndColumns = places |> List.map mapper }
+                if canEliminateOthers then yield ExclussiveInGroup { Numbers = [ first+1; second+1 ]; RowsAndColumns = places |> List.map mapper }
 
 
     for first in 0..8 do
@@ -299,13 +325,13 @@ let matchTwice (mapper: int -> (int * int)) (presence: int list array) = seq {
                         |> Seq.distinct
                         |> Seq.exists (fun p -> places |> List.contains p)
 
-                    if canEliminateOthers then yield { Numbers = [ first+1; second+1; third+1 ]; RowsAndColumns = places |> List.map mapper }
+                    if canEliminateOthers then yield ExclussiveInGroup { Numbers = [ first+1; second+1; third+1 ]; RowsAndColumns = places |> List.map mapper }
 }
 
 let matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
     for value in 0..8 do
         match presence.[value] with
-        | [ position ] -> yield { Numbers = [value+1]; RowsAndColumns = [ mapper position] }
+        | [ position ] -> yield ExclussiveInGroup { Numbers = [value+1]; RowsAndColumns = [ mapper position] }
         | _ -> ()
 
     yield! matchTwice mapper presence
@@ -317,14 +343,33 @@ let analyse (opts: Options) (group: NinerGroup) : SolutionStep seq =
     values
     |> toOrderedPresence
     |> matchExclussivePresence (fun idx -> fields.[idx] )
-    |> Seq.map ExclussiveInGroup
+
+let analyseCross (opts: Options) (group: SingularCrossGroup) : SolutionStep seq =
+    let source = group.Source |> Seq.toArray
+    let target = group.Target |> Seq.toArray
+
+    let findPossibilities target =
+        target
+        |> Seq.map (fun (row, col) -> opts.[row].[col])
+        |> Seq.concat
+        |> Seq.distinct
+        |> Seq.toList
+
+    let sourcePossibilities () = source |> findPossibilities
+
+    findPossibilities target
+    |> Seq.filter (fun inTarget -> sourcePossibilities() |> List.contains inTarget )
+    |> Seq.map (fun value -> AbsentInGroup { Numbers = [value]; RowsAndColumns = source |> Seq.toList })
 
 let steps options = seq {
     // first try eliminating singular options
     yield! findSingularOptions options
-    // next try checking groups
+    // next try checking niner groups
     for group in ninerGroups() do
         yield! analyse options group
+    // next try checking cross groups
+    for group in singularCrossGroups() do
+        yield! analyseCross options group
 }
 
 let rec solveState state preAction =
