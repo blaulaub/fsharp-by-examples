@@ -105,6 +105,16 @@ let ninerGroups (opts: Options): NinerGroup seq = seq {
 /// </summary>
 type SingularOption = { Row: int; Col: int; Value: int }
 
+/// <summary>
+/// A limited number of values occupies a limited number
+/// of fields, meaning that no other numbers can be on
+/// these fields.
+/// </summary>
+type ExclussivePresence = {
+    Numbers: int list
+    RowsAndColumns: (int * int) list
+}
+
 type SolutionState = { Board: Sudoku; Options: Options }
 
 let emptySudoku (): Sudoku =
@@ -125,9 +135,9 @@ let initialSolutionState (sudoku: Sudoku): SolutionState =
 /// </summary>
 type SolutionStep =
 | ApplySingularOption of SingularOption
-| SingleInRow of SingularOption
-| SingleInColumn of SingularOption
-| SingleInBlock of SingularOption
+| SingleInRow of ExclussivePresence
+| SingleInColumn of ExclussivePresence
+| SingleInBlock of ExclussivePresence
 
 /// <summary>
 /// Find and return all fields that have a
@@ -179,15 +189,16 @@ let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
     | ApplySingularOption option ->
         printfn "(singular option)"
         applySingularOptionToState option oldState
-    | SingleInRow option ->
+    | SingleInRow { Numbers = [value]; RowsAndColumns = [(row, col)] } ->
         printfn "(singular in row)"
-        applySingularOptionToState option oldState
-    | SingleInColumn option ->
+        applySingularOptionToState {Row = row; Col = col; Value = value} oldState
+    | SingleInColumn { Numbers = [value]; RowsAndColumns = [(row, col)] } ->
         printfn "(singular in column)"
-        applySingularOptionToState option oldState
-    | SingleInBlock option ->
+        applySingularOptionToState {Row = row; Col = col; Value = value} oldState
+    | SingleInBlock { Numbers = [value]; RowsAndColumns = [(row, col)] } ->
         printfn "(singular in block)"
-        applySingularOptionToState option oldState
+        applySingularOptionToState {Row = row; Col = col; Value = value} oldState
+    | _ -> failwith (sprintf "unsupported %A" step)
 
 let toOrderedPresence (values: int list array) : int list array =
     let up = values.Length - 1
@@ -222,15 +233,15 @@ let analyse (group : NinerGroup) : SolutionStep seq =
         | Row { Row = targetRow; Values = values } ->
             values
             |> toOrderedPresence
-            |> matchSinglePresence (fun pos value -> SingleInRow { Row = targetRow; Col = pos; Value = value })
+            |> matchSinglePresence (fun pos value -> SingleInRow { Numbers = [value]; RowsAndColumns = [(targetRow, pos)] })
         | Column { Col = targetCol; Values = values } ->
             values
             |> toOrderedPresence
-            |> matchSinglePresence (fun pos value -> SingleInColumn { Row = pos; Col = targetCol; Value = value })
+            |> matchSinglePresence (fun pos value -> SingleInColumn { Numbers = [value]; RowsAndColumns = [(pos, targetCol)] })
         | Subblock { SupRow = supRow; SupCol = supCol; Values = values } ->
             values
             |> toOrderedPresence
-            |> matchSinglePresence (fun pos value -> SingleInBlock { Row = supRow*3+pos/3; Col = supCol*3+pos%3; Value = value })
+            |> matchSinglePresence (fun pos value -> SingleInBlock { Numbers = [value]; RowsAndColumns = [(supRow*3+pos/3, supCol*3+pos%3)] })
 
 let steps options = seq {
     // first try eliminating singular options
