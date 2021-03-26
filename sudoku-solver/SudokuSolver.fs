@@ -59,44 +59,16 @@ let options (sudoku: Sudoku): Options =
             | None -> [1..9]
         )
 
-type NinerRow = { Row: int; Values: int list array }
+type NinerGroup = (int*int) seq
 
-let ninerRows (opts: Options): NinerRow seq = seq {
-    for row in 0..8 -> {
-        Row = row
-        Values = [| for col in 0..8 -> opts.[row].[col] |]
-    }
-}
-
-type NinerColumn = { Col: int; Values: int list array }
-
-let ninerColumns (opts: Options): NinerColumn seq = seq {
-    for col in 0..8 -> {
-        Col = col
-        Values = [| for row in 0..8 -> opts.[row].[col] |]
-    }
-}
-
-type NinerSubblock = { SupRow: int; SupCol: int; Values: int list array }
-
-let ninerSubblocks (opts: Options): NinerSubblock seq = seq {
+let ninerGroups (): NinerGroup seq = seq {
+    for row in 0..8 -> seq { for col in 0..8 -> (row, col) }
+    for col in 0..8 -> seq { for row in 0..8 -> (row, col) }
     for supRow in 0..2 do
-    for supCol in 0..2 -> {
-        SupRow = supRow
-        SupCol = supCol
-        Values = [| for row in 0..2 do for col in 0..2 -> opts.[3*supRow + row].[3*supCol + col] |]
+    for supCol in 0..2 -> seq {
+        for subRow in 0..2 do
+        for subCol in 0..2 -> (supRow*3+subRow, supCol*3+subCol)
     }
-}
-
-type NinerGroup =
-| Row of NinerRow
-| Column of NinerColumn
-| Subblock of NinerSubblock
-
-let ninerGroups (opts: Options): NinerGroup seq = seq {
-    yield! ninerRows opts |> Seq.map Row
-    yield! ninerColumns opts |> Seq.map Column
-    yield! ninerSubblocks opts |> Seq.map Subblock
 }
 
 /// <summary>
@@ -175,9 +147,7 @@ let initialSolutionState (sudoku: Sudoku): SolutionState =
 /// </summary>
 type SolutionStep =
 | ApplySingularOption of SingularOption
-| ExclussiveInRow of ExclussivePresence
-| ExclussiveInColumn of ExclussivePresence
-| ExclussiveInBlock of ExclussivePresence
+| ExclussiveInGroup of ExclussivePresence
 
 /// <summary>
 /// Find and return all fields that have a
@@ -243,9 +213,7 @@ let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
     | ApplySingularOption option ->
         printfn "(singular %d at %dx%d)" option.Value (option.Row+1) (option.Col+1)
         applySingularOptionToState option oldState
-    | ExclussiveInRow presence
-    | ExclussiveInColumn presence
-    | ExclussiveInBlock presence ->
+    | ExclussiveInGroup presence ->
         printfn "(exclussive values %A at %A)" presence.Numbers presence.RowsAndColumns
         applyExlussivePresenceToState presence oldState
 
@@ -343,30 +311,20 @@ let matchExclussivePresence (mapper: int -> (int * int)) (presence: int list arr
     yield! matchTwice mapper presence
 }
 
-let analyse group =
-    match group with
-    | Row { Row = targetRow; Values = values } ->
-        values
-        |> toOrderedPresence
-        |> matchExclussivePresence (mapFromIndexInRow targetRow)
-        |> Seq.map ExclussiveInRow
-    | Column { Col = targetCol; Values = values } ->
-        values
-        |> toOrderedPresence
-        |> matchExclussivePresence (mapFromIndexInColumn targetCol)
-        |> Seq.map ExclussiveInColumn
-    | Subblock { SupRow = supRow; SupCol = supCol; Values = values } ->
-        values
-        |> toOrderedPresence
-        |> matchExclussivePresence (mapFromIndexInBlock (3*supRow+supCol))
-        |> Seq.map ExclussiveInBlock
+let analyse (opts: Options) (group: NinerGroup) : SolutionStep seq =
+    let fields = group |> Seq.toArray
+    let values = [| for (row, col) in fields -> opts.[row].[col] |]
+    values
+    |> toOrderedPresence
+    |> matchExclussivePresence (fun idx -> fields.[idx] )
+    |> Seq.map ExclussiveInGroup
 
 let steps options = seq {
     // first try eliminating singular options
     yield! findSingularOptions options
     // next try checking groups
-    for group in ninerGroups options do
-        yield! analyse group
+    for group in ninerGroups() do
+        yield! analyse options group
 }
 
 let rec solveState state preAction =
