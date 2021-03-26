@@ -114,13 +114,13 @@ let tests =
                 |]
 
             let rowSteps = SudokuSolver.analyse (SudokuSolver.Row { Row = 0; Values = values }) |> Seq.toList
-            Expect.equal rowSteps [SudokuSolver.SingleInRow { Numbers = [5]; RowsAndColumns = [(0, 4)] } ] "find solution 5 in row"
+            Expect.equal rowSteps [SudokuSolver.ExclussiveInRow { Numbers = [5]; RowsAndColumns = [(0, 4)] } ] "find solution 5 in row"
 
             let colSteps = SudokuSolver.analyse (SudokuSolver.Column { Col = 0; Values = values }) |> Seq.toList
-            Expect.equal colSteps [SudokuSolver.SingleInColumn { Numbers = [5]; RowsAndColumns = [(4, 0)] }] "find solution 5 in columns"
+            Expect.equal colSteps [SudokuSolver.ExclussiveInColumn { Numbers = [5]; RowsAndColumns = [(4, 0)] }] "find solution 5 in columns"
 
             let blockSteps = SudokuSolver.analyse (SudokuSolver.Subblock { SupRow = 0; SupCol = 0; Values = values }) |> Seq.toList
-            Expect.equal blockSteps [SudokuSolver.SingleInBlock { Numbers = [5]; RowsAndColumns = [(1, 1)] }] "find solution 5 in block"
+            Expect.equal blockSteps [SudokuSolver.ExclussiveInBlock { Numbers = [5]; RowsAndColumns = [(1, 1)] }] "find solution 5 in block"
         }
 
         test "verify applySingularOption" {

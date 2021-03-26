@@ -138,6 +138,9 @@ type SolutionStep =
 | SingleInRow of ExclussivePresence
 | SingleInColumn of ExclussivePresence
 | SingleInBlock of ExclussivePresence
+| ExclussiveInRow of ExclussivePresence
+| ExclussiveInColumn of ExclussivePresence
+| ExclussiveInBlock of ExclussivePresence
 
 /// <summary>
 /// Find and return all fields that have a
@@ -184,6 +187,9 @@ let applySingularOptionToState { Row = targetRow; Col = targetCol; Value = num }
             |> applySingularOption { Row = targetRow; Col = targetCol; Value = num }
         { Board = newBoard; Options = newOptions }
 
+let applyExlussivePresenceToState { Numbers = numbers; RowsAndColumns = rowsAndCols } oldState =
+    failwith "not impl"
+
 let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
     match step with
     | ApplySingularOption option ->
@@ -198,6 +204,11 @@ let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
     | SingleInBlock { Numbers = [value]; RowsAndColumns = [(row, col)] } ->
         printfn "(singular in block)"
         applySingularOptionToState {Row = row; Col = col; Value = value} oldState
+    | ExclussiveInRow presence
+    | ExclussiveInColumn presence
+    | ExclussiveInBlock presence ->
+        printfn "(exclussive %A)" presence
+        applyExlussivePresenceToState presence oldState
     | _ -> failwith (sprintf "unsupported %A" step)
 
 let toOrderedPresence (values: int list array) : int list array =
@@ -220,28 +231,34 @@ let toOrderedPresence (values: int list array) : int list array =
     ) (up, [| for _ in 0..up -> [] |])
     |> snd
 
-let matchSinglePresence (mapper: int -> int -> SolutionStep) (presence: int list array) = seq {
-    let up = presence.Length - 1
-    for value in 0..up do
+let mapFromIndexInRow row idx = (row, idx)
+let mapFromIndexInColumn col idx = (idx, col)
+let mapFromIndexInBlock block idx = ((block/3)*3+idx/3,(block%3)*3+idx%3)
+
+let matchSinglePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
+    for value in 0..8 do
         match presence.[value] with
-        | [ position ] -> yield mapper position (value+1)
+        | [ position ] -> yield { Numbers = [value+1]; RowsAndColumns = [ mapper position] }
         | _ -> ()
     }
 
-let analyse (group : NinerGroup) : SolutionStep seq =
+let analyse group =
     match group with
-        | Row { Row = targetRow; Values = values } ->
-            values
-            |> toOrderedPresence
-            |> matchSinglePresence (fun pos value -> SingleInRow { Numbers = [value]; RowsAndColumns = [(targetRow, pos)] })
-        | Column { Col = targetCol; Values = values } ->
-            values
-            |> toOrderedPresence
-            |> matchSinglePresence (fun pos value -> SingleInColumn { Numbers = [value]; RowsAndColumns = [(pos, targetCol)] })
-        | Subblock { SupRow = supRow; SupCol = supCol; Values = values } ->
-            values
-            |> toOrderedPresence
-            |> matchSinglePresence (fun pos value -> SingleInBlock { Numbers = [value]; RowsAndColumns = [(supRow*3+pos/3, supCol*3+pos%3)] })
+    | Row { Row = targetRow; Values = values } ->
+        values
+        |> toOrderedPresence
+        |> matchSinglePresence (mapFromIndexInRow targetRow)
+        |> Seq.map ExclussiveInRow
+    | Column { Col = targetCol; Values = values } ->
+        values
+        |> toOrderedPresence
+        |> matchSinglePresence (mapFromIndexInColumn targetCol)
+        |> Seq.map ExclussiveInColumn
+    | Subblock { SupRow = supRow; SupCol = supCol; Values = values } ->
+        values
+        |> toOrderedPresence
+        |> matchSinglePresence (mapFromIndexInBlock (3*supRow+supCol))
+        |> Seq.map ExclussiveInBlock
 
 let steps options = seq {
     // first try eliminating singular options
