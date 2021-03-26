@@ -135,9 +135,6 @@ let initialSolutionState (sudoku: Sudoku): SolutionState =
 /// </summary>
 type SolutionStep =
 | ApplySingularOption of SingularOption
-| SingleInRow of ExclussivePresence
-| SingleInColumn of ExclussivePresence
-| SingleInBlock of ExclussivePresence
 | ExclussiveInRow of ExclussivePresence
 | ExclussiveInColumn of ExclussivePresence
 | ExclussiveInBlock of ExclussivePresence
@@ -167,6 +164,15 @@ let applySingularOption { Row = targetRow; Col = targetCol; Value = targetNum } 
         |]
     |]
 
+let applyExclussivePresence { Numbers = numbers; RowsAndColumns = rowsAndCols } (options: Options) : Options =
+    [| for row in 0..8 ->
+        [| for col in 0..8 ->
+            if rowsAndCols |> List.contains (row, col)
+            then [ for num in options.[row].[col] do if numbers |> List.contains num then num ]
+            else options.[row].[col]
+        |]
+    |]
+
 let applySingularOptionToState { Row = targetRow; Col = targetCol; Value = num } oldState =
         printfn "field row %d col %d has single option %d" targetRow targetCol num
         let oldBoard = oldState.Board
@@ -187,29 +193,21 @@ let applySingularOptionToState { Row = targetRow; Col = targetCol; Value = num }
             |> applySingularOption { Row = targetRow; Col = targetCol; Value = num }
         { Board = newBoard; Options = newOptions }
 
-let applyExlussivePresenceToState { Numbers = numbers; RowsAndColumns = rowsAndCols } oldState =
-    failwith "not impl"
+let applyExlussivePresenceToState { Numbers = numbers; RowsAndColumns = rowsAndCols } oldState = {
+    Board = oldState.Board  // board is not updated
+    Options = oldState.Options |> applyExclussivePresence { Numbers = numbers; RowsAndColumns = rowsAndCols }
+}
 
 let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
     match step with
     | ApplySingularOption option ->
-        printfn "(singular option)"
+        printfn "(singular %d at %dx%d)" option.Value (option.Row+1) (option.Col+1)
         applySingularOptionToState option oldState
-    | SingleInRow { Numbers = [value]; RowsAndColumns = [(row, col)] } ->
-        printfn "(singular in row)"
-        applySingularOptionToState {Row = row; Col = col; Value = value} oldState
-    | SingleInColumn { Numbers = [value]; RowsAndColumns = [(row, col)] } ->
-        printfn "(singular in column)"
-        applySingularOptionToState {Row = row; Col = col; Value = value} oldState
-    | SingleInBlock { Numbers = [value]; RowsAndColumns = [(row, col)] } ->
-        printfn "(singular in block)"
-        applySingularOptionToState {Row = row; Col = col; Value = value} oldState
     | ExclussiveInRow presence
     | ExclussiveInColumn presence
     | ExclussiveInBlock presence ->
-        printfn "(exclussive %A)" presence
+        printfn "(exclussive values %A at %A)" presence.Numbers presence.RowsAndColumns
         applyExlussivePresenceToState presence oldState
-    | _ -> failwith (sprintf "unsupported %A" step)
 
 let toOrderedPresence (values: int list array) : int list array =
     let up = values.Length - 1
