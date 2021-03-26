@@ -233,7 +233,7 @@ let mapFromIndexInRow row idx = (row, idx)
 let mapFromIndexInColumn col idx = (idx, col)
 let mapFromIndexInBlock block idx = ((block/3)*3+idx/3,(block%3)*3+idx%3)
 
-let matchSinglePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
+let matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
     for value in 0..8 do
         match presence.[value] with
         | [ position ] -> yield { Numbers = [value+1]; RowsAndColumns = [ mapper position] }
@@ -245,17 +245,17 @@ let analyse group =
     | Row { Row = targetRow; Values = values } ->
         values
         |> toOrderedPresence
-        |> matchSinglePresence (mapFromIndexInRow targetRow)
+        |> matchExclussivePresence (mapFromIndexInRow targetRow)
         |> Seq.map ExclussiveInRow
     | Column { Col = targetCol; Values = values } ->
         values
         |> toOrderedPresence
-        |> matchSinglePresence (mapFromIndexInColumn targetCol)
+        |> matchExclussivePresence (mapFromIndexInColumn targetCol)
         |> Seq.map ExclussiveInColumn
     | Subblock { SupRow = supRow; SupCol = supCol; Values = values } ->
         values
         |> toOrderedPresence
-        |> matchSinglePresence (mapFromIndexInBlock (3*supRow+supCol))
+        |> matchExclussivePresence (mapFromIndexInBlock (3*supRow+supCol))
         |> Seq.map ExclussiveInBlock
 
 let steps options = seq {
