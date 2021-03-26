@@ -105,18 +105,6 @@ let ninerGroups (opts: Options): NinerGroup seq = seq {
 /// </summary>
 type SingularOption = { Row: int; Col: int; Value: int }
 
-/// <summary>
-/// Find and return all fields that have a
-/// single possible solution.
-/// </summary>
-let findSingularOptions (opts: Options): SingularOption seq = seq {
-    for row in 0..8 do
-    for col in 0..8 do
-    match opts.[row].[col] with
-    | [ num ] -> yield { Row = row; Col = col; Value = num }
-    | _ -> ()
-}
-
 type SolutionState = { Board: Sudoku; Options: Options }
 
 let emptySudoku (): Sudoku =
@@ -138,6 +126,23 @@ let initialSolutionState (sudoku: Sudoku): SolutionState =
 type SolutionStep =
 | ApplySingularOption of SingularOption
 
+/// <summary>
+/// Find and return all fields that have a
+/// single possible solution.
+/// </summary>
+let findSingularOptions (opts: Options): SolutionStep seq = seq {
+    for row in 0..8 do
+    for col in 0..8 do
+    match opts.[row].[col] with
+    | [ num ] -> yield ApplySingularOption { Row = row; Col = col; Value = num }
+    | _ -> ()
+}
+
+let eliminateOption (source: int list) row col targetRow targetCol targetNum: int list =
+    if row <> targetRow && col <> targetCol && (row/3 <> targetRow/3 || col/3 <> targetCol/3)
+    then source
+    else [ for num in source do if num <> targetNum then num ]
+
 let applySingularOption { Row = targetRow; Col = targetCol; Value = num } oldState =
         printfn "field row %d col %d has single option %d" targetRow targetCol num
         let oldBoard = oldState.Board
@@ -155,12 +160,7 @@ let applySingularOption { Row = targetRow; Col = targetCol; Value = num } oldSta
         let oldOptions = oldState.Options
         let newOptions =
             oldOptions
-            |> mapForRowAndColBy (fun source row col ->
-                source.[row].[col]
-                |> Seq.filter (fun value ->
-                    value <> num || row <> targetRow || col <> targetCol || (row/3) <> (targetRow/3) || (col/3)<>(targetCol/3))
-                |> Seq.toList
-            )
+            |> mapForRowAndColBy (fun source row col -> eliminateOption source.[row].[col] row col targetRow targetCol num)
         { Board = newBoard; Options = newOptions }
 
 let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
@@ -222,9 +222,7 @@ let solve sudoku : Sudoku =
     let initialState = initialSolutionState sudoku
 
     let findAndEliminateSingularOptions state =
-        let options = findSingularOptions state.Options
-        options
-        |> Seq.map ApplySingularOption
+        findSingularOptions state.Options
         |> Seq.fold applyStep state
 
     let state2 =
