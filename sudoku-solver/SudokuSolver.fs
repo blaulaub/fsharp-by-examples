@@ -200,7 +200,8 @@ let analyse (group : NinerGroup) : SolutionStep seq =
                 let up = values.Length - 1
                 for i in 0..up do
                     match values.[i] with
-                    | [ col ] -> yield ApplySingularOption { Row = targetRow; Col = col; Value = i+1 }
+                    | [ col ] ->
+                        yield ApplySingularOption { Row = targetRow; Col = col; Value = i+1 }
                     | _ -> ()
                 // TODO: also find multiple presence
                 }
@@ -211,37 +212,48 @@ let analyse (group : NinerGroup) : SolutionStep seq =
                 let up = values.Length - 1
                 for i in 0..up do
                     match values.[i] with
-                    | [ row ] -> yield ApplySingularOption { Row = row; Col = targetCol; Value = i+1 }
+                    | [ row ] ->
+                        yield ApplySingularOption { Row = row; Col = targetCol; Value = i+1 }
                     | _ -> ()
                 // TODO: also find multiple presence
                 }
         | Subblock { SupRow = supRow; SupCol = supCol; Values = values } ->
             toOrderedPresence values
-            |> fun values ->
-                // TODO: find something
-                Seq.empty
+            |> fun values -> seq {
+                // find single presence
+                let up = values.Length - 1
+                for i in 0..up do
+                    match values.[i] with
+                    | [ block ] ->
+                        let subRow = block/3
+                        let subCol = block%3
+                        yield ApplySingularOption { Row = supRow*3+subRow; Col = supCol*3+subCol; Value = i+1 }
+                    | _ -> ()
+                // TODO: also find multiple presence
+                }
 
 let solve sudoku : Sudoku =
-
-    let initialState = initialSolutionState sudoku
 
     let findAndEliminateSingularOptions state =
         findSingularOptions state.Options
         |> Seq.fold applyStep state
 
-    let state2 =
+    let analyseAndEliminateGroups state2 =
+        let groups2 = ninerGroups state2.Options
+        let steps2 = seq {
+            for group in groups2 do
+                yield! analyse group
+            }
+        steps2 |> Seq.fold applyStep state2
+
+    let initialState = initialSolutionState sudoku
+
+    let finalState =
         initialState
         |> findAndEliminateSingularOptions
-
-    let groups = ninerGroups state2.Options
-
-    let steps = seq {
-        for group in groups do
-            yield! analyse group
-        }
-
-    let state3 = steps |> Seq.fold applyStep state2
-
-    let finalState = state3
+        |> analyseAndEliminateGroups
+        |> findAndEliminateSingularOptions
+//        |> analyseAndEliminateGroups
+//        |> findAndEliminateSingularOptions
 
     finalState.Board

@@ -44,6 +44,8 @@ let tests =
             Expect.equal ([| [2]; [2] |]            |> SudokuSolver.toOrderedPresence) [| []; [0; 1] |]             "second of two twice"
             Expect.equal ([| [1;2]; [2;3]; [3;1] |] |> SudokuSolver.toOrderedPresence) [| [0; 2]; [0; 1]; [1; 2] |] "circular with two from three"
             Expect.equal ([| [1;2;3]; [2;3]; [3] |] |> SudokuSolver.toOrderedPresence) [| [0]; [0; 1]; [0; 1; 2] |] "descending with three"
+
+            Expect.equal ([| [1]; [2]; [3]; [4]; [5]; [6] |] |> SudokuSolver.toOrderedPresence) [| [0]; [1]; [2]; [3]; [4]; [5] |] "sth a bit longer"
         }
 
         test "verify eliminateOption" {
@@ -53,6 +55,54 @@ let tests =
             Expect.equal (SudokuSolver.eliminateOption [1..9] 0 0 1 3 1) [1..9] "partial subblock match 1 removes nothing"
             Expect.equal (SudokuSolver.eliminateOption [1..9] 0 0 3 1 1) [1..9] "partial subblock match 2 removes nothing"
             Expect.equal (SudokuSolver.eliminateOption [1..9] 0 0 1 1 1) [2..9] "subblock match removes value"
+        }
+
+        test "verify analyse for everything possible" {
+            let values =
+                [|
+                    [0..9];
+                    [0..9];
+                    [0..9];
+                    [0..9];
+                    [0..9];
+                    [0..9];
+                    [0..9];
+                    [0..9];
+                    [0..9]
+                |]
+
+            let rowSteps = SudokuSolver.analyse (SudokuSolver.Row { Row = 0; Values = values }) |> Seq.toList
+            Expect.equal rowSteps [] "everything possible in row - no solution"
+
+            let colSteps = SudokuSolver.analyse (SudokuSolver.Column { Col = 0; Values = values }) |> Seq.toList
+            Expect.equal colSteps [] "everything possible in column - no solution"
+
+            let blockSteps = SudokuSolver.analyse (SudokuSolver.Subblock { SupRow = 0; SupCol = 0; Values = values }) |> Seq.toList
+            Expect.equal blockSteps [] "everything possible in block - no solution"
+        }
+
+        test "verify analyse for one possible" {
+            let values =
+                [|
+                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
+                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
+                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
+                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
+                    [0..9];
+                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
+                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
+                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
+                    [0; 1; 2; 3; 4;   6; 7; 8; 9];
+                |]
+
+            let rowSteps = SudokuSolver.analyse (SudokuSolver.Row { Row = 0; Values = values }) |> Seq.toList
+            Expect.equal rowSteps [SudokuSolver.ApplySingularOption { Row = 0; Col = 4; Value = 5 }] "find solution 5 in row"
+
+            let colSteps = SudokuSolver.analyse (SudokuSolver.Column { Col = 0; Values = values }) |> Seq.toList
+            Expect.equal colSteps [SudokuSolver.ApplySingularOption { Row = 4; Col = 0; Value = 5 }] "find solution 5 in columns"
+
+            let blockSteps = SudokuSolver.analyse (SudokuSolver.Subblock { SupRow = 0; SupCol = 0; Values = values }) |> Seq.toList
+            Expect.equal blockSteps [SudokuSolver.ApplySingularOption { Row = 1; Col = 1; Value = 5 }] "find solution 5 in block"
         }
 
         test "try solve some board" {
