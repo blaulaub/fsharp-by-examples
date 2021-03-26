@@ -125,6 +125,67 @@ let tests =
                     Expect.equal (remainingOptions.[row].[col]) [1..9]             (sprintf "elsewhere at row %d col %d" row col)
         }
 
+        test "verify niner columns" {
+            let initialOptions () = [| for _ in 0..8 -> [| for _ in 0..8 -> [1..9] |] |]
+            for { Values = niner } in SudokuSolver.ninerColumns (initialOptions()) do
+                Expect.equal niner [| for _ in 0..8 -> [1..9] |] "initial match"
+
+            let singularOption : SudokuSolver.SingularOption = { Row = 0; Col = 4; Value = 5 }
+            let remainingOptions = SudokuSolver.applySingularOption singularOption (initialOptions())
+
+            let ninerRows = SudokuSolver.ninerRows remainingOptions |> Seq.toArray
+            for row in 0..8 do
+                let ninerRow = ninerRows.[row].Values
+                Expect.equal ninerRow (
+                    match row with
+                    | 0 ->
+                        [|
+                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                        |]
+                    | 1 | 2 ->
+                        [|
+                            [1..9]       ;[1..9]       ;[1..9]
+                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                            [1..9]       ;[1..9]       ;[1..9]
+                        |]
+                    | _ ->
+                        [|
+                            [1..9];[1..9]       ;[1..9]
+                            [1..9];[1..4]@[6..9];[1..9]
+                            [1..9];[1..9]       ;[1..9]
+                        |]
+                ) (sprintf "row %d after match" row)
+
+            let ninerColumns = SudokuSolver.ninerColumns remainingOptions |> Seq.toArray
+            for col in 0..8 do
+                let ninerColumn = ninerColumns.[col].Values
+                Expect.equal ninerColumn (
+                    match col with
+                    | 4 ->
+                        [|
+                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                        |]
+                    | 3 | 5 ->
+                        [|
+                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                            [1..9]       ;[1..9]       ;[1..9]
+                            [1..9]       ;[1..9]       ;[1..9]
+                        |]
+                    | _ ->
+                        [|
+                            [1..4]@[6..9];[1..9];[1..9]
+                            [1..9]       ;[1..9];[1..9]
+                            [1..9]       ;[1..9];[1..9]
+                        |]
+                ) (sprintf "column %d after match" col)
+
+
+        }
+
         test "try solve some board" {
             let initialState =
                 SudokuSolver.initialSolutionState difficultSudoku

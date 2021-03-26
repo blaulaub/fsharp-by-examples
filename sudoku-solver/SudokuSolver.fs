@@ -148,7 +148,8 @@ let eliminateOption (source: int list) row col targetRow targetCol targetNum: in
     if targetCol>8 then failwith "bad targetCol"
     if targetNum<1 then failwith "bad targetNum"
     if row <> targetRow && col <> targetCol && (row/3 <> targetRow/3 || col/3 <> targetCol/3)
-    then source
+    then
+        source
     else
         [
             for num in source do
