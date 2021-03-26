@@ -88,12 +88,12 @@ let ninerSubblocks (opts: Options): NinerSubblock seq = seq {
     }
 }
 
-type NinerGroups =
+type NinerGroup =
 | Row of NinerRow
 | Column of NinerColumn
 | Subblock of NinerSubblock
 
-let ninerGroups (opts: Options): NinerGroups seq = seq {
+let ninerGroups (opts: Options): NinerGroup seq = seq {
     yield! ninerRows opts |> Seq.map Row
     yield! ninerColumns opts |> Seq.map Column
     yield! ninerSubblocks opts |> Seq.map Subblock
@@ -184,7 +184,38 @@ let toOrderedPresence (values: int list array) : int list array =
                 |]
             ) state
         )
-    ) (up, [| for _ in 0..up -> [] |]) |> snd
+    ) (up, [| for _ in 0..up -> [] |])
+    |> snd
+
+let analyse (group : NinerGroup) : SolutionStep seq =
+    match group with
+        | Row { Row = targetRow; Values = values } ->
+            toOrderedPresence values
+            |> fun values -> seq {
+                // find single presence
+                let up = values.Length - 1
+                for i in 0..up do
+                    match values.[i] with
+                    | [ col ] -> yield ApplySingularOption { Row = targetRow; Col = col; Value = i }
+                    | _ -> ()
+                // TODO: also find multiple presence
+                }
+        | Column { Col = targetCol; Values = values } ->
+            toOrderedPresence values
+            |> fun values -> seq {
+                // find single presence
+                let up = values.Length - 1
+                for i in 0..up do
+                    match values.[i] with
+                    | [ row ] -> yield ApplySingularOption { Row = row; Col = targetCol; Value = i }
+                    | _ -> ()
+                // TODO: also find multiple presence
+                }
+        | Subblock { SupRow = supRow; SupCol = supCol; Values = values } ->
+            toOrderedPresence values
+            |> fun values ->
+                // TODO: find something
+                Seq.empty
 
 let solve sudoku : Sudoku =
 
@@ -202,19 +233,13 @@ let solve sudoku : Sudoku =
 
     let groups = ninerGroups state2.Options
 
-    for group in groups do
-        match group with
-        | Row { Row = targetRow; Values = values } ->
-            toOrderedPresence values
-            |> ignore
-        | Column { Col = targetCol; Values = values } ->
-            toOrderedPresence values
-            |> ignore
-        | Subblock { SupRow = supRow; SupCol = supCol; Values = values } ->
-            toOrderedPresence values
-            |> ignore
+    let steps = seq {
+        for group in groups do
+            yield! analyse group
+        }
 
+    let state3 = steps |> Seq.fold applyStep state2
 
-    let finalState = state2
+    let finalState = state3
 
     finalState.Board
