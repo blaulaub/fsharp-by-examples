@@ -75,15 +75,6 @@ let tests =
             Expect.equal ([| [1]; [2]; [3]; [4]; [5]; [6] |] |> SudokuSolver.toOrderedPresence) [| [0]; [1]; [2]; [3]; [4]; [5] |] "sth a bit longer"
         }
 
-        test "verify eliminateOption" {
-            Expect.equal (SudokuSolver.eliminateOption [1..9] 0 0 3 3 1) [1..9] "no match removes nothing"
-            Expect.equal (SudokuSolver.eliminateOption [1..9] 0 0 0 3 1) [2..9] "row match removes value"
-            Expect.equal (SudokuSolver.eliminateOption [1..9] 0 0 3 0 1) [2..9] "col match removes value"
-            Expect.equal (SudokuSolver.eliminateOption [1..9] 0 0 1 3 1) [1..9] "partial subblock match 1 removes nothing"
-            Expect.equal (SudokuSolver.eliminateOption [1..9] 0 0 3 1 1) [1..9] "partial subblock match 2 removes nothing"
-            Expect.equal (SudokuSolver.eliminateOption [1..9] 0 0 1 1 1) [2..9] "subblock match removes value"
-        }
-
         test "verify analyse for everything possible" {
             let values =
                 [|
@@ -142,6 +133,8 @@ let tests =
             for row in 0..8 do
             for col in 0..8 do
                 match (row, col) with
+                | (0, 4) ->
+                    Expect.equal (remainingOptions.[row].[col]) [ ]                (sprintf "in row at row %d col %d" row col)
                 | (0, _) ->
                     Expect.equal (remainingOptions.[row].[col]) [1;2;3;4; 6;7;8;9] (sprintf "in row at row %d col %d" row col)
                 | (_, 4) ->
@@ -168,7 +161,7 @@ let tests =
                     | 0 ->
                         [|
                             [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
-                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                            [1..4]@[6..9];[]           ;[1..4]@[6..9]
                             [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
                         |]
                     | 1 | 2 ->
@@ -192,7 +185,7 @@ let tests =
                     match col with
                     | 4 ->
                         [|
-                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                            []           ;[1..4]@[6..9];[1..4]@[6..9]
                             [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
                             [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
                         |]
@@ -217,7 +210,7 @@ let tests =
                     match block with
                     | 1 ->
                         [|
-                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                            [1..4]@[6..9];[]           ;[1..4]@[6..9]
                             [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
                             [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
                         |]
@@ -258,9 +251,9 @@ let tests =
                     match row with
                     | 0 ->
                         [|
-                            [0..8];[0..8];[0..8]
-                            [0..8];[]    ;[0..8]
-                            [0..8];[0..8];[0..8]
+                            [0..3]@[5..8];[0..3]@[5..8];[0..3]@[5..8]
+                            [0..3]@[5..8];[]           ;[0..3]@[5..8]
+                            [0..3]@[5..8];[0..3]@[5..8];[0..3]@[5..8]
                         |]
                     | 1 | 2 ->
                         [|
@@ -283,9 +276,9 @@ let tests =
                     match col with
                     | 4 ->
                         [|
-                            [0..8];[0..8];[0..8]
-                            [0..8];[]    ;[0..8]
-                            [0..8];[0..8];[0..8]
+                            [1..8];[1..8];[1..8]
+                            [1..8];[]    ;[1..8]
+                            [1..8];[1..8];[1..8]
                         |]
                     | 3 | 5 ->
                         [|
@@ -308,9 +301,9 @@ let tests =
                     match block with
                     | 1 ->
                         [|
-                            [0..8];[0..8];[0..8]
-                            [0..8];[]    ;[0..8]
-                            [0..8];[0..8];[0..8]
+                            [0]@[2..8];[0]@[2..8];[0]@[2..8]
+                            [0]@[2..8];[]        ;[0]@[2..8]
+                            [0]@[2..8];[0]@[2..8];[0]@[2..8]
                         |]
                     | 0 | 2 ->
                         [|

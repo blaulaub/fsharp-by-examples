@@ -141,25 +141,18 @@ let findSingularOptions (opts: Options): SolutionStep seq = seq {
     | _ -> ()
 }
 
-let eliminateOption (source: int list) row col targetRow targetCol targetNum: int list =
-    if row>8 then failwith "bad row"
-    if col>8 then failwith "bad col"
-    if targetRow>8 then failwith "bad targetRow"
-    if targetCol>8 then failwith "bad targetCol"
-    if targetNum<1 then failwith "bad targetNum"
-    if row <> targetRow && col <> targetCol && (row/3 <> targetRow/3 || col/3 <> targetCol/3)
-    then
-        source
-    else
-        [
-            for num in source do
-                if num<1 then failwith "bad num"
-                if num <> targetNum then num
-        ]
-
-let applySingularOption { Row = targetRow; Col = targetCol; Value = num } (options: Options) : Options =
-    options
-    |> mapForRowAndColBy (fun source row col -> eliminateOption source.[row].[col] row col targetRow targetCol num)
+let applySingularOption { Row = targetRow; Col = targetCol; Value = targetNum } (options: Options) : Options =
+    [| for row in 0..8 ->
+        [| for col in 0..8 ->
+            if row = targetRow && col = targetCol
+            then
+                []
+            else
+                if row <> targetRow && col <> targetCol && (row/3 <> targetRow/3 || col/3 <> targetCol/3)
+                then options.[row].[col]
+                else [ for num in options.[row].[col] do if num <> targetNum then num ]
+        |]
+    |]
 
 let applySingularOptionToState { Row = targetRow; Col = targetCol; Value = num } oldState =
         printfn "field row %d col %d has single option %d" targetRow targetCol num
@@ -216,46 +209,28 @@ let toOrderedPresence (values: int list array) : int list array =
     ) (up, [| for _ in 0..up -> [] |])
     |> snd
 
+let matchSinglePresence (mapper: int -> int -> SolutionStep) (presence: int list array) = seq {
+    let up = presence.Length - 1
+    for value in 0..up do
+        match presence.[value] with
+        | [ position ] -> yield mapper position (value+1)
+        | _ -> ()
+    }
+
 let analyse (group : NinerGroup) : SolutionStep seq =
     match group with
         | Row { Row = targetRow; Values = values } ->
-            toOrderedPresence values
-            |> fun v -> seq {
-                // find single presence
-                let up = v.Length - 1
-                for i in 0..up do
-                    match v.[i] with
-                    | [ col ] ->
-                        yield SingleInRow { Row = targetRow; Col = col; Value = i+1 }
-                    | _ -> ()
-                // TODO: also find multiple presence
-                }
+            values
+            |> toOrderedPresence
+            |> matchSinglePresence (fun pos value -> SingleInRow { Row = targetRow; Col = pos; Value = value })
         | Column { Col = targetCol; Values = values } ->
-            toOrderedPresence values
-            |> fun v -> seq {
-                // find single presence
-                let up = v.Length - 1
-                for i in 0..up do
-                    match v.[i] with
-                    | [ row ] ->
-                        yield SingleInColumn { Row = row; Col = targetCol; Value = i+1 }
-                    | _ -> ()
-                // TODO: also find multiple presence
-                }
+            values
+            |> toOrderedPresence
+            |> matchSinglePresence (fun pos value -> SingleInColumn { Row = pos; Col = targetCol; Value = value })
         | Subblock { SupRow = supRow; SupCol = supCol; Values = values } ->
-            toOrderedPresence values
-            |> fun v -> seq {
-                // find single presence
-                let up = v.Length - 1
-                for i in 0..up do
-                    match v.[i] with
-                    | [ block ] ->
-                        let subRow = block/3
-                        let subCol = block%3
-                        yield SingleInBlock { Row = supRow*3+subRow; Col = supCol*3+subCol; Value = i+1 }
-                    | _ -> ()
-                // TODO: also find multiple presence
-                }
+            values
+            |> toOrderedPresence
+            |> matchSinglePresence (fun pos value -> SingleInBlock { Row = supRow*3+pos/3; Col = supCol*3+pos%3; Value = value })
 
 let steps options = seq {
     // first try eliminating singular options
