@@ -49,6 +49,18 @@ let tests =
                     Expect.equal opts.[row].[col] [1..9] (sprintf "unrestricted for row %d col %d" row col)
         }
 
+        test "find singular options" {
+            let board = [| for row in 0..8 -> [| for col in 0..8 -> None |] |]
+            board.[1].[2] <- Some 3
+
+            let opts = SudokuSolver.options board
+
+            let singularOptions = SudokuSolver.findSingularOptions opts |> Seq.toArray
+
+            Expect.equal 1 singularOptions.Length "have only one singular option"
+            Expect.equal (SudokuSolver.ApplySingularOption { Row = 1; Col = 2; Value = 3}) singularOptions.[0] "singular option matches"
+        }
+
         test "verify toOrderedPresence" {
             let subSorted = Array.map List.sort
             Expect.equal ([| |]                     |> SudokuSolver.toOrderedPresence) [| |]                        "empty of zero"
