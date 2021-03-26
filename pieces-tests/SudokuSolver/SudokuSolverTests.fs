@@ -125,7 +125,7 @@ let tests =
                     Expect.equal (remainingOptions.[row].[col]) [1..9]             (sprintf "elsewhere at row %d col %d" row col)
         }
 
-        test "verify niner columns" {
+        test "verify niner groups" {
             let initialOptions () = [| for _ in 0..8 -> [| for _ in 0..8 -> [1..9] |] |]
             for { Values = niner } in SudokuSolver.ninerColumns (initialOptions()) do
                 Expect.equal niner [| for _ in 0..8 -> [1..9] |] "initial match"
@@ -183,6 +183,36 @@ let tests =
                         |]
                 ) (sprintf "column %d after match" col)
 
+            let ninerSubblocks = SudokuSolver.ninerSubblocks remainingOptions |> Seq.toArray
+            for block in 0..8 do
+                let ninerSubblock = ninerSubblocks.[block].Values
+                Expect.equal ninerSubblock (
+                    match block with
+                    | 1 ->
+                        [|
+                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                        |]
+                    | 0 | 2 ->
+                        [|
+                            [1..4]@[6..9];[1..4]@[6..9];[1..4]@[6..9]
+                            [1..9]       ;[1..9]       ;[1..9]
+                            [1..9]       ;[1..9]       ;[1..9]
+                        |]
+                    | 4 | 7 ->
+                        [|
+                            [1..9];[1..4]@[6..9];[1..9]
+                            [1..9];[1..4]@[6..9];[1..9]
+                            [1..9];[1..4]@[6..9];[1..9]
+                        |]
+                    | _ ->
+                        [|
+                            [1..9];[1..9];[1..9]
+                            [1..9];[1..9];[1..9]
+                            [1..9];[1..9];[1..9]
+                        |]
+                ) (sprintf "block %d after match" block)
 
         }
 
