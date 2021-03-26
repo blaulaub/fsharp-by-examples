@@ -233,12 +233,75 @@ let mapFromIndexInRow row idx = (row, idx)
 let mapFromIndexInColumn col idx = (idx, col)
 let mapFromIndexInBlock block idx = ((block/3)*3+idx/3,(block%3)*3+idx%3)
 
+let matchTwice (mapper: int -> (int * int)) (presence: int list array) = seq {
+
+    for first in 0..8 do
+    if presence.[first].Length > 0 then
+
+        for second in (first+1)..8 do
+        if presence.[second].Length > 0 then
+
+            let places =
+                [ presence.[first]; presence.[second] ]
+                |> List.fold (fun s p ->
+                    p
+                    |> List.fold (fun s p ->
+                        if s |> List.contains p then s else p :: s
+                        ) s
+                    ) []
+
+            if places.Length = 2 then
+
+                let canEliminateOthers =
+                    seq { 0..8 }
+                    |> Seq.filter (fun other -> other <> first && other <> second)
+                    |> Seq.map (fun other -> presence.[other])
+                    |> Seq.concat
+                    |> Seq.distinct
+                    |> Seq.exists (fun p -> places |> List.contains p)
+
+                if canEliminateOthers then yield { Numbers = [ first+1; second+1 ]; RowsAndColumns = places |> List.map mapper }
+
+
+    for first in 0..8 do
+    if presence.[first].Length > 0 then
+
+        for second in (first+1)..8 do
+        if presence.[second].Length > 0 then
+
+            for third in (second+1)..8 do
+            if presence.[third].Length > 0 then
+
+                let places =
+                    [ presence.[first]; presence.[second]; presence.[third] ]
+                    |> List.fold (fun s p ->
+                        p
+                        |> List.fold (fun s p ->
+                            if s |> List.contains p then s else p :: s
+                            ) s
+                        ) []
+
+                if places.Length = 3 then
+
+                    let canEliminateOthers =
+                        seq { 0..8 }
+                        |> Seq.filter (fun other -> other <> first && other <> second && other <> third)
+                        |> Seq.map (fun other -> presence.[other])
+                        |> Seq.concat
+                        |> Seq.distinct
+                        |> Seq.exists (fun p -> places |> List.contains p)
+
+                    if canEliminateOthers then yield { Numbers = [ first+1; second+1; third+1 ]; RowsAndColumns = places |> List.map mapper }
+}
+
 let matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
     for value in 0..8 do
         match presence.[value] with
         | [ position ] -> yield { Numbers = [value+1]; RowsAndColumns = [ mapper position] }
         | _ -> ()
-    }
+
+    yield! matchTwice mapper presence
+}
 
 let analyse group =
     match group with
