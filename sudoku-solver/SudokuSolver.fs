@@ -143,7 +143,11 @@ let eliminateOption (source: int list) row col targetRow targetCol targetNum: in
     then source
     else [ for num in source do if num <> targetNum then num ]
 
-let applySingularOption { Row = targetRow; Col = targetCol; Value = num } oldState =
+let applySingularOption { Row = targetRow; Col = targetCol; Value = num } (options: Options) : Options =
+    options
+    |> mapForRowAndColBy (fun source row col -> eliminateOption source.[row].[col] row col targetRow targetCol num)
+
+let applySingularOptionToState { Row = targetRow; Col = targetCol; Value = num } oldState =
         printfn "field row %d col %d has single option %d" targetRow targetCol num
         let oldBoard = oldState.Board
         let newBoard =
@@ -160,12 +164,12 @@ let applySingularOption { Row = targetRow; Col = targetCol; Value = num } oldSta
         let oldOptions = oldState.Options
         let newOptions =
             oldOptions
-            |> mapForRowAndColBy (fun source row col -> eliminateOption source.[row].[col] row col targetRow targetCol num)
+            |> applySingularOption { Row = targetRow; Col = targetCol; Value = num }
         { Board = newBoard; Options = newOptions }
 
 let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
     match step with
-    | ApplySingularOption option -> applySingularOption option oldState
+    | ApplySingularOption option -> applySingularOptionToState option oldState
 
 let toOrderedPresence (values: int list array) : int list array =
     let up = values.Length - 1
@@ -196,7 +200,7 @@ let analyse (group : NinerGroup) : SolutionStep seq =
                 let up = values.Length - 1
                 for i in 0..up do
                     match values.[i] with
-                    | [ col ] -> yield ApplySingularOption { Row = targetRow; Col = col; Value = i }
+                    | [ col ] -> yield ApplySingularOption { Row = targetRow; Col = col; Value = i+1 }
                     | _ -> ()
                 // TODO: also find multiple presence
                 }
@@ -207,7 +211,7 @@ let analyse (group : NinerGroup) : SolutionStep seq =
                 let up = values.Length - 1
                 for i in 0..up do
                     match values.[i] with
-                    | [ row ] -> yield ApplySingularOption { Row = row; Col = targetCol; Value = i }
+                    | [ row ] -> yield ApplySingularOption { Row = row; Col = targetCol; Value = i+1 }
                     | _ -> ()
                 // TODO: also find multiple presence
                 }
