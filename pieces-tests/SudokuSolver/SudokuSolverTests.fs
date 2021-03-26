@@ -127,7 +127,7 @@ let tests =
 
         test "try solve some board" {
             let initialState =
-                SudokuSolver.initialSolutionState easySudoku
+                SudokuSolver.initialSolutionState difficultSudoku
             let finalState =
                 SudokuSolver.solveState initialState (fun state ->
                     printfn "-----------------"
