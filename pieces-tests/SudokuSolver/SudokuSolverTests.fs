@@ -34,6 +34,21 @@ let easySudoku =
 let tests =
     testList "Sudoku solver tests" [
 
+        test "verify options" {
+            let board = [| for row in 0..8 -> [| for col in 0..8 -> None |] |]
+            board.[1].[2] <- Some 3
+
+            let opts = SudokuSolver.options board
+
+            for row in 0..8 do
+            for col in 0..8 do
+                match (row, col) with
+                | (1, 2) ->
+                    Expect.equal opts.[row].[col] [3] (sprintf "precise for row %d col %d" row col)
+                | (_, _) ->
+                    Expect.equal opts.[row].[col] [1..9] (sprintf "unrestricted for row %d col %d" row col)
+        }
+
         test "verify toOrderedPresence" {
             let subSorted = Array.map List.sort
             Expect.equal ([| |]                     |> SudokuSolver.toOrderedPresence) [| |]                        "empty of zero"
@@ -219,11 +234,12 @@ let tests =
         test "try solve some board" {
             let initialState =
                 SudokuSolver.initialSolutionState difficultSudoku
-            let finalState =
+            do
                 SudokuSolver.solveState initialState (fun state ->
                     printfn "-----------------"
                     SudokuSolver.toString state.Board |> printfn "%s"
                 )
+                |> ignore
             ()
         }
     ]

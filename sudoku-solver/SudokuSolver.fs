@@ -220,11 +220,11 @@ let analyse (group : NinerGroup) : SolutionStep seq =
     match group with
         | Row { Row = targetRow; Values = values } ->
             toOrderedPresence values
-            |> fun values -> seq {
+            |> fun v -> seq {
                 // find single presence
-                let up = values.Length - 1
+                let up = v.Length - 1
                 for i in 0..up do
-                    match values.[i] with
+                    match v.[i] with
                     | [ col ] ->
                         yield SingleInRow { Row = targetRow; Col = col; Value = i+1 }
                     | _ -> ()
@@ -232,11 +232,11 @@ let analyse (group : NinerGroup) : SolutionStep seq =
                 }
         | Column { Col = targetCol; Values = values } ->
             toOrderedPresence values
-            |> fun values -> seq {
+            |> fun v -> seq {
                 // find single presence
-                let up = values.Length - 1
+                let up = v.Length - 1
                 for i in 0..up do
-                    match values.[i] with
+                    match v.[i] with
                     | [ row ] ->
                         yield SingleInColumn { Row = row; Col = targetCol; Value = i+1 }
                     | _ -> ()
@@ -244,11 +244,11 @@ let analyse (group : NinerGroup) : SolutionStep seq =
                 }
         | Subblock { SupRow = supRow; SupCol = supCol; Values = values } ->
             toOrderedPresence values
-            |> fun values -> seq {
+            |> fun v -> seq {
                 // find single presence
-                let up = values.Length - 1
+                let up = v.Length - 1
                 for i in 0..up do
-                    match values.[i] with
+                    match v.[i] with
                     | [ block ] ->
                         let subRow = block/3
                         let subCol = block%3
