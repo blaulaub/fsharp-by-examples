@@ -4,7 +4,7 @@ type SolverState = { Board: Board; Options: Possibilities }
 
 module SolverState =
 
-    let initialSolutionState (sudoku: Board): SolverState =
+    let fromBoard (sudoku: Board): SolverState =
         {
             Board = Board.empty 3 3
             Options = Possibilities.fromBoard sudoku
@@ -71,12 +71,14 @@ module SolverState =
             yield! options |> ConclusiveAbsence.find group |> Seq.map AbsentInGroup
     }
 
-    let rec solveState state preAction =
+    let rec solveWithPreAction preAction state =
         preAction state
         let next =
             steps state.Options
             |> Seq.tryHead
             |> Option.map (applyStep state)
         match next with
-        | Some newState -> solveState newState preAction
+        | Some newState -> solveWithPreAction preAction newState
         | None -> state
+
+    let solve state = solveWithPreAction (ignore) state

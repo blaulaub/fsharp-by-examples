@@ -17,6 +17,19 @@ let difficultSudoku =
         [| None  ; None  ; Some 1; Some 8; None  ; Some 4; Some 3; None  ; None   |]
     |]
 
+let difficultSudokuSolution =
+    [|
+        [| Some 2; Some 8; Some 9; Some 4; Some 3; Some 6; Some 1; Some 5; Some 7 |];
+        [| Some 6; Some 1; Some 3; Some 5; Some 9; Some 7; Some 8; Some 4; Some 2 |];
+        [| Some 5; Some 7; Some 4; Some 1; Some 8; Some 2; Some 9; Some 6; Some 3 |];
+        [| Some 4; Some 5; Some 7; Some 3; Some 1; Some 8; Some 6; Some 2; Some 9 |];
+        [| Some 3; Some 9; Some 2; Some 6; Some 4; Some 5; Some 7; Some 8; Some 1 |];
+        [| Some 1; Some 6; Some 8; Some 2; Some 7; Some 9; Some 5; Some 3; Some 4 |];
+        [| Some 9; Some 4; Some 6; Some 7; Some 5; Some 3; Some 2; Some 1; Some 8 |];
+        [| Some 8; Some 3; Some 5; Some 9; Some 2; Some 1; Some 4; Some 7; Some 6 |];
+        [| Some 7; Some 2; Some 1; Some 8; Some 6; Some 4; Some 3; Some 9; Some 5 |]
+    |]
+
 // Sample data for an easy Sudoku
 let easySudoku =
     [|
@@ -62,20 +75,6 @@ let tests =
             Expect.equal (SolverState.ApplySingularOption { Row = 1; Col = 2; Value = 3}) singularOptions.[0] "singular option matches"
         }
 
-        test "verify toOrderedPresence" {
-            let subSorted = Array.map List.sort
-            Expect.equal ([| |]                     |> Possibilities.toOrderedPresence) [| |]                        "empty of zero"
-            Expect.equal ([| [] |]                  |> Possibilities.toOrderedPresence) [| [] |]                     "empty of one"
-            Expect.equal ([| [1] |]                 |> Possibilities.toOrderedPresence) [| [0] |]                    "one of one"
-            Expect.equal ([| [1]; [2] |]            |> Possibilities.toOrderedPresence) [| [0]; [1] |]               "one of two each"
-            Expect.equal ([| [1]; [1] |]            |> Possibilities.toOrderedPresence) [| [0; 1]; [] |]             "first of two twice"
-            Expect.equal ([| [2]; [2] |]            |> Possibilities.toOrderedPresence) [| []; [0; 1] |]             "second of two twice"
-            Expect.equal ([| [1;2]; [2;3]; [3;1] |] |> Possibilities.toOrderedPresence) [| [0; 2]; [0; 1]; [1; 2] |] "circular with two from three"
-            Expect.equal ([| [1;2;3]; [2;3]; [3] |] |> Possibilities.toOrderedPresence) [| [0]; [0; 1]; [0; 1; 2] |] "descending with three"
-
-            Expect.equal ([| [1]; [2]; [3]; [4]; [5]; [6] |] |> Possibilities.toOrderedPresence) [| [0]; [1]; [2]; [3]; [4]; [5] |] "sth a bit longer"
-        }
-
         test "verify applySingularOption" {
 
             let initialOptions () = [| for _ in 0..8 -> [| for _ in 0..8 -> [1..9] |] |]
@@ -98,15 +97,20 @@ let tests =
                     Expect.equal (remainingOptions.[row].[col]) [1..9]             (sprintf "elsewhere at row %d col %d" row col)
         }
 
+        test "solve difficult board" {
+            let finalState = difficultSudoku |> SolverState.fromBoard |> SolverState.solve
+            Expect.equal finalState.Board difficultSudokuSolution ""
+        }
+
         test "try solve some board" {
             let initialState =
-                SolverState.initialSolutionState difficultSudoku
-            do
-                SolverState.solveState initialState (fun state ->
-                    printfn "-----------------"
-                    Utilities.toString state.Board |> printfn "%s"
+                SolverState.fromBoard difficultSudoku
+
+            initialState
+            |> SolverState.solveWithPreAction (fun state ->
+                printfn "-----------------"
+                Utilities.toString state.Board |> printfn "%s"
                 )
-                |> ignore
-            ()
+            |> ignore
         }
     ]
