@@ -2,11 +2,9 @@ module SudokuSolver
 
 type RowAndColumnBoard<'T> = 'T array array
 
-let indices (data: 'T array) : int seq = seq { 0..(data.Length-1) }
-
 let mapForRowAndColBy<'In, 'Out> action (source: 'In RowAndColumnBoard): 'Out RowAndColumnBoard =
-    [| for row in indices source ->
-        [| for col in indices source.[row] ->
+    [| for row in 0..8 ->
+        [| for col in 0..8 ->
             action source row col
         |]
     |]
