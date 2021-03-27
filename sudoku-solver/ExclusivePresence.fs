@@ -41,9 +41,11 @@ module ExclusivePresence =
 
                 if places.Length = 2 then
 
+                    let exceptIncluded = Seq.filter (fun other -> other <> first && other <> second)
+
                     let canEliminateOthers =
                         seq { 0..(total-1) }
-                        |> Seq.filter (fun other -> other <> first && other <> second)
+                        |> exceptIncluded
                         |> Seq.map (fun other -> presence.[other])
                         |> Seq.concat
                         |> Seq.distinct
@@ -66,9 +68,11 @@ module ExclusivePresence =
 
                     if places.Length = 3 then
 
+                        let exceptIncluded = Seq.filter (fun other -> other <> first && other <> second && other <> third)
+
                         let canEliminateOthers =
                             seq { 0..(total-1) }
-                            |> Seq.filter (fun other -> other <> first && other <> second && other <> third)
+                            |> exceptIncluded
                             |> Seq.map (fun other -> presence.[other])
                             |> Seq.concat
                             |> Seq.distinct
