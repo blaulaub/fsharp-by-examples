@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Compile Include="SudokuSolver.fs" />
+    <Compile Include="SudokuUtils.fs" />
   </ItemGroup>
 
 </Project>

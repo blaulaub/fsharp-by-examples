@@ -103,7 +103,7 @@ let tests =
             do
                 SudokuSolver.solveState initialState (fun state ->
                     printfn "-----------------"
-                    SudokuSolver.toString state.Board |> printfn "%s"
+                    SudokuUtils.toString state.Board |> printfn "%s"
                 )
                 |> ignore
             ()

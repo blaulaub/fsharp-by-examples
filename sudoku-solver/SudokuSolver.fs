@@ -2,29 +2,11 @@ module SudokuSolver
 
 type RowAndColumnBoard<'T> = 'T array array
 
-let boardToString<'T> (fieldToString: 'T -> string) (board: 'T RowAndColumnBoard) =
-    board
-    |> Seq.map (fun line ->
-        line
-        |> Seq.map fieldToString
-        |> String.concat ""
-        )
-    |> String.concat "\n"
-
 /// <summary>
 /// A Sudoku board. Some of the fields contain an integer value,
 /// some of them are empty.
 /// </summary>
 type Sudoku = int option RowAndColumnBoard
-
-/// <summary>
-/// Dump the Sudoku into a nine-line-nine-column string.
-/// </summary>
-let toString = boardToString (fun x ->
-    match x with
-    | Some value -> sprintf " %d " value
-    | None -> "   "
-    )
 
 /// <summary>
 /// A Sudoku board not with the solution, but with the possible
