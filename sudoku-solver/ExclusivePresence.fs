@@ -36,7 +36,7 @@ module ExclusivePresence =
         ) (up, [| for _ in 0..up -> [] |])
         |> snd
 
-    let matchTwice (mapper: int -> (int * int)) (presence: int list array) = seq {
+    let private matchTwice (mapper: int -> (int * int)) (presence: int list array) = seq {
 
         for first in 0..8 do
         if presence.[first].Length > 0 then
@@ -97,7 +97,7 @@ module ExclusivePresence =
                         if canEliminateOthers then yield { Numbers = [ first+1; second+1; third+1 ]; RowsAndColumns = places |> List.map mapper }
     }
 
-    let matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
+    let private matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
         for value in 0..8 do
             match presence.[value] with
             | [ position ] -> yield { Numbers = [value+1]; RowsAndColumns = [ mapper position] }
