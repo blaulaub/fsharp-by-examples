@@ -108,7 +108,7 @@ let tests =
 
             initialState
             |> SolverState.solveWithPreAction (fun state ->
-                printfn "-----------------"
+                printfn "---------------------------"
                 Utilities.toString state.Board |> printfn "%s"
                 )
             |> ignore

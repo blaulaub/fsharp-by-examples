@@ -19,24 +19,23 @@ module SolverState =
     | AbsentInGroup of ConclusiveAbsence
 
     let applySingularOptionToState { Row = targetRow; Col = targetCol; Value = num } oldState =
-            printfn "field row %d col %d has single option %d" targetRow targetCol num
-            let oldBoard = oldState.Board
-            let newBoard =
-                [| for row in 0..8 ->
-                    if row <> targetRow
-                    then oldBoard.[row]
-                    else
-                        [| for col in 0..8 ->
-                            if col <> targetCol
-                            then oldBoard.[row].[col]
-                            else Some num
-                        |]
-                |]
-            let oldOptions = oldState.Options
-            let newOptions =
-                oldOptions
-                |> SingularOption.apply { Row = targetRow; Col = targetCol; Value = num }
-            { Board = newBoard; Options = newOptions }
+        let oldBoard = oldState.Board
+        let newBoard =
+            [| for row in 0..8 ->
+                if row <> targetRow
+                then oldBoard.[row]
+                else
+                    [| for col in 0..8 ->
+                        if col <> targetCol
+                        then oldBoard.[row].[col]
+                        else Some num
+                    |]
+            |]
+        let oldOptions = oldState.Options
+        let newOptions =
+            oldOptions
+            |> SingularOption.apply { Row = targetRow; Col = targetCol; Value = num }
+        { Board = newBoard; Options = newOptions }
 
     let applyExlussivePresenceToState (presence: ExclusivePresence) oldState = {
         Board = oldState.Board  // board is not updated
@@ -51,13 +50,10 @@ module SolverState =
     let applyStep (oldState: SolverState) (step: SolutionStep): SolverState =
         match step with
         | ApplySingularOption option ->
-            printfn "(singular %d at %dx%d)" option.Value (option.Row+1) (option.Col+1)
             applySingularOptionToState option oldState
         | ExclusiveInGroup presence ->
-            printfn "(exclussive values %A at %A)" presence.Numbers presence.RowsAndColumns
             applyExlussivePresenceToState presence oldState
         | AbsentInGroup absence ->
-            printfn "(absent values %A at %A)" absence.Numbers absence.RowsAndColumns
             applyConclusiveAbsenceToState absence oldState
 
     let steps options = seq {
