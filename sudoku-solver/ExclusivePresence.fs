@@ -18,10 +18,12 @@ module ExclusivePresence =
 
     let private matchTwice (mapper: int -> (int * int)) (presence: int list array) = seq {
 
-        for first in 0..8 do
+        let total = superRows * superColumns
+
+        for first in 0..(total-1) do
         if presence.[first].Length > 0 then
 
-            for second in (first+1)..8 do
+            for second in (first+1)..(total-1) do
             if presence.[second].Length > 0 then
 
                 let places =
@@ -36,7 +38,7 @@ module ExclusivePresence =
                 if places.Length = 2 then
 
                     let canEliminateOthers =
-                        seq { 0..8 }
+                        seq { 0..(total-1) }
                         |> Seq.filter (fun other -> other <> first && other <> second)
                         |> Seq.map (fun other -> presence.[other])
                         |> Seq.concat
@@ -46,13 +48,13 @@ module ExclusivePresence =
                     if canEliminateOthers then yield { Numbers = [ first+1; second+1 ]; RowsAndColumns = places |> List.map mapper }
 
 
-        for first in 0..8 do
+        for first in 0..(total-1) do
         if presence.[first].Length > 0 then
 
-            for second in (first+1)..8 do
+            for second in (first+1)..(total-1) do
             if presence.[second].Length > 0 then
 
-                for third in (second+1)..8 do
+                for third in (second+1)..(total-1) do
                 if presence.[third].Length > 0 then
 
                     let places =
@@ -67,7 +69,7 @@ module ExclusivePresence =
                     if places.Length = 3 then
 
                         let canEliminateOthers =
-                            seq { 0..8 }
+                            seq { 0..(total-1) }
                             |> Seq.filter (fun other -> other <> first && other <> second && other <> third)
                             |> Seq.map (fun other -> presence.[other])
                             |> Seq.concat
@@ -78,7 +80,8 @@ module ExclusivePresence =
     }
 
     let private matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
-        for value in 0..8 do
+        let total = superRows * superColumns
+        for value in 0..(total-1) do
             match presence.[value] with
             | [ position ] -> yield { Numbers = [value+1]; RowsAndColumns = [ mapper position] }
             | _ -> ()
