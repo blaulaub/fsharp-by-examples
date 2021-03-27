@@ -61,21 +61,7 @@ module Solver =
             applyConclusiveAbsenceToState absence oldState
 
     let analyseCross (opts: Possibilities) (group: SingularCrossGroup) : SolutionStep seq =
-        let source = group.Source |> Seq.toArray
-        let target = group.Target |> Seq.toArray
-
-        let findPossibilities target =
-            target
-            |> Seq.map (fun (row, col) -> opts.[row].[col])
-            |> Seq.concat
-            |> Seq.distinct
-            |> Seq.toList
-
-        let sourcePossibilities () = source |> findPossibilities
-
-        findPossibilities target
-        |> Seq.filter (fun inTarget -> sourcePossibilities() |> List.contains inTarget )
-        |> Seq.map (fun value -> AbsentInGroup { Numbers = [value]; RowsAndColumns = source |> Seq.toList })
+        ConclusiveAbsence.find opts group |> Seq.map AbsentInGroup
 
     let steps options = seq {
         // first try eliminating singular options

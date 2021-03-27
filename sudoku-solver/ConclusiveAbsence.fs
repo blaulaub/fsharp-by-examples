@@ -14,6 +14,23 @@ module ConclusiveAbsence =
     let private superColumns = 3
     let private superRows = 3
 
+    let find (opts: Possibilities) (group: SingularCrossGroup) : ConclusiveAbsence seq =
+        let source = group.Source |> Seq.toArray
+        let target = group.Target |> Seq.toArray
+
+        let findPossibilities target =
+            target
+            |> Seq.map (fun (row, col) -> opts.[row].[col])
+            |> Seq.concat
+            |> Seq.distinct
+            |> Seq.toList
+
+        let sourcePossibilities () = source |> findPossibilities
+
+        findPossibilities target
+        |> Seq.filter (fun inTarget -> sourcePossibilities() |> List.contains inTarget )
+        |> Seq.map (fun value -> { Numbers = [value]; RowsAndColumns = source |> Seq.toList })
+
     let apply (absence: ConclusiveAbsence) (options: Possibilities) : Possibilities =
 
         let total = superRows * superColumns
