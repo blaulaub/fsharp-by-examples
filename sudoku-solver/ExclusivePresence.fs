@@ -25,6 +25,15 @@ module ExclusivePresence =
                 ) s
             ) []
 
+    let canEliminateOthers (presence: int list array) (places: int list) (exceptIncluded: int seq -> int seq) =
+        let total = superRows * superColumns
+        seq { 0..(total-1) }
+        |> exceptIncluded
+        |> Seq.map (fun other -> presence.[other])
+        |> Seq.concat
+        |> Seq.distinct
+        |> Seq.exists (fun p -> places |> List.contains p)
+
     let private matchTwice (mapper: int -> (int * int)) (presence: int list array) = seq {
 
         let total = superRows * superColumns
@@ -43,15 +52,8 @@ module ExclusivePresence =
 
                     let exceptIncluded = Seq.filter (fun other -> other <> first && other <> second)
 
-                    let canEliminateOthers =
-                        seq { 0..(total-1) }
-                        |> exceptIncluded
-                        |> Seq.map (fun other -> presence.[other])
-                        |> Seq.concat
-                        |> Seq.distinct
-                        |> Seq.exists (fun p -> places |> List.contains p)
-
-                    if canEliminateOthers then yield { Numbers = [ first+1; second+1 ]; RowsAndColumns = places |> List.map mapper }
+                    if canEliminateOthers presence places exceptIncluded
+                    then yield { Numbers = [ first+1; second+1 ]; RowsAndColumns = places |> List.map mapper }
 
         for first in 0..(total-1) do
         if presence.[first].Length > 0 then
@@ -70,15 +72,8 @@ module ExclusivePresence =
 
                         let exceptIncluded = Seq.filter (fun other -> other <> first && other <> second && other <> third)
 
-                        let canEliminateOthers =
-                            seq { 0..(total-1) }
-                            |> exceptIncluded
-                            |> Seq.map (fun other -> presence.[other])
-                            |> Seq.concat
-                            |> Seq.distinct
-                            |> Seq.exists (fun p -> places |> List.contains p)
-
-                        if canEliminateOthers then yield { Numbers = [ first+1; second+1; third+1 ]; RowsAndColumns = places |> List.map mapper }
+                        if canEliminateOthers presence places exceptIncluded
+                        then yield { Numbers = [ first+1; second+1; third+1 ]; RowsAndColumns = places |> List.map mapper }
     }
 
     let private matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
