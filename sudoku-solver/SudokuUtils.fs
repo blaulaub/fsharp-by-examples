@@ -1,6 +1,6 @@
 module SudokuUtils
 
-let boardToString<'T> (fieldToString: 'T -> string) (board: 'T SudokuSolver.RowAndColumnBoard) =
+let private boardToString<'T> (fieldToString: 'T -> string) (board: 'T array array) =
     board
     |> Seq.map (fun line ->
         line

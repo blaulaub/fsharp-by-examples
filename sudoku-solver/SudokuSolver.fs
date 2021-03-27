@@ -2,8 +2,6 @@ module SudokuSolver
 
 open Ch.PatchCode.SudokuSolver
 
-type RowAndColumnBoard<'T> = 'T array array
-
 /// <summary>
 /// A Sudoku board not with the solution, but with the possible
 /// numbers.
@@ -12,12 +10,12 @@ type RowAndColumnBoard<'T> = 'T array array
 /// Instead of an algorithm trying to make <see cref="Sudoku"/> complete,
 /// we will look for an algorithm trying to make <see cref="Options"/> empty.
 /// </remarks>
-type Options = int list RowAndColumnBoard
+type Possibilities = int list array array
 
 /// <summary>
 /// Derives initial options from a given <see cref="Sudoku"/> setup.
 /// </summary>
-let options (sudoku: SudokuBoard): Options =
+let options (sudoku: SudokuBoard): Possibilities =
     [| for row in sudoku ->
         [| for field in row ->
             match field with
@@ -102,7 +100,7 @@ type ConclussiveAbsence = {
     RowsAndColumns: (int * int) list
 }
 
-type SolutionState = { Board: SudokuBoard; Options: Options }
+type SolutionState = { Board: SudokuBoard; Options: Possibilities }
 
 let initialSolutionState (sudoku: SudokuBoard): SolutionState =
     {
@@ -122,7 +120,7 @@ type SolutionStep =
 /// Find and return all fields that have a
 /// single possible solution.
 /// </summary>
-let findSingularOptions (opts: Options): SolutionStep seq = seq {
+let findSingularOptions (opts: Possibilities): SolutionStep seq = seq {
     for row in 0..8 do
     for col in 0..8 do
     match opts.[row].[col] with
@@ -130,7 +128,7 @@ let findSingularOptions (opts: Options): SolutionStep seq = seq {
     | _ -> ()
 }
 
-let applySingularOption { Row = targetRow; Col = targetCol; Value = targetNum } (options: Options) : Options =
+let applySingularOption { Row = targetRow; Col = targetCol; Value = targetNum } (options: Possibilities) : Possibilities =
     [| for row in 0..8 ->
         [| for col in 0..8 ->
             if row = targetRow && col = targetCol
@@ -143,7 +141,7 @@ let applySingularOption { Row = targetRow; Col = targetCol; Value = targetNum } 
         |]
     |]
 
-let applyExclussivePresence (presence: ExclussivePresence) (options: Options) : Options =
+let applyExclussivePresence (presence: ExclussivePresence) (options: Possibilities) : Possibilities =
     [| for row in 0..8 ->
         [| for col in 0..8 ->
             if presence.RowsAndColumns |> List.contains (row, col)
@@ -152,7 +150,7 @@ let applyExclussivePresence (presence: ExclussivePresence) (options: Options) : 
         |]
     |]
 
-let applyConclusiveAbsence (absence: ConclussiveAbsence) (options: Options) : Options =
+let applyConclusiveAbsence (absence: ConclussiveAbsence) (options: Possibilities) : Possibilities =
     [| for row in 0..8 ->
         [| for col in 0..8 ->
             if absence.RowsAndColumns |> List.contains (row, col)
@@ -297,14 +295,14 @@ let matchExclussivePresence (mapper: int -> (int * int)) (presence: int list arr
     yield! matchTwice mapper presence
 }
 
-let analyse (opts: Options) (group: NinerGroup) : SolutionStep seq =
+let analyse (opts: Possibilities) (group: NinerGroup) : SolutionStep seq =
     let fields = group |> Seq.toArray
     let values = [| for (row, col) in fields -> opts.[row].[col] |]
     values
     |> toOrderedPresence
     |> matchExclussivePresence (fun idx -> fields.[idx] )
 
-let analyseCross (opts: Options) (group: SingularCrossGroup) : SolutionStep seq =
+let analyseCross (opts: Possibilities) (group: SingularCrossGroup) : SolutionStep seq =
     let source = group.Source |> Seq.toArray
     let target = group.Target |> Seq.toArray
 
