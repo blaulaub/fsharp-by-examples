@@ -102,54 +102,6 @@ let tests =
             Expect.equal (SolverState.ApplySingularOption { Row = 1; Col = 2; Value = 3}) singularOptions.[0] "singular option matches"
         }
 
-        test "verify singularCrossGroups 1" {
-            let group =
-                CrossGroup.singularCrossGroups()
-                |> Seq.filter (fun g -> (g.Target |> Seq.contains (1,0)) && (g.Target |> Seq.contains (2,2)))
-                |> Seq.exactlyOne
-
-            Expect.equal (group.Source |> Seq.length) 6 ""
-            Expect.equal (group.Target |> Seq.length) 6 ""
-
-            Expect.isTrue (group.Target |> Seq.contains (1,0)) ""
-            Expect.isTrue (group.Target |> Seq.contains (1,1)) ""
-            Expect.isTrue (group.Target |> Seq.contains (1,2)) ""
-            Expect.isTrue (group.Target |> Seq.contains (2,0)) ""
-            Expect.isTrue (group.Target |> Seq.contains (2,1)) ""
-            Expect.isTrue (group.Target |> Seq.contains (2,2)) ""
-
-            Expect.isTrue (group.Source |> Seq.contains (0,3)) (sprintf "but contains %A" group.Source)
-            Expect.isTrue (group.Source |> Seq.contains (0,4)) (sprintf "but contains %A" group.Source)
-            Expect.isTrue (group.Source |> Seq.contains (0,5)) (sprintf "but contains %A" group.Source)
-            Expect.isTrue (group.Source |> Seq.contains (0,6)) (sprintf "but contains %A" group.Source)
-            Expect.isTrue (group.Source |> Seq.contains (0,7)) (sprintf "but contains %A" group.Source)
-            Expect.isTrue (group.Source |> Seq.contains (0,8)) (sprintf "but contains %A" group.Source)
-        }
-
-        test "verify singularCrossGroups 2" {
-            let group =
-                CrossGroup.singularCrossGroups()
-                |> Seq.filter (fun g -> (g.Target |> Seq.contains (0,0)) && (g.Target |> Seq.contains (2,2)))
-                |> Seq.exactlyOne
-
-            Expect.equal (group.Source |> Seq.length) 6 ""
-            Expect.equal (group.Target |> Seq.length) 6 ""
-
-            Expect.isTrue (group.Target |> Seq.contains (0,0)) ""
-            Expect.isTrue (group.Target |> Seq.contains (0,1)) ""
-            Expect.isTrue (group.Target |> Seq.contains (0,2)) ""
-            Expect.isTrue (group.Target |> Seq.contains (2,0)) ""
-            Expect.isTrue (group.Target |> Seq.contains (2,1)) ""
-            Expect.isTrue (group.Target |> Seq.contains (2,2)) ""
-
-            Expect.isTrue (group.Source |> Seq.contains (1,3)) (sprintf "but contains %A" group.Source)
-            Expect.isTrue (group.Source |> Seq.contains (1,4)) (sprintf "but contains %A" group.Source)
-            Expect.isTrue (group.Source |> Seq.contains (1,5)) (sprintf "but contains %A" group.Source)
-            Expect.isTrue (group.Source |> Seq.contains (1,6)) (sprintf "but contains %A" group.Source)
-            Expect.isTrue (group.Source |> Seq.contains (1,7)) (sprintf "but contains %A" group.Source)
-            Expect.isTrue (group.Source |> Seq.contains (1,8)) (sprintf "but contains %A" group.Source)
-        }
-
         test "verify applySingularOption" {
 
             let initialOptions () = [| for _ in 0..8 -> [| for _ in 0..8 -> [1..9] |] |]

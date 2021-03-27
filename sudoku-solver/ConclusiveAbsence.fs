@@ -14,20 +14,21 @@ module ConclusiveAbsence =
     let private superColumns = 3
     let private superRows = 3
 
+    /// Returns the list of numbers present in the given fields.
+    let findPossibilities (opts: Possibilities) (fields: (int*int) seq) =
+        fields
+        |> Seq.map (fun (row, col) -> opts.[row].[col])
+        |> Seq.concat
+        |> Seq.distinct
+        |> Seq.toList
+
     let find (group: SingularCrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
         let source = group.Source |> Seq.toArray
         let target = group.Target |> Seq.toArray
 
-        let findPossibilities t =
-            t
-            |> Seq.map (fun (row, col) -> opts.[row].[col])
-            |> Seq.concat
-            |> Seq.distinct
-            |> Seq.toList
+        let sourcePossibilities () = source |> findPossibilities opts
 
-        let sourcePossibilities () = source |> findPossibilities
-
-        findPossibilities target
+        findPossibilities opts target
         |> Seq.filter (fun inTarget -> sourcePossibilities() |> List.contains inTarget )
         |> Seq.map (fun value -> { Numbers = [value]; RowsAndColumns = source |> Seq.toList })
 
