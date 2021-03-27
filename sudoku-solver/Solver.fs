@@ -26,9 +26,6 @@ module Solver =
     | ExclusiveInGroup of ExclusivePresence
     | AbsentInGroup of ConclussiveAbsence
 
-    let findSingularOptions (opts: Possibilities): SolutionStep seq =
-        opts |> SingularOption.find |> Seq.map ApplySingularOption
-
     let applyConclusiveAbsence (absence: ConclussiveAbsence) (options: Possibilities) : Possibilities =
         [| for row in 0..8 ->
             [| for col in 0..8 ->
@@ -127,7 +124,7 @@ module Solver =
 
     let steps options = seq {
         // first try eliminating singular options
-        yield! findSingularOptions options
+        yield! options |> SingularOption.find |> Seq.map ApplySingularOption
         // next try checking niner groups
         for group in RuleGroup.groups 3 3 do
             yield! analyse options group
