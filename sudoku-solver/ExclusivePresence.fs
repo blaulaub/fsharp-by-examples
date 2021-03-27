@@ -51,7 +51,6 @@ module ExclusivePresence =
 
                     if canEliminateOthers then yield { Numbers = [ first+1; second+1 ]; RowsAndColumns = places |> List.map mapper }
 
-
         for first in 0..(total-1) do
         if presence.[first].Length > 0 then
 
