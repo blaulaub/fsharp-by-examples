@@ -3,12 +3,6 @@ namespace Ch.PatchCode.SudokuSolver
 module Solver =
 
     /// <summary>
-    /// A singular option is a field on the board where
-    /// only one value can possibly be the solution.
-    /// </summary>
-    type SingularOption = { Row: int; Col: int; Value: int }
-
-    /// <summary>
     /// A limited number of values occupies a limited number
     /// of fields, meaning that no other numbers can be on
     /// these fields.
@@ -42,17 +36,8 @@ module Solver =
     | ExclussiveInGroup of ExclussivePresence
     | AbsentInGroup of ConclussiveAbsence
 
-    /// <summary>
-    /// Find and return all fields that have a
-    /// single possible solution.
-    /// </summary>
-    let findSingularOptions (opts: Possibilities): SolutionStep seq = seq {
-        for row in 0..8 do
-        for col in 0..8 do
-        match opts.[row].[col] with
-        | [ num ] -> yield ApplySingularOption { Row = row; Col = col; Value = num }
-        | _ -> ()
-    }
+    let findSingularOptions (opts: Possibilities): SolutionStep seq =
+        opts |> SingularOption.find |> Seq.map ApplySingularOption
 
     let applySingularOption { Row = targetRow; Col = targetCol; Value = targetNum } (options: Possibilities) : Possibilities =
         [| for row in 0..8 ->

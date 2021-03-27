@@ -10,6 +10,7 @@
     <Compile Include="RuleGroup.fs" />
     <Compile Include="Possibilities.fs" />
     <Compile Include="CrossGroup.fs" />
+    <Compile Include="SingularOption.fs" />
     <Compile Include="Solver.fs" />
     <Compile Include="Utilities.fs" />
   </ItemGroup>

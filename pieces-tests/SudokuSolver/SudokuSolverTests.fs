@@ -80,7 +80,7 @@ let tests =
 
             let initialOptions () = [| for _ in 0..8 -> [| for _ in 0..8 -> [1..9] |] |]
 
-            let singularOption : Solver.SingularOption = { Row = 0; Col = 4; Value = 5 }
+            let singularOption : SingularOption = { Row = 0; Col = 4; Value = 5 }
             let remainingOptions = Solver.applySingularOption singularOption (initialOptions())
 
             for row in 0..8 do
