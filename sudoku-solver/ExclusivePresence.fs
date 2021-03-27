@@ -16,6 +16,15 @@ module ExclusivePresence =
     let private superColumns = 3
     let private superRows = 3
 
+    let private commonPlaces (individualPlaces: int list list) =
+        individualPlaces
+        |> Seq.fold (fun s p ->
+            p
+            |> List.fold (fun s p ->
+                if s |> List.contains p then s else p :: s
+                ) s
+            ) []
+
     let private matchTwice (mapper: int -> (int * int)) (presence: int list array) = seq {
 
         let total = superRows * superColumns
@@ -28,12 +37,7 @@ module ExclusivePresence =
 
                 let places =
                     [ presence.[first]; presence.[second] ]
-                    |> List.fold (fun s p ->
-                        p
-                        |> List.fold (fun s p ->
-                            if s |> List.contains p then s else p :: s
-                            ) s
-                        ) []
+                    |> commonPlaces
 
                 if places.Length = 2 then
 
@@ -59,12 +63,7 @@ module ExclusivePresence =
 
                     let places =
                         [ presence.[first]; presence.[second]; presence.[third] ]
-                        |> List.fold (fun s p ->
-                            p
-                            |> List.fold (fun s p ->
-                                if s |> List.contains p then s else p :: s
-                                ) s
-                            ) []
+                        |> commonPlaces
 
                     if places.Length = 3 then
 
