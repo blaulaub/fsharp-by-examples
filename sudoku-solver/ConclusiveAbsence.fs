@@ -15,7 +15,7 @@ module ConclusiveAbsence =
     let private superRows = 3
 
     /// Returns the list of numbers present in the given fields.
-    let findPossibilities (opts: Possibilities) (fields: (int*int) seq) =
+    let private findPossibilities (opts: Possibilities) (fields: (int*int) seq) =
         fields
         |> Seq.map (fun (row, col) -> opts.[row].[col])
         |> Seq.concat
