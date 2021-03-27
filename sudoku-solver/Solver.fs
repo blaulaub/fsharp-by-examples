@@ -3,16 +3,6 @@ namespace Ch.PatchCode.SudokuSolver
 module Solver =
 
     /// <summary>
-    /// A limited number of values occupies a limited number
-    /// of fields, meaning that no other numbers can be on
-    /// these fields.
-    /// </summary>
-    type ExclussivePresence = {
-        Numbers: int list
-        RowsAndColumns: (int * int) list
-    }
-
-    /// <summary>
     /// A list of values that are definetly not present in a list of fields.
     /// </summary>
     type ConclussiveAbsence = {
