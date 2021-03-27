@@ -23,20 +23,11 @@ module Solver =
     /// </summary>
     type SolutionStep =
     | ApplySingularOption of SingularOption
-    | ExclussiveInGroup of ExclussivePresence
+    | ExclussiveInGroup of ExclusivePresence
     | AbsentInGroup of ConclussiveAbsence
 
     let findSingularOptions (opts: Possibilities): SolutionStep seq =
         opts |> SingularOption.find |> Seq.map ApplySingularOption
-
-    let applyExclussivePresence (presence: ExclussivePresence) (options: Possibilities) : Possibilities =
-        [| for row in 0..8 ->
-            [| for col in 0..8 ->
-                if presence.RowsAndColumns |> List.contains (row, col)
-                then [ for num in options.[row].[col] do if presence.Numbers |> List.contains num then num ]
-                else options.[row].[col]
-            |]
-        |]
 
     let applyConclusiveAbsence (absence: ConclussiveAbsence) (options: Possibilities) : Possibilities =
         [| for row in 0..8 ->
@@ -67,9 +58,9 @@ module Solver =
                 |> SingularOption.apply { Row = targetRow; Col = targetCol; Value = num }
             { Board = newBoard; Options = newOptions }
 
-    let applyExlussivePresenceToState (presence: ExclussivePresence) oldState = {
+    let applyExlussivePresenceToState (presence: ExclusivePresence) oldState = {
         Board = oldState.Board  // board is not updated
-        Options = oldState.Options |> applyExclussivePresence presence
+        Options = oldState.Options |> ExclusivePresence.apply presence
     }
 
     let applyConclusiveAbsenceToState (absence: ConclussiveAbsence) oldState = {
