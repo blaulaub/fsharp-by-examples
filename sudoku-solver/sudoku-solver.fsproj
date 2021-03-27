@@ -6,11 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SudokuBoard.fs" />
+    <Compile Include="Board.fs" />
     <Compile Include="RuleGroup.fs" />
-    <Compile Include="SudokuPossibilities.fs" />
-    <Compile Include="SudokuSolver.fs" />
-    <Compile Include="SudokuUtils.fs" />
+    <Compile Include="Possibilities.fs" />
+    <Compile Include="Solver.fs" />
+    <Compile Include="Utilities.fs" />
   </ItemGroup>
 
 </Project>
