@@ -38,7 +38,7 @@ let tests =
             let board = [| for row in 0..8 -> [| for col in 0..8 -> None |] |]
             board.[1].[2] <- Some 3
 
-            let opts = SudokuSolver.options board
+            let opts = SudokuSolver.possibilities board
 
             for row in 0..8 do
             for col in 0..8 do
@@ -53,7 +53,7 @@ let tests =
             let board = [| for row in 0..8 -> [| for col in 0..8 -> None |] |]
             board.[1].[2] <- Some 3
 
-            let opts = SudokuSolver.options board
+            let opts = SudokuSolver.possibilities board
 
             let singularOptions = SudokuSolver.findSingularOptions opts |> Seq.toArray
 

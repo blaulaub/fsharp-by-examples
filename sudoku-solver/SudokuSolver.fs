@@ -3,19 +3,9 @@ module SudokuSolver
 open Ch.PatchCode.SudokuSolver
 
 /// <summary>
-/// A Sudoku board not with the solution, but with the possible
-/// numbers.
-/// </summary>
-/// <remarks>
-/// Instead of an algorithm trying to make <see cref="Sudoku"/> complete,
-/// we will look for an algorithm trying to make <see cref="Options"/> empty.
-/// </remarks>
-type Possibilities = int list array array
-
-/// <summary>
 /// Derives initial options from a given <see cref="Sudoku"/> setup.
 /// </summary>
-let options (sudoku: SudokuBoard): Possibilities =
+let possibilities (sudoku: Board): Possibilities =
     [| for row in sudoku ->
         [| for field in row ->
             match field with
@@ -100,12 +90,12 @@ type ConclussiveAbsence = {
     RowsAndColumns: (int * int) list
 }
 
-type SolutionState = { Board: SudokuBoard; Options: Possibilities }
+type SolutionState = { Board: Board; Options: Possibilities }
 
-let initialSolutionState (sudoku: SudokuBoard): SolutionState =
+let initialSolutionState (sudoku: Board): SolutionState =
     {
-        Board = SudokuBoard.emptySudoku 3 3
-        Options = options sudoku
+        Board = Board.empty 3 3
+        Options = possibilities sudoku
     }
 
 /// <summary>

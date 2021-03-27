@@ -1,10 +1,10 @@
 namespace Ch.PatchCode.SudokuSolver
 
-type SudokuBoard = int option array array
+type Board = int option array array
 
-module SudokuBoard =
+module Board =
 
-    let emptySudoku (superRows: int) (superColumns: int): SudokuBoard =
+    let empty (superRows: int) (superColumns: int): Board =
         let total = superRows * superColumns
         [| for _ in 0..(total-1) ->
             [| for _ in 0..(total-1) ->
