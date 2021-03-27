@@ -6,6 +6,7 @@ namespace Ch.PatchCode.SudokuSolver
 /// </summary>
 type SingularCrossGroup = {
     Source: (int*int) seq
+    Intersection: (int*int) seq
     Target: (int*int) seq
 }
 
@@ -27,6 +28,11 @@ module CrossGroup =
                 for col in 0..(total-1) do
                 if (row%superColumns = subRow) && (col/superRows <> supCol) then yield ((row/3)*3+subRow, col)
             }
+            Intersection = seq {
+                for subRow in 0..(superColumns-1) do
+                for col in 0..(total-1) do
+                if (row%superColumns = subRow) && (col/superRows = supCol) then yield ((row/3)*3+subRow, col)
+            }
             Target = seq {
                 for col in 0..(total-1) do
                 for subRow in 0..(superColumns-1) do
@@ -41,6 +47,11 @@ module CrossGroup =
                 for subCol in 0..(superRows-1) do
                 for row in 0..(total-1) do
                 if (col%superRows = subCol) && (row/superColumns <> supRow) then yield (row, (col/3)*3+subCol)
+            }
+            Intersection = seq {
+                for subCol in 0..(superRows-1) do
+                for row in 0..(total-1) do
+                if (col%superRows = subCol) && (row/superColumns = supRow) then yield (row, (col/3)*3+subCol)
             }
             Target = seq {
                 for row in 0..(total-1) do

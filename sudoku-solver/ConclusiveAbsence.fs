@@ -18,8 +18,8 @@ module ConclusiveAbsence =
         let source = group.Source |> Seq.toArray
         let target = group.Target |> Seq.toArray
 
-        let findPossibilities target =
-            target
+        let findPossibilities t =
+            t
             |> Seq.map (fun (row, col) -> opts.[row].[col])
             |> Seq.concat
             |> Seq.distinct
