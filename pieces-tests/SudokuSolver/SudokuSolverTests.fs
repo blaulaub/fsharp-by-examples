@@ -64,16 +64,16 @@ let tests =
 
         test "verify toOrderedPresence" {
             let subSorted = Array.map List.sort
-            Expect.equal ([| |]                     |> Solver.toOrderedPresence) [| |]                        "empty of zero"
-            Expect.equal ([| [] |]                  |> Solver.toOrderedPresence) [| [] |]                     "empty of one"
-            Expect.equal ([| [1] |]                 |> Solver.toOrderedPresence) [| [0] |]                    "one of one"
-            Expect.equal ([| [1]; [2] |]            |> Solver.toOrderedPresence) [| [0]; [1] |]               "one of two each"
-            Expect.equal ([| [1]; [1] |]            |> Solver.toOrderedPresence) [| [0; 1]; [] |]             "first of two twice"
-            Expect.equal ([| [2]; [2] |]            |> Solver.toOrderedPresence) [| []; [0; 1] |]             "second of two twice"
-            Expect.equal ([| [1;2]; [2;3]; [3;1] |] |> Solver.toOrderedPresence) [| [0; 2]; [0; 1]; [1; 2] |] "circular with two from three"
-            Expect.equal ([| [1;2;3]; [2;3]; [3] |] |> Solver.toOrderedPresence) [| [0]; [0; 1]; [0; 1; 2] |] "descending with three"
+            Expect.equal ([| |]                     |> Possibilities.toOrderedPresence) [| |]                        "empty of zero"
+            Expect.equal ([| [] |]                  |> Possibilities.toOrderedPresence) [| [] |]                     "empty of one"
+            Expect.equal ([| [1] |]                 |> Possibilities.toOrderedPresence) [| [0] |]                    "one of one"
+            Expect.equal ([| [1]; [2] |]            |> Possibilities.toOrderedPresence) [| [0]; [1] |]               "one of two each"
+            Expect.equal ([| [1]; [1] |]            |> Possibilities.toOrderedPresence) [| [0; 1]; [] |]             "first of two twice"
+            Expect.equal ([| [2]; [2] |]            |> Possibilities.toOrderedPresence) [| []; [0; 1] |]             "second of two twice"
+            Expect.equal ([| [1;2]; [2;3]; [3;1] |] |> Possibilities.toOrderedPresence) [| [0; 2]; [0; 1]; [1; 2] |] "circular with two from three"
+            Expect.equal ([| [1;2;3]; [2;3]; [3] |] |> Possibilities.toOrderedPresence) [| [0]; [0; 1]; [0; 1; 2] |] "descending with three"
 
-            Expect.equal ([| [1]; [2]; [3]; [4]; [5]; [6] |] |> Solver.toOrderedPresence) [| [0]; [1]; [2]; [3]; [4]; [5] |] "sth a bit longer"
+            Expect.equal ([| [1]; [2]; [3]; [4]; [5]; [6] |] |> Possibilities.toOrderedPresence) [| [0]; [1]; [2]; [3]; [4]; [5] |] "sth a bit longer"
         }
 
         test "verify applySingularOption" {
