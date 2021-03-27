@@ -56,10 +56,10 @@ let tests =
 
             let opts = Possibilities.fromBoard board
 
-            let singularOptions = opts |> SingularOption.find |> Seq.map Solver.ApplySingularOption |> Seq.toArray
+            let singularOptions = opts |> SingularOption.find |> Seq.map SolverState.ApplySingularOption |> Seq.toArray
 
             Expect.equal 1 singularOptions.Length "have only one singular option"
-            Expect.equal (Solver.ApplySingularOption { Row = 1; Col = 2; Value = 3}) singularOptions.[0] "singular option matches"
+            Expect.equal (SolverState.ApplySingularOption { Row = 1; Col = 2; Value = 3}) singularOptions.[0] "singular option matches"
         }
 
         test "verify toOrderedPresence" {
@@ -100,9 +100,9 @@ let tests =
 
         test "try solve some board" {
             let initialState =
-                Solver.initialSolutionState difficultSudoku
+                SolverState.initialSolutionState difficultSudoku
             do
-                Solver.solveState initialState (fun state ->
+                SolverState.solveState initialState (fun state ->
                     printfn "-----------------"
                     Utilities.toString state.Board |> printfn "%s"
                 )

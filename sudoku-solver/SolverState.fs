@@ -1,10 +1,10 @@
 namespace Ch.PatchCode.SudokuSolver
 
-module Solver =
+type SolverState = { Board: Board; Options: Possibilities }
 
-    type SolutionState = { Board: Board; Options: Possibilities }
+module SolverState =
 
-    let initialSolutionState (sudoku: Board): SolutionState =
+    let initialSolutionState (sudoku: Board): SolverState =
         {
             Board = Board.empty 3 3
             Options = Possibilities.fromBoard sudoku
@@ -48,7 +48,7 @@ module Solver =
         Options = oldState.Options |> ConclusiveAbsence.apply absence
     }
 
-    let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
+    let applyStep (oldState: SolverState) (step: SolutionStep): SolverState =
         match step with
         | ApplySingularOption option ->
             printfn "(singular %d at %dx%d)" option.Value (option.Row+1) (option.Col+1)

@@ -13,7 +13,7 @@
     <Compile Include="SingularOption.fs" />
     <Compile Include="ExclusivePresence.fs" />
     <Compile Include="ConclusiveAbsence.fs" />
-    <Compile Include="Solver.fs" />
+    <Compile Include="SolverState.fs" />
     <Compile Include="Utilities.fs" />
   </ItemGroup>
 
