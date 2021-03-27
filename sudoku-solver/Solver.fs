@@ -18,15 +18,6 @@ module Solver =
     | ExclusiveInGroup of ExclusivePresence
     | AbsentInGroup of ConclusiveAbsence
 
-    let applyConclusiveAbsence (absence: ConclusiveAbsence) (options: Possibilities) : Possibilities =
-        [| for row in 0..8 ->
-            [| for col in 0..8 ->
-                if absence.RowsAndColumns |> List.contains (row, col)
-                then [ for num in options.[row].[col] do if not (absence.Numbers |> List.contains num) then num ]
-                else options.[row].[col]
-            |]
-        |]
-
     let applySingularOptionToState { Row = targetRow; Col = targetCol; Value = num } oldState =
             printfn "field row %d col %d has single option %d" targetRow targetCol num
             let oldBoard = oldState.Board
@@ -54,7 +45,7 @@ module Solver =
 
     let applyConclusiveAbsenceToState (absence: ConclusiveAbsence) oldState = {
         Board = oldState.Board  // board is not updated
-        Options = oldState.Options |> applyConclusiveAbsence absence
+        Options = oldState.Options |> ConclusiveAbsence.apply absence
     }
 
     let applyStep (oldState: SolutionState) (step: SolutionStep): SolutionState =
