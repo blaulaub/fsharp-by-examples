@@ -29,6 +29,6 @@ module RuleGroup =
             seq {
                 for subRow in 0..(subRows-1) do
                 for subCol in 0..(subCols-1) ->
-                    (supRow*3+subRow, supCol*3+subCol)
+                    (supRow*superColumns+subRow, supCol*superRows+subCol)
             }
         }
