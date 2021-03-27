@@ -2,16 +2,6 @@ module SudokuSolver
 
 type RowAndColumnBoard<'T> = 'T array array
 
-let mapForRowAndColBy<'In, 'Out> action (source: 'In RowAndColumnBoard): 'Out RowAndColumnBoard =
-    [| for row in 0..8 ->
-        [| for col in 0..8 ->
-            action source row col
-        |]
-    |]
-
-let mapEachFieldBy<'In, 'Out> action (source: 'In RowAndColumnBoard): 'Out RowAndColumnBoard =
-    mapForRowAndColBy (fun source row col -> action source.[row].[col]) source
-
 let boardToString<'T> (fieldToString: 'T -> string) (board: 'T RowAndColumnBoard) =
     board
     |> Seq.map (fun line ->
@@ -50,12 +40,13 @@ type Options = int list RowAndColumnBoard
 /// Derives initial options from a given <see cref="Sudoku"/> setup.
 /// </summary>
 let options (sudoku: Sudoku): Options =
-    sudoku
-    |> mapEachFieldBy (fun field ->
+    [| for row in sudoku ->
+        [| for field in row ->
             match field with
             | Some num -> [ num ]
             | None -> [1..9]
-        )
+         |]
+    |]
 
 type NinerGroup = (int*int) seq
 
