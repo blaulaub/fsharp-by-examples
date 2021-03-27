@@ -33,15 +33,28 @@ let difficultSudokuSolution =
 // Sample data for an easy Sudoku
 let easySudoku =
     [|
-        [|Some 5; Some 4; None  ; None  ; Some 3; None  ; None  ; Some 9; Some 2|];
-        [|Some 2; None  ; Some 3; Some 7; None  ; Some 5; Some 1; None  ; Some 6|];
-        [|None  ; Some 9; None  ; Some 4; None  ; Some 6; None  ; Some 5; None  |];
-        [|None  ; Some 2; Some 9; None  ; None  ; None  ; Some 5; Some 1; None  |];
-        [|Some 1; None  ; None  ; None  ; None  ; None  ; None  ; None  ; Some 9|];
-        [|None  ; Some 7; Some 5; None  ; None  ; None  ; Some 3; Some 6; None  |];
-        [|None  ; Some 1; None  ; Some 2; None  ; Some 9; None  ; Some 3; None  |];
-        [|Some 9; None  ; Some 7; Some 8; None  ; Some 3; Some 4; None  ; Some 1|];
-        [|Some 3; Some 5; None  ; None  ; Some 4; None  ; None  ; Some 7; Some 8|]
+        [| Some 5; Some 4; None  ; None  ; Some 3; None  ; None  ; Some 9; Some 2 |];
+        [| Some 2; None  ; Some 3; Some 7; None  ; Some 5; Some 1; None  ; Some 6 |];
+        [| None  ; Some 9; None  ; Some 4; None  ; Some 6; None  ; Some 5; None   |];
+        [| None  ; Some 2; Some 9; None  ; None  ; None  ; Some 5; Some 1; None   |];
+        [| Some 1; None  ; None  ; None  ; None  ; None  ; None  ; None  ; Some 9 |];
+        [| None  ; Some 7; Some 5; None  ; None  ; None  ; Some 3; Some 6; None   |];
+        [| None  ; Some 1; None  ; Some 2; None  ; Some 9; None  ; Some 3; None   |];
+        [| Some 9; None  ; Some 7; Some 8; None  ; Some 3; Some 4; None  ; Some 1 |];
+        [| Some 3; Some 5; None  ; None  ; Some 4; None  ; None  ; Some 7; Some 8 |]
+    |]
+
+let easySudokuSolution =
+    [|
+        [| Some 5; Some 4; Some 6; Some 1; Some 3; Some 8; Some 7; Some 9; Some 2 |];
+        [| Some 2; Some 8; Some 3; Some 7; Some 9; Some 5; Some 1; Some 4; Some 6 |];
+        [| Some 7; Some 9; Some 1; Some 4; Some 2; Some 6; Some 8; Some 5; Some 3 |];
+        [| Some 6; Some 2; Some 9; Some 3; Some 8; Some 4; Some 5; Some 1; Some 7 |];
+        [| Some 1; Some 3; Some 4; Some 5; Some 6; Some 7; Some 2; Some 8; Some 9 |];
+        [| Some 8; Some 7; Some 5; Some 9; Some 1; Some 2; Some 3; Some 6; Some 4 |];
+        [| Some 4; Some 1; Some 8; Some 2; Some 7; Some 9; Some 6; Some 3; Some 5 |];
+        [| Some 9; Some 6; Some 7; Some 8; Some 5; Some 3; Some 4; Some 2; Some 1 |];
+        [| Some 3; Some 5; Some 2; Some 6; Some 4; Some 1; Some 9; Some 7; Some 8 |]
     |]
 
 [<Tests>]
@@ -95,6 +108,11 @@ let tests =
                     Expect.equal (remainingOptions.[row].[col]) [1;2;3;4; 6;7;8;9] (sprintf "in block at row %d col %d" row col)
                 | _ ->
                     Expect.equal (remainingOptions.[row].[col]) [1..9]             (sprintf "elsewhere at row %d col %d" row col)
+        }
+
+        test "solve easy board" {
+            let finalState = easySudoku |> SolverState.fromBoard |> SolverState.solve
+            Expect.equal finalState.Board easySudokuSolution ""
         }
 
         test "solve difficult board" {
