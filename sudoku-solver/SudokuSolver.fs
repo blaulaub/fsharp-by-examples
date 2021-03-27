@@ -1,12 +1,8 @@
 module SudokuSolver
 
-type RowAndColumnBoard<'T> = 'T array array
+open Ch.PatchCode.SudokuSolver
 
-/// <summary>
-/// A Sudoku board. Some of the fields contain an integer value,
-/// some of them are empty.
-/// </summary>
-type Sudoku = int option RowAndColumnBoard
+type RowAndColumnBoard<'T> = 'T array array
 
 /// <summary>
 /// A Sudoku board not with the solution, but with the possible
@@ -21,7 +17,7 @@ type Options = int list RowAndColumnBoard
 /// <summary>
 /// Derives initial options from a given <see cref="Sudoku"/> setup.
 /// </summary>
-let options (sudoku: Sudoku): Options =
+let options (sudoku: SudokuBoard): Options =
     [| for row in sudoku ->
         [| for field in row ->
             match field with
@@ -106,18 +102,11 @@ type ConclussiveAbsence = {
     RowsAndColumns: (int * int) list
 }
 
-type SolutionState = { Board: Sudoku; Options: Options }
+type SolutionState = { Board: SudokuBoard; Options: Options }
 
-let emptySudoku (): Sudoku =
-    [| for row in 0..8 ->
-        [| for col in 0..8 ->
-            None
-        |]
-    |]
-
-let initialSolutionState (sudoku: Sudoku): SolutionState =
+let initialSolutionState (sudoku: SudokuBoard): SolutionState =
     {
-        Board = emptySudoku ()
+        Board = SudokuBoard.emptySudoku 3 3
         Options = options sudoku
     }
 
