@@ -39,19 +39,6 @@ module Solver =
     let findSingularOptions (opts: Possibilities): SolutionStep seq =
         opts |> SingularOption.find |> Seq.map ApplySingularOption
 
-    let applySingularOption { Row = targetRow; Col = targetCol; Value = targetNum } (options: Possibilities) : Possibilities =
-        [| for row in 0..8 ->
-            [| for col in 0..8 ->
-                if row = targetRow && col = targetCol
-                then
-                    []
-                else
-                    if row <> targetRow && col <> targetCol && (row/3 <> targetRow/3 || col/3 <> targetCol/3)
-                    then options.[row].[col]
-                    else [ for num in options.[row].[col] do if num <> targetNum then num ]
-            |]
-        |]
-
     let applyExclussivePresence (presence: ExclussivePresence) (options: Possibilities) : Possibilities =
         [| for row in 0..8 ->
             [| for col in 0..8 ->
@@ -87,7 +74,7 @@ module Solver =
             let oldOptions = oldState.Options
             let newOptions =
                 oldOptions
-                |> applySingularOption { Row = targetRow; Col = targetCol; Value = num }
+                |> SingularOption.apply { Row = targetRow; Col = targetCol; Value = num }
             { Board = newBoard; Options = newOptions }
 
     let applyExlussivePresenceToState (presence: ExclussivePresence) oldState = {
