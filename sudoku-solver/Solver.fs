@@ -301,7 +301,7 @@ module Solver =
         // first try eliminating singular options
         yield! findSingularOptions options
         // next try checking niner groups
-        for group in RuleGroup.groups() do
+        for group in RuleGroup.groups 3 3 do
             yield! analyse options group
         // next try checking cross groups
         for group in singularCrossGroups() do
