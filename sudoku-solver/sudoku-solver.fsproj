@@ -12,6 +12,7 @@
     <Compile Include="CrossGroup.fs" />
     <Compile Include="SingularOption.fs" />
     <Compile Include="ExclusivePresence.fs" />
+    <Compile Include="ConclusiveAbsence.fs" />
     <Compile Include="Solver.fs" />
     <Compile Include="Utilities.fs" />
   </ItemGroup>

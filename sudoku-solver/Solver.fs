@@ -2,14 +2,6 @@ namespace Ch.PatchCode.SudokuSolver
 
 module Solver =
 
-    /// <summary>
-    /// A list of values that are definetly not present in a list of fields.
-    /// </summary>
-    type ConclussiveAbsence = {
-        Numbers: int list
-        RowsAndColumns: (int * int) list
-    }
-
     type SolutionState = { Board: Board; Options: Possibilities }
 
     let initialSolutionState (sudoku: Board): SolutionState =
@@ -24,9 +16,9 @@ module Solver =
     type SolutionStep =
     | ApplySingularOption of SingularOption
     | ExclusiveInGroup of ExclusivePresence
-    | AbsentInGroup of ConclussiveAbsence
+    | AbsentInGroup of ConclusiveAbsence
 
-    let applyConclusiveAbsence (absence: ConclussiveAbsence) (options: Possibilities) : Possibilities =
+    let applyConclusiveAbsence (absence: ConclusiveAbsence) (options: Possibilities) : Possibilities =
         [| for row in 0..8 ->
             [| for col in 0..8 ->
                 if absence.RowsAndColumns |> List.contains (row, col)
@@ -60,7 +52,7 @@ module Solver =
         Options = oldState.Options |> ExclusivePresence.apply presence
     }
 
-    let applyConclusiveAbsenceToState (absence: ConclussiveAbsence) oldState = {
+    let applyConclusiveAbsenceToState (absence: ConclusiveAbsence) oldState = {
         Board = oldState.Board  // board is not updated
         Options = oldState.Options |> applyConclusiveAbsence absence
     }
