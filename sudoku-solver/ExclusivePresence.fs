@@ -86,7 +86,7 @@ module ExclusivePresence =
         yield! matchTwice mapper presence
     }
 
-    let find (opts: Possibilities) (group: RuleGroup): ExclusivePresence seq =
+    let find (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
         let total = superRows * superColumns
         let fields = group |> Seq.toArray
         let values = [| for (row, col) in fields -> opts.[row].[col] |]

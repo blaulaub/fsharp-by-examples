@@ -82,7 +82,7 @@ module Solver =
         yield! options |> SingularOption.find |> Seq.map ApplySingularOption
         // next try checking niner groups
         for group in RuleGroup.groups 3 3 do
-            yield! ExclusivePresence.find options group |> Seq.map ExclusiveInGroup
+            yield! options |> ExclusivePresence.find group |> Seq.map ExclusiveInGroup
         // next try checking cross groups
         for group in CrossGroup.singularCrossGroups() do
             yield! analyseCross options group
