@@ -19,32 +19,33 @@ module CrossGroup =
 
         let total = superRows * superColumns
 
-        for supCol in 0..(superColumns-1) do
         for row in 0..(total-1) do
+        for supCol in 0..(superColumns-1) do
         yield {
             Source = seq {
-                for col in 0..(total-1) do
                 for subRow in 0..(superColumns-1) do
-                if row%superColumns = subRow && col/superRows <> supCol then yield (row, col)
+                for col in 0..(total-1) do
+                if (row%superColumns = subRow) && (col/superRows <> supCol) then yield ((row/3)*3+subRow, col)
             }
             Target = seq {
                 for col in 0..(total-1) do
                 for subRow in 0..(superColumns-1) do
-                if row%superColumns <> subRow && col/superRows = supCol then yield (row, col)
+                if (row%superColumns <> subRow) && (col/superRows = supCol) then yield ((row/3)*3+subRow, col)
             }
         }
-        for supRow in 0..(superRows-1) do
-        for col in 0..(total-1) do
-        yield {
-            Source = seq {
-                for row in 0..(total-1) do
-                for subCol in 0..(superRows-1) do
-                if col%superRows = subCol && row/superColumns <> supRow then yield (row, col)
-            }
-            Target = seq {
-                for row in 0..(total-1) do
-                for subCol in 0..(superRows-1) do
-                if col%superRows <> subCol && row/superColumns = supRow then yield (row, col)
-            }
-        }
+
+//        for col in 0..(total-1) do
+//        for supRow in 0..(superRows-1) do
+//        yield {
+//            Source = seq {
+//                for subCol in 0..(superRows-1) do
+//                for row in 0..(total-1) do
+//                if (col%superRows = subCol) && (row/superColumns <> supRow) then yield (row, (col/3)*3+subCol)
+//            }
+//            Target = seq {
+//                for row in 0..(total-1) do
+//                for subCol in 0..(superRows-1) do
+//                if (col%superRows <> subCol) && (row/superColumns = supRow) then yield (row, (col/3)*3+subCol)
+//            }
+//        }
     }
