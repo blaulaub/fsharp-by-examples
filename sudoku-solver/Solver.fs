@@ -3,18 +3,6 @@ namespace Ch.PatchCode.SudokuSolver
 module Solver =
 
     /// <summary>
-    /// Derives initial options from a given <see cref="Sudoku"/> setup.
-    /// </summary>
-    let possibilities (sudoku: Board): Possibilities =
-        [| for row in sudoku ->
-            [| for field in row ->
-                match field with
-                | Some num -> [ num ]
-                | None -> [1..9]
-             |]
-        |]
-
-    /// <summary>
     /// If a particular number cannot be in fields referenced by source,
     /// then it also cannot be in fields referenced by target.
     /// </summary>
@@ -83,7 +71,7 @@ module Solver =
     let initialSolutionState (sudoku: Board): SolutionState =
         {
             Board = Board.empty 3 3
-            Options = possibilities sudoku
+            Options = Possibilities.fromBoard sudoku
         }
 
     /// <summary>

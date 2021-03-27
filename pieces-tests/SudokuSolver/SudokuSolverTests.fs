@@ -39,7 +39,7 @@ let tests =
             let board = [| for row in 0..8 -> [| for col in 0..8 -> None |] |]
             board.[1].[2] <- Some 3
 
-            let opts = Solver.possibilities board
+            let opts = Possibilities.fromBoard board
 
             for row in 0..8 do
             for col in 0..8 do
@@ -54,7 +54,7 @@ let tests =
             let board = [| for row in 0..8 -> [| for col in 0..8 -> None |] |]
             board.[1].[2] <- Some 3
 
-            let opts = Solver.possibilities board
+            let opts = Possibilities.fromBoard board
 
             let singularOptions = Solver.findSingularOptions opts |> Seq.toArray
 
