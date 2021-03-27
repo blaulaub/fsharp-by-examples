@@ -14,18 +14,6 @@ module Solver =
              |]
         |]
 
-    type NinerGroup = (int*int) seq
-
-    let ninerGroups (): NinerGroup seq = seq {
-        for row in 0..8 -> seq { for col in 0..8 -> (row, col) }
-        for col in 0..8 -> seq { for row in 0..8 -> (row, col) }
-        for supRow in 0..2 do
-        for supCol in 0..2 -> seq {
-            for subRow in 0..2 do
-            for subCol in 0..2 -> (supRow*3+subRow, supCol*3+subCol)
-        }
-    }
-
     /// <summary>
     /// If a particular number cannot be in fields referenced by source,
     /// then it also cannot be in fields referenced by target.
@@ -285,7 +273,7 @@ module Solver =
         yield! matchTwice mapper presence
     }
 
-    let analyse (opts: Possibilities) (group: NinerGroup) : SolutionStep seq =
+    let analyse (opts: Possibilities) (group: RuleGroup) : SolutionStep seq =
         let fields = group |> Seq.toArray
         let values = [| for (row, col) in fields -> opts.[row].[col] |]
         values
@@ -313,7 +301,7 @@ module Solver =
         // first try eliminating singular options
         yield! findSingularOptions options
         // next try checking niner groups
-        for group in ninerGroups() do
+        for group in RuleGroup.groups() do
             yield! analyse options group
         // next try checking cross groups
         for group in singularCrossGroups() do
