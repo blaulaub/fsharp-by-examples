@@ -1,6 +1,7 @@
-module SudokuSolverTests
+module SolverTests
 
 open Expecto
+open Ch.PatchCode.SudokuSolver
 
 /// Sample data for a difficult Sudoku
 let difficultSudoku =
@@ -38,7 +39,7 @@ let tests =
             let board = [| for row in 0..8 -> [| for col in 0..8 -> None |] |]
             board.[1].[2] <- Some 3
 
-            let opts = SudokuSolver.possibilities board
+            let opts = Solver.possibilities board
 
             for row in 0..8 do
             for col in 0..8 do
@@ -53,34 +54,34 @@ let tests =
             let board = [| for row in 0..8 -> [| for col in 0..8 -> None |] |]
             board.[1].[2] <- Some 3
 
-            let opts = SudokuSolver.possibilities board
+            let opts = Solver.possibilities board
 
-            let singularOptions = SudokuSolver.findSingularOptions opts |> Seq.toArray
+            let singularOptions = Solver.findSingularOptions opts |> Seq.toArray
 
             Expect.equal 1 singularOptions.Length "have only one singular option"
-            Expect.equal (SudokuSolver.ApplySingularOption { Row = 1; Col = 2; Value = 3}) singularOptions.[0] "singular option matches"
+            Expect.equal (Solver.ApplySingularOption { Row = 1; Col = 2; Value = 3}) singularOptions.[0] "singular option matches"
         }
 
         test "verify toOrderedPresence" {
             let subSorted = Array.map List.sort
-            Expect.equal ([| |]                     |> SudokuSolver.toOrderedPresence) [| |]                        "empty of zero"
-            Expect.equal ([| [] |]                  |> SudokuSolver.toOrderedPresence) [| [] |]                     "empty of one"
-            Expect.equal ([| [1] |]                 |> SudokuSolver.toOrderedPresence) [| [0] |]                    "one of one"
-            Expect.equal ([| [1]; [2] |]            |> SudokuSolver.toOrderedPresence) [| [0]; [1] |]               "one of two each"
-            Expect.equal ([| [1]; [1] |]            |> SudokuSolver.toOrderedPresence) [| [0; 1]; [] |]             "first of two twice"
-            Expect.equal ([| [2]; [2] |]            |> SudokuSolver.toOrderedPresence) [| []; [0; 1] |]             "second of two twice"
-            Expect.equal ([| [1;2]; [2;3]; [3;1] |] |> SudokuSolver.toOrderedPresence) [| [0; 2]; [0; 1]; [1; 2] |] "circular with two from three"
-            Expect.equal ([| [1;2;3]; [2;3]; [3] |] |> SudokuSolver.toOrderedPresence) [| [0]; [0; 1]; [0; 1; 2] |] "descending with three"
+            Expect.equal ([| |]                     |> Solver.toOrderedPresence) [| |]                        "empty of zero"
+            Expect.equal ([| [] |]                  |> Solver.toOrderedPresence) [| [] |]                     "empty of one"
+            Expect.equal ([| [1] |]                 |> Solver.toOrderedPresence) [| [0] |]                    "one of one"
+            Expect.equal ([| [1]; [2] |]            |> Solver.toOrderedPresence) [| [0]; [1] |]               "one of two each"
+            Expect.equal ([| [1]; [1] |]            |> Solver.toOrderedPresence) [| [0; 1]; [] |]             "first of two twice"
+            Expect.equal ([| [2]; [2] |]            |> Solver.toOrderedPresence) [| []; [0; 1] |]             "second of two twice"
+            Expect.equal ([| [1;2]; [2;3]; [3;1] |] |> Solver.toOrderedPresence) [| [0; 2]; [0; 1]; [1; 2] |] "circular with two from three"
+            Expect.equal ([| [1;2;3]; [2;3]; [3] |] |> Solver.toOrderedPresence) [| [0]; [0; 1]; [0; 1; 2] |] "descending with three"
 
-            Expect.equal ([| [1]; [2]; [3]; [4]; [5]; [6] |] |> SudokuSolver.toOrderedPresence) [| [0]; [1]; [2]; [3]; [4]; [5] |] "sth a bit longer"
+            Expect.equal ([| [1]; [2]; [3]; [4]; [5]; [6] |] |> Solver.toOrderedPresence) [| [0]; [1]; [2]; [3]; [4]; [5] |] "sth a bit longer"
         }
 
         test "verify applySingularOption" {
 
             let initialOptions () = [| for _ in 0..8 -> [| for _ in 0..8 -> [1..9] |] |]
 
-            let singularOption : SudokuSolver.SingularOption = { Row = 0; Col = 4; Value = 5 }
-            let remainingOptions = SudokuSolver.applySingularOption singularOption (initialOptions())
+            let singularOption : Solver.SingularOption = { Row = 0; Col = 4; Value = 5 }
+            let remainingOptions = Solver.applySingularOption singularOption (initialOptions())
 
             for row in 0..8 do
             for col in 0..8 do
@@ -99,11 +100,11 @@ let tests =
 
         test "try solve some board" {
             let initialState =
-                SudokuSolver.initialSolutionState difficultSudoku
+                Solver.initialSolutionState difficultSudoku
             do
-                SudokuSolver.solveState initialState (fun state ->
+                Solver.solveState initialState (fun state ->
                     printfn "-----------------"
-                    SudokuUtils.toString state.Board |> printfn "%s"
+                    Utilities.toString state.Board |> printfn "%s"
                 )
                 |> ignore
             ()
