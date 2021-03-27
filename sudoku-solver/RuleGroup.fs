@@ -16,10 +16,10 @@ module RuleGroup =
 
         let total = superRows * superColumns
 
-        for row in 0..8 ->
+        for row in 0..(total-1) ->
             seq { for col in 0..(total-1) -> (row, col) }
 
-        for col in 0..8 ->
+        for col in 0..(total-1) ->
             seq { for row in 0..(total-1) -> (row, col) }
 
         let subRows = superColumns
