@@ -9,6 +9,7 @@
     <Compile Include="Board.fs" />
     <Compile Include="RuleGroup.fs" />
     <Compile Include="Possibilities.fs" />
+    <Compile Include="CrossGroup.fs" />
     <Compile Include="Solver.fs" />
     <Compile Include="Utilities.fs" />
   </ItemGroup>
