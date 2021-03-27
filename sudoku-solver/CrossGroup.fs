@@ -33,7 +33,7 @@ module CrossGroup =
                 if row%superColumns <> subRow && col/superRows = supCol then yield (row, col)
             }
         }
-        for supRow in 0..2 do
+        for supRow in 0..(superRows-1) do
         for col in 0..(total-1) do
         yield {
             Source = seq {
