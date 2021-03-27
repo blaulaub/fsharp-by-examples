@@ -60,9 +60,6 @@ module Solver =
             printfn "(absent values %A at %A)" absence.Numbers absence.RowsAndColumns
             applyConclusiveAbsenceToState absence oldState
 
-    let analyseCross (opts: Possibilities) (group: SingularCrossGroup) : SolutionStep seq =
-        ConclusiveAbsence.find opts group |> Seq.map AbsentInGroup
-
     let steps options = seq {
         // first try eliminating singular options
         yield! options |> SingularOption.find |> Seq.map ApplySingularOption
@@ -71,7 +68,7 @@ module Solver =
             yield! options |> ExclusivePresence.find group |> Seq.map ExclusiveInGroup
         // next try checking cross groups
         for group in CrossGroup.singularCrossGroups() do
-            yield! analyseCross options group
+            yield! options |> ConclusiveAbsence.find group |> Seq.map AbsentInGroup
     }
 
     let rec solveState state preAction =

@@ -14,7 +14,7 @@ module ConclusiveAbsence =
     let private superColumns = 3
     let private superRows = 3
 
-    let find (opts: Possibilities) (group: SingularCrossGroup) : ConclusiveAbsence seq =
+    let find (group: SingularCrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
         let source = group.Source |> Seq.toArray
         let target = group.Target |> Seq.toArray
 
