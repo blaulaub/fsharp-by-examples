@@ -60,10 +60,6 @@ module Solver =
             printfn "(absent values %A at %A)" absence.Numbers absence.RowsAndColumns
             applyConclusiveAbsenceToState absence oldState
 
-    let mapFromIndexInRow row idx = (row, idx)
-    let mapFromIndexInColumn col idx = (idx, col)
-    let mapFromIndexInBlock block idx = ((block/3)*3+idx/3,(block%3)*3+idx%3)
-
     let analyse (opts: Possibilities) (group: RuleGroup) : SolutionStep seq =
         ExclusivePresence.find opts group
         |> Seq.map ExclusiveInGroup
