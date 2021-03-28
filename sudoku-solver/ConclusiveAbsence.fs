@@ -23,14 +23,11 @@ module ConclusiveAbsence =
         |> Seq.toList
 
     let find (group: SingularCrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
-        let source = group.Source |> Seq.toArray
-        let target = group.Target |> Seq.toArray
-
-        let sourcePossibilities () = source |> findPossibilities opts
-
-        findPossibilities opts target
-        |> Seq.filter (fun inTarget -> sourcePossibilities() |> List.contains inTarget )
-        |> Seq.map (fun value -> { Numbers = [value]; RowsAndColumns = source |> Seq.toList })
+        group.Intersection
+        |> findPossibilities opts
+        |> Seq.filter (fun possibilities ->      group.Target |> findPossibilities opts |> List.contains possibilities)
+        |> Seq.filter (fun possibilities -> not (group.Source |> findPossibilities opts |> List.contains possibilities))
+        |> Seq.map (fun value -> { Numbers = [value]; RowsAndColumns = group.Target |> Seq.toList })
 
     let apply (absence: ConclusiveAbsence) (options: Possibilities) : Possibilities =
 

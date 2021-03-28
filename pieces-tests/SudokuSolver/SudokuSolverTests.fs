@@ -44,6 +44,19 @@ let difficultSudoku2 =
         [| None  ; Some 3; None  ; None  ; Some 4; None  ; None  ; Some 6; None   |]
     |]
 
+let difficultSudoku2Solution =
+    [|
+        [| Some 3; Some 4; Some 8; Some 6; Some 1; Some 2; Some 5; Some 9; Some 7 |];
+        [| Some 2; Some 5; Some 6; Some 7; Some 9; Some 8; Some 4; Some 3; Some 1 |];
+        [| Some 7; Some 1; Some 9; Some 3; Some 5; Some 4; Some 2; Some 8; Some 6 |];
+        [| Some 9; Some 6; Some 5; Some 2; Some 3; Some 1; Some 7; Some 4; Some 8 |];
+        [| Some 4; Some 2; Some 7; Some 9; Some 8; Some 5; Some 6; Some 1; Some 3 |];
+        [| Some 1; Some 8; Some 3; Some 4; Some 7; Some 6; Some 9; Some 5; Some 2 |];
+        [| Some 6; Some 9; Some 4; Some 8; Some 2; Some 3; Some 1; Some 7; Some 5 |];
+        [| Some 8; Some 7; Some 1; Some 5; Some 6; Some 9; Some 3; Some 2; Some 4 |];
+        [| Some 5; Some 3; Some 2; Some 1; Some 4; Some 7; Some 8; Some 6; Some 9 |]
+    |]
+
 // Sample data for an easy Sudoku
 let easySudoku =
     [|
@@ -132,6 +145,11 @@ let tests =
         test "solve difficult board" {
             let finalState = difficultSudoku |> SolverState.fromBoard |> SolverState.solve
             Expect.equal finalState.Board difficultSudokuSolution ""
+        }
+
+        test "solve difficult board 2" {
+            let finalState = difficultSudoku2 |> SolverState.fromBoard |> SolverState.solve
+            Expect.equal finalState.Board difficultSudoku2Solution ""
         }
 
         test "try solve some board" {
