@@ -18,8 +18,8 @@ module Possibilities =
         [| for row in board ->
             [| for field in row ->
                 match field with
-                | Some num -> [ num ]
-                | None -> [1..total]
+                | Some num -> [ num-1 ]
+                | None -> [0..(total-1)]
              |]
         |]
 
@@ -37,7 +37,7 @@ module Possibilities =
                     // note: we may create a lots of arrays here, maybe that is not cheap...
                     [|
                         for idx in 0..up ->
-                            if idx = (v-1)
+                            if idx = v
                             then i::state.[idx]
                             else state.[idx]
                     |]

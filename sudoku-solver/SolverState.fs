@@ -28,7 +28,7 @@ module SolverState =
                     [| for col in 0..8 ->
                         if col <> targetCol
                         then oldBoard.[row].[col]
-                        else Some num
+                        else Some (num+1)
                     |]
             |]
         let oldOptions = oldState.Options

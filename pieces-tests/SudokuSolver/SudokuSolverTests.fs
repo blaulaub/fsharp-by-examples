@@ -98,9 +98,9 @@ let tests =
             for col in 0..8 do
                 match (row, col) with
                 | (1, 2) ->
-                    Expect.equal opts.[row].[col] [3] (sprintf "precise for row %d col %d" row col)
+                    Expect.equal opts.[row].[col] [2] (sprintf "precise for row %d col %d" row col)
                 | (_, _) ->
-                    Expect.equal opts.[row].[col] [1..9] (sprintf "unrestricted for row %d col %d" row col)
+                    Expect.equal opts.[row].[col] [0..8] (sprintf "unrestricted for row %d col %d" row col)
         }
 
         test "find singular options" {
@@ -112,14 +112,14 @@ let tests =
             let singularOptions = opts |> SingularOption.find |> Seq.map SolverState.ApplySingularOption |> Seq.toArray
 
             Expect.equal 1 singularOptions.Length "have only one singular option"
-            Expect.equal (SolverState.ApplySingularOption { Row = 1; Col = 2; Value = 3}) singularOptions.[0] "singular option matches"
+            Expect.equal (SolverState.ApplySingularOption { Row = 1; Col = 2; Value = 2}) singularOptions.[0] "singular option matches"
         }
 
         test "verify applySingularOption" {
 
-            let initialOptions () = [| for _ in 0..8 -> [| for _ in 0..8 -> [1..9] |] |]
+            let initialOptions () = [| for _ in 0..8 -> [| for _ in 0..8 -> [0..8] |] |]
 
-            let singularOption : SingularOption = { Row = 0; Col = 4; Value = 5 }
+            let singularOption : SingularOption = { Row = 0; Col = 4; Value = 4 }
             let remainingOptions = SingularOption.apply singularOption (initialOptions())
 
             for row in 0..8 do
@@ -128,13 +128,13 @@ let tests =
                 | (0, 4) ->
                     Expect.equal (remainingOptions.[row].[col]) [ ]                (sprintf "in row at row %d col %d" row col)
                 | (0, _) ->
-                    Expect.equal (remainingOptions.[row].[col]) [1;2;3;4; 6;7;8;9] (sprintf "in row at row %d col %d" row col)
+                    Expect.equal (remainingOptions.[row].[col]) [0;1;2;3; 5;6;7;8] (sprintf "in row at row %d col %d" row col)
                 | (_, 4) ->
-                    Expect.equal (remainingOptions.[row].[col]) [1;2;3;4; 6;7;8;9] (sprintf "in column at row %d col %d" row col)
+                    Expect.equal (remainingOptions.[row].[col]) [0;1;2;3; 5;6;7;8] (sprintf "in column at row %d col %d" row col)
                 | (_, _) when (row/3=0 && col/3=1) ->
-                    Expect.equal (remainingOptions.[row].[col]) [1;2;3;4; 6;7;8;9] (sprintf "in block at row %d col %d" row col)
+                    Expect.equal (remainingOptions.[row].[col]) [0;1;2;3; 5;6;7;8] (sprintf "in block at row %d col %d" row col)
                 | _ ->
-                    Expect.equal (remainingOptions.[row].[col]) [1..9]             (sprintf "elsewhere at row %d col %d" row col)
+                    Expect.equal (remainingOptions.[row].[col]) [0..8]             (sprintf "elsewhere at row %d col %d" row col)
         }
 
         test "solve easy board" {

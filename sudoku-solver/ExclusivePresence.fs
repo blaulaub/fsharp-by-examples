@@ -53,7 +53,7 @@ module ExclusivePresence =
                     let exceptIncluded = Seq.filter (fun other -> other <> first && other <> second)
 
                     if canEliminateOthers presence places exceptIncluded
-                    then yield { Numbers = [ first+1; second+1 ]; RowsAndColumns = places |> List.map mapper }
+                    then yield { Numbers = [ first; second ]; RowsAndColumns = places |> List.map mapper }
 
         for first in 0..(total-1) do
         if presence.[first].Length > 0 then
@@ -73,14 +73,14 @@ module ExclusivePresence =
                         let exceptIncluded = Seq.filter (fun other -> other <> first && other <> second && other <> third)
 
                         if canEliminateOthers presence places exceptIncluded
-                        then yield { Numbers = [ first+1; second+1; third+1 ]; RowsAndColumns = places |> List.map mapper }
+                        then yield { Numbers = [ first; second; third ]; RowsAndColumns = places |> List.map mapper }
     }
 
     let private matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
         let total = superRows * superColumns
         for value in 0..(total-1) do
             match presence.[value] with
-            | [ position ] -> yield { Numbers = [value+1]; RowsAndColumns = [ mapper position] }
+            | [ position ] -> yield { Numbers = [value]; RowsAndColumns = [ mapper position] }
             | _ -> ()
 
         yield! matchTwice mapper presence
