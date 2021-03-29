@@ -16,7 +16,7 @@ module ExclusivePresence =
     let private superColumns = 3
     let private superRows = 3
 
-    let private commonPlaces (individualPlaces: int list list) =
+    let private commonPlaces (individualPlaces: int list seq) =
         individualPlaces
         |> Seq.fold (fun s p ->
             p
@@ -44,16 +44,19 @@ module ExclusivePresence =
             for second in (first+1)..(total-1) do
             if presence.[second].Length > 0 then
 
+                let indices = [ first; second ]
+
                 let places =
-                    [ presence.[first]; presence.[second] ]
+                    indices
+                    |> Seq.map (fun x -> presence.[x])
                     |> commonPlaces
 
-                if places.Length = 2 then
+                if places.Length = indices.Length then
 
                     let exceptIncluded = Seq.filter (fun other -> other <> first && other <> second)
 
                     if canEliminateOthers presence places exceptIncluded
-                    then yield { Numbers = [ first; second ]; RowsAndColumns = places |> List.map mapper }
+                    then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
 
         for first in 0..(total-1) do
         if presence.[first].Length > 0 then
@@ -64,16 +67,19 @@ module ExclusivePresence =
                 for third in (second+1)..(total-1) do
                 if presence.[third].Length > 0 then
 
+                    let indices = [ first; second; third ]
+
                     let places =
-                        [ presence.[first]; presence.[second]; presence.[third] ]
+                        indices
+                        |> Seq.map (fun x -> presence.[x])
                         |> commonPlaces
 
-                    if places.Length = 3 then
+                    if places.Length = indices.Length then
 
                         let exceptIncluded = Seq.filter (fun other -> other <> first && other <> second && other <> third)
 
                         if canEliminateOthers presence places exceptIncluded
-                        then yield { Numbers = [ first; second; third ]; RowsAndColumns = places |> List.map mapper }
+                        then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
     }
 
     let private matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
