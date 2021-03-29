@@ -63,7 +63,7 @@ module SolverState =
         for group in RuleGroup.groups 3 3 do
             yield! options |> ExclusivePresence.find group |> Seq.map ExclusiveInGroup
         // next try checking cross groups
-        for group in CrossGroup.singularCrossGroups() do
+        for group in CrossGroup.singularCrossGroups 3 3 do
             yield! options |> ConclusiveAbsence.find group |> Seq.map AbsentInGroup
     }
 
