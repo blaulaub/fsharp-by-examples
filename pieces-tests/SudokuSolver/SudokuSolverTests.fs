@@ -163,4 +163,55 @@ let tests =
                 )
             |> ignore
         }
+
+        test "try invent some board" {
+
+            let apply (row, col, n) next0 =
+                next0
+                |> SolverState.applySingularOptionToState { Row = row; Col = col; Value = n}
+
+            let next (rnd: int -> int) state =
+
+                let next0 =
+                    state
+                    |> SolverState.solve
+
+                let undet = [|
+                    for row in 0..8 do
+                    for col in 0..8 do
+                    if next0.Options.[row].[col].Length > 0
+                    then yield (row, col)
+                |]
+
+                let pick =
+                    if undet.Length > 0
+                    then
+                        let (row, col) = undet.[rnd undet.Length]
+                        let l = rnd next0.Options.[row].[col].Length
+                        let n = next0.Options.[row].[col].[l]
+                        Some (row, col, n)
+                    else None
+
+                match pick with
+                | Some pick -> apply pick next0
+                | None -> next0
+
+            let initialState = Board.empty 3 3 |> SolverState.fromBoard
+            let rnd = System.Random()
+            let nextRandom upperEx = rnd.Next(upperEx)
+
+            let next1 =
+                initialState
+                |> next nextRandom
+                |> next nextRandom
+                |> next nextRandom
+                |> next nextRandom
+                |> next nextRandom
+                |> next nextRandom
+                |> next nextRandom
+                |> next nextRandom
+                |> next nextRandom
+
+            Utilities.toString next1.Board |> printfn "%s"
+        }
     ]
