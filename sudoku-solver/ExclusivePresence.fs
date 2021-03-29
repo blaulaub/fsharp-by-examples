@@ -40,10 +40,25 @@ module ExclusivePresence =
 
         let total = superRows * superColumns
 
-        for first in (presence |> present (total-1) 0) do
+        let seq1 = seq {
+            for first in (presence |> present (total-1) 0) do
+                yield [ first ]
+        }
 
-            let indices = [ first ]
+        let seq2 = seq {
+            for first in (presence |> present (total-1) 0) do
+                for second in (presence |> present (total-1) (first+1)) do
+                    yield [ first; second ]
+        }
 
+        let seq3 = seq {
+            for first in (presence |> present (total-1) 0) do
+                for second in (presence |> present (total-1) (first+1)) do
+                    for third in (presence |> present (total-1) (second+1)) do
+                        yield [ first; second; third ]
+        }
+
+        for indices in seq1 do
             let places =
                 indices
                 |> Seq.map (fun x -> presence.[x])
@@ -56,43 +71,31 @@ module ExclusivePresence =
                 if canEliminateOthers presence places exceptIncluded
                 then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
 
-        for first in (presence |> present (total-1) 0) do
+        for indices in seq2 do
+            let places =
+                indices
+                |> Seq.map (fun x -> presence.[x])
+                |> commonPlaces
 
-            for second in (presence |> present (total-1) (first+1)) do
+            if places.Length = indices.Length then
 
-                let indices = [ first; second ]
+                let exceptIncluded = Seq.filter (fun other -> not (indices |> List.contains other))
 
-                let places =
-                    indices
-                    |> Seq.map (fun x -> presence.[x])
-                    |> commonPlaces
+                if canEliminateOthers presence places exceptIncluded
+                then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
 
-                if places.Length = indices.Length then
+        for indices in seq3 do
+            let places =
+                indices
+                |> Seq.map (fun x -> presence.[x])
+                |> commonPlaces
 
-                    let exceptIncluded = Seq.filter (fun other -> not (indices |> List.contains other))
+            if places.Length = indices.Length then
 
-                    if canEliminateOthers presence places exceptIncluded
-                    then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
+                let exceptIncluded = Seq.filter (fun other -> not (indices |> List.contains other))
 
-        for first in (presence |> present (total-1) 0) do
-
-            for second in (presence |> present (total-1) (first+1)) do
-
-                for third in (presence |> present (total-1) (second+1)) do
-
-                    let indices = [ first; second; third ]
-
-                    let places =
-                        indices
-                        |> Seq.map (fun x -> presence.[x])
-                        |> commonPlaces
-
-                    if places.Length = indices.Length then
-
-                        let exceptIncluded = Seq.filter (fun other -> not (indices |> List.contains other))
-
-                        if canEliminateOthers presence places exceptIncluded
-                        then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
+                if canEliminateOthers presence places exceptIncluded
+                then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
     }
 
     let find (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
