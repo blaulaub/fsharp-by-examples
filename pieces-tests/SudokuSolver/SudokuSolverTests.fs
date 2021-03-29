@@ -164,13 +164,16 @@ let tests =
             |> ignore
         }
 
+
         test "try invent some board" {
 
-            let apply (row, col, n) next0 =
+
+            let apply next0 (row, col, n) =
                 next0
                 |> SolverState.applySingularOptionToState { Row = row; Col = col; Value = n}
 
-            let next (rnd: int -> int) state =
+
+            let nextStateAndPick (rnd: int -> int) state =
 
                 let next0 =
                     state
@@ -183,35 +186,44 @@ let tests =
                     then yield (row, col)
                 |]
 
-                let pick =
-                    if undet.Length > 0
-                    then
-                        let (row, col) = undet.[rnd undet.Length]
-                        let l = rnd next0.Options.[row].[col].Length
-                        let n = next0.Options.[row].[col].[l]
-                        Some (row, col, n)
-                    else None
+                if undet.Length > 0
+                then
+                    let (row, col) = undet.[rnd undet.Length]
+                    let l = rnd next0.Options.[row].[col].Length
+                    let n = next0.Options.[row].[col].[l]
+                    (next0, Some (row, col, n))
+                else
+                    (next0, None)
 
-                match pick with
-                | Some pick -> apply pick next0
-                | None -> next0
+
+            let rec getHints (rnd: int -> int) state = seq {
+                match nextStateAndPick rnd state with
+                | (next0, Some pick) ->
+                    yield pick
+                    yield! getHints rnd (apply next0 pick)
+                | (_, None) -> ()
+            }
+
 
             let initialState = Board.empty 3 3 |> SolverState.fromBoard
             let rnd = System.Random()
             let nextRandom upperEx = rnd.Next(upperEx)
 
-            let next1 =
-                initialState
-                |> next nextRandom
-                |> next nextRandom
-                |> next nextRandom
-                |> next nextRandom
-                |> next nextRandom
-                |> next nextRandom
-                |> next nextRandom
-                |> next nextRandom
-                |> next nextRandom
+            let initialState () = Board.empty 3 3 |> SolverState.fromBoard
 
-            Utilities.toString next1.Board |> printfn "%s"
+            let board =
+                initialState ()
+                |> getHints nextRandom
+                |> Seq.fold apply (initialState ())
+                |> (fun state -> state.Board)
+
+            let hintCount (board: Board) =
+                board
+                |> Array.concat
+                |> Array.fold (fun sum field -> if field.IsSome then sum+1 else sum) 0
+
+            printfn "Hint Count: %d" (hintCount board)
+            printfn "---"
+            Utilities.toString board |> printfn "%s"
         }
     ]
