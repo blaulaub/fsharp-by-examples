@@ -53,7 +53,7 @@ module ExclusivePresence =
 
                 if places.Length = indices.Length then
 
-                    let exceptIncluded = Seq.filter (fun other -> other <> first && other <> second)
+                    let exceptIncluded = Seq.filter (fun other -> not (indices |> List.contains other))
 
                     if canEliminateOthers presence places exceptIncluded
                     then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
@@ -76,7 +76,7 @@ module ExclusivePresence =
 
                     if places.Length = indices.Length then
 
-                        let exceptIncluded = Seq.filter (fun other -> other <> first && other <> second && other <> third)
+                        let exceptIncluded = Seq.filter (fun other -> not (indices |> List.contains other))
 
                         if canEliminateOthers presence places exceptIncluded
                         then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
@@ -84,10 +84,23 @@ module ExclusivePresence =
 
     let private matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
         let total = superRows * superColumns
-        for value in 0..(total-1) do
-            match presence.[value] with
-            | [ position ] -> yield { Numbers = [value]; RowsAndColumns = [ mapper position] }
-            | _ -> ()
+
+        for first in 0..(total-1) do
+        if presence.[first].Length > 0 then
+
+                let indices = [ first ]
+
+                let places =
+                    indices
+                    |> Seq.map (fun x -> presence.[x])
+                    |> commonPlaces
+
+                if places.Length = indices.Length then
+
+                    let exceptIncluded = Seq.filter (fun other -> not (indices |> List.contains other))
+
+                    if canEliminateOthers presence places exceptIncluded
+                    then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
 
         yield! matchTwice mapper presence
     }
