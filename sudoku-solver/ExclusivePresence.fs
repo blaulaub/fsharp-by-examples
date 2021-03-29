@@ -36,9 +36,25 @@ module ExclusivePresence =
         |> Seq.distinct
         |> Seq.exists (fun p -> places |> List.contains p)
 
-    let private matchTwice (mapper: int -> (int * int)) (presence: int list array) = seq {
+    let private matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
 
         let total = superRows * superColumns
+
+        for first in (presence |> present (total-1) 0) do
+
+            let indices = [ first ]
+
+            let places =
+                indices
+                |> Seq.map (fun x -> presence.[x])
+                |> commonPlaces
+
+            if places.Length = indices.Length then
+
+                let exceptIncluded = Seq.filter (fun other -> not (indices |> List.contains other))
+
+                if canEliminateOthers presence places exceptIncluded
+                then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
 
         for first in (presence |> present (total-1) 0) do
 
@@ -77,29 +93,6 @@ module ExclusivePresence =
 
                         if canEliminateOthers presence places exceptIncluded
                         then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
-    }
-
-    let private matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
-
-        let total = superRows * superColumns
-
-        for first in (presence |> present (total-1) 0) do
-
-                let indices = [ first ]
-
-                let places =
-                    indices
-                    |> Seq.map (fun x -> presence.[x])
-                    |> commonPlaces
-
-                if places.Length = indices.Length then
-
-                    let exceptIncluded = Seq.filter (fun other -> not (indices |> List.contains other))
-
-                    if canEliminateOthers presence places exceptIncluded
-                    then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
-
-        yield! matchTwice mapper presence
     }
 
     let find (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
