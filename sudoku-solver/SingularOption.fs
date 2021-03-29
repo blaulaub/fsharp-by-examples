@@ -8,15 +8,11 @@ type SingularOption = { Row: int; Col: int; Value: int }
 
 module SingularOption =
 
-    // this code is still limited to a 9x9 (3x3) Sudoku
-    let private superColumns = 3
-    let private superRows = 3
-
     /// <summary>
     /// Find and return all fields that have a
     /// single possible solution.
     /// </summary>
-    let find (opts: Possibilities): SingularOption seq = seq {
+    let find (superRows: int) (superColumns: int) (opts: Possibilities): SingularOption seq = seq {
         let total = superRows * superColumns
         for row in 0..(total-1) do
         for col in 0..(total-1) do
@@ -25,7 +21,7 @@ module SingularOption =
         | _ -> ()
     }
 
-    let apply (singularOption: SingularOption) (options: Possibilities) : Possibilities =
+    let apply (superRows: int) (superColumns: int) (singularOption: SingularOption) (options: Possibilities) : Possibilities =
         let total = superRows * superColumns
         [| for row in 0..(total-1) ->
             [| for col in 0..(total-1) ->

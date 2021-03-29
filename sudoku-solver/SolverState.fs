@@ -34,7 +34,7 @@ module SolverState =
         let oldOptions = oldState.Options
         let newOptions =
             oldOptions
-            |> SingularOption.apply { Row = targetRow; Col = targetCol; Value = num }
+            |> SingularOption.apply 3 3 { Row = targetRow; Col = targetCol; Value = num }
         { Board = newBoard; Options = newOptions }
 
     let applyExlussivePresenceToState (presence: ExclusivePresence) oldState = {
@@ -58,7 +58,7 @@ module SolverState =
 
     let steps options = seq {
         // first try eliminating singular options
-        yield! options |> SingularOption.find |> Seq.map ApplySingularOption
+        yield! options |> SingularOption.find 3 3 |> Seq.map ApplySingularOption
         // next try checking niner groups
         for group in RuleGroup.groups 3 3 do
             yield! options |> ExclusivePresence.find group |> Seq.map ExclusiveInGroup
