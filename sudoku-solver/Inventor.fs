@@ -7,15 +7,17 @@ module Inventor =
         |> SolverState.applySingularOptionToState { Row = row; Col = col; Value = n}
 
 
-    let private nextStateAndPick (rnd: int -> int) state =
+    let private nextStateAndPick (superRows: int) (superColumns: int) (rnd: int -> int) state =
+
+        let total = superRows * superColumns
 
         let next0 =
             state
             |> SolverState.solve
 
         let undet = [|
-            for row in 0..8 do
-            for col in 0..8 do
+            for row in 0..(total-1) do
+            for col in 0..(total-1) do
             if next0.Options.[row].[col].Length > 0
             then yield (row, col)
         |]
@@ -29,11 +31,11 @@ module Inventor =
         else
             (next0, None)
 
-    let rec private getHints (rnd: int -> int) state = seq {
-        match nextStateAndPick rnd state with
+    let rec private getHints (superRows: int) (superColumns: int) (rnd: int -> int) state = seq {
+        match nextStateAndPick superRows superColumns rnd state with
         | (next0, Some pick) ->
             yield pick
-            yield! getHints rnd (apply next0 pick)
+            yield! getHints superRows superColumns rnd (apply next0 pick)
         | (_, None) -> ()
     }
 
@@ -42,6 +44,6 @@ module Inventor =
         let initialState () = Board.empty superRows superColumns |> SolverState.fromBoard
 
         initialState ()
-        |> getHints nextRandom
+        |> getHints superRows superColumns nextRandom
         |> Seq.fold apply (initialState ())
         |> (fun state -> state.Board)
