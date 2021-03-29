@@ -92,7 +92,7 @@ let tests =
             let board = [| for row in 0..8 -> [| for col in 0..8 -> None |] |]
             board.[1].[2] <- Some 3
 
-            let opts = Possibilities.fromBoard board
+            let opts = Possibilities.fromBoard 3 3 board
 
             for row in 0..8 do
             for col in 0..8 do
@@ -107,7 +107,7 @@ let tests =
             let board = [| for row in 0..8 -> [| for col in 0..8 -> None |] |]
             board.[1].[2] <- Some 3
 
-            let opts = Possibilities.fromBoard board
+            let opts = Possibilities.fromBoard 3 3 board
 
             let singularOptions = opts |> SingularOption.find |> Seq.map SolverState.ApplySingularOption |> Seq.toArray
 

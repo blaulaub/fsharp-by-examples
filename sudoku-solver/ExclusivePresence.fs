@@ -91,7 +91,7 @@ module ExclusivePresence =
         let fields = group |> Seq.toArray
         let values = [| for (row, col) in fields -> opts.[row].[col] |]
         values
-        |> Possibilities.toOrderedPresence
+        |> Possibilities.toOrderedPresence superRows superColumns
         |> matchExclussivePresence (fun idx -> fields.[idx] )
 
     let apply (presence: ExclusivePresence) (options: Possibilities) : Possibilities =

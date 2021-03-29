@@ -4,30 +4,32 @@ type Possibilities = int list array array
 
 module Possibilities =
 
-    // this code is still limited to a 9x9 (3x3) Sudoku
-    let private superColumns = 3
-    let private superRows = 3
-
     /// <summary>
     /// Derives initial options from a given <see cref="Board"/> setup.
     /// </summary>
-    let fromBoard (board: Board): Possibilities =
+    let fromBoard (superRows: int) (superColumns: int) (board: Board): Possibilities =
 
-        let total = board.Length
+        let total = superRows * superColumns
+
+        let initialGuess = [0..(total-1)]
 
         [| for row in board ->
             [| for field in row ->
                 match field with
                 | Some num -> [ num-1 ]
-                | None -> [0..(total-1)]
+                | None -> initialGuess
              |]
         |]
 
     /// <summary>
     /// Reversal: Instead of telling where what is possible, tell what is possible where.
     /// </summary>
-    let toOrderedPresence (values: int list array) : int list array =
-        let up = superRows * superColumns - 1
+    let toOrderedPresence (superRows: int) (superColumns: int) (values: int list array) : int list array =
+
+        let total = superRows * superColumns
+
+        let initialState = ((total-1), [| for _ in 0..(total-1) -> [] |])
+
         values
         |> Array.rev
         |> Array.fold (fun (i, state) l ->
@@ -36,12 +38,12 @@ module Possibilities =
                 l |> List.fold (fun state v ->
                     // note: we may create a lots of arrays here, maybe that is not cheap...
                     [|
-                        for idx in 0..up ->
+                        for idx in 0..(total-1) ->
                             if idx = v
                             then i::state.[idx]
                             else state.[idx]
                     |]
                 ) state
             )
-        ) (up, [| for _ in 0..up -> [] |])
+        ) initialState
         |> snd

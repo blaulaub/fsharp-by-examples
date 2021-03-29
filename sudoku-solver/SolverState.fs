@@ -7,7 +7,7 @@ module SolverState =
     let fromBoard (sudoku: Board): SolverState =
         {
             Board = Board.empty 3 3
-            Options = Possibilities.fromBoard sudoku
+            Options = Possibilities.fromBoard 3 3 sudoku
         }
 
     /// <summary>
