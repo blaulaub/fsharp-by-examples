@@ -16,6 +16,8 @@ module ExclusivePresence =
     let private superColumns = 3
     let private superRows = 3
 
+    let present upper lower (presence: int list array) = seq { for idx in lower..upper do if presence.[idx].Length > 0 then yield idx }
+
     let private commonPlaces (individualPlaces: int list seq) =
         individualPlaces
         |> Seq.fold (fun s p ->
@@ -38,11 +40,9 @@ module ExclusivePresence =
 
         let total = superRows * superColumns
 
-        for first in 0..(total-1) do
-        if presence.[first].Length > 0 then
+        for first in (presence |> present (total-1) 0) do
 
-            for second in (first+1)..(total-1) do
-            if presence.[second].Length > 0 then
+            for second in (presence |> present (total-1) (first+1)) do
 
                 let indices = [ first; second ]
 
@@ -58,14 +58,11 @@ module ExclusivePresence =
                     if canEliminateOthers presence places exceptIncluded
                     then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
 
-        for first in 0..(total-1) do
-        if presence.[first].Length > 0 then
+        for first in (presence |> present (total-1) 0) do
 
-            for second in (first+1)..(total-1) do
-            if presence.[second].Length > 0 then
+            for second in (presence |> present (total-1) (first+1)) do
 
-                for third in (second+1)..(total-1) do
-                if presence.[third].Length > 0 then
+                for third in (presence |> present (total-1) (second+1)) do
 
                     let indices = [ first; second; third ]
 
@@ -83,10 +80,10 @@ module ExclusivePresence =
     }
 
     let private matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
+
         let total = superRows * superColumns
 
-        for first in 0..(total-1) do
-        if presence.[first].Length > 0 then
+        for first in (presence |> present (total-1) 0) do
 
                 let indices = [ first ]
 
