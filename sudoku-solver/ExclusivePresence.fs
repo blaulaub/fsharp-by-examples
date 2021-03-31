@@ -12,17 +12,13 @@ type ExclusivePresence = {
 
 module ExclusivePresence =
 
-    // this code is still limited to a 9x9 (3x3) Sudoku
-    let private superColumns = 3
-    let private superRows = 3
-
-    let present (presence: int list array) = seq {
+    let private present (presence: int list array) = seq {
         for idx in 0..(presence.Length-1) do
             if presence.[idx].Length > 0 then
                 yield idx
     }
 
-    let groups (presence: int list array) (depth: int) = seq {
+    let private groups (presence: int list array) (depth: int) = seq {
         let l = present presence |> Seq.toList
 
         let g0 (l: int list) = seq { yield [] }
@@ -54,7 +50,7 @@ module ExclusivePresence =
                 ) s
             ) []
 
-    let private canEliminateOthers (presence: int list array) (places: int list) (exceptIncluded: int seq -> int seq) =
+    let private canEliminateOthers (superRows: int) (superColumns: int) (presence: int list array) (places: int list) (exceptIncluded: int seq -> int seq) =
         let total = superRows * superColumns
         seq { 0..(total-1) }
         |> exceptIncluded
@@ -63,7 +59,7 @@ module ExclusivePresence =
         |> Seq.distinct
         |> Seq.exists (fun p -> places |> List.contains p)
 
-    let private matchExclussivePresence (depth: int) (mapper: int -> (int * int)) (presence: int list array) = seq {
+    let private matchExclussivePresence (superRows: int) (superColumns: int) (depth: int) (mapper: int -> (int * int)) (presence: int list array) = seq {
 
         for indices in groups presence depth do
             let places =
@@ -75,19 +71,19 @@ module ExclusivePresence =
 
                 let exceptIncluded = Seq.filter (fun other -> not (indices |> List.contains other))
 
-                if canEliminateOthers presence places exceptIncluded
+                if canEliminateOthers superRows superColumns presence places exceptIncluded
                 then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
 
     }
 
-    let find (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
+    let find (superRows: int) (superColumns: int) (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
         let fields = group |> Seq.toArray
         let values = [| for (row, col) in fields -> opts.[row].[col] |]
         values
         |> Possibilities.toOrderedPresence superRows superColumns
-        |> matchExclussivePresence 1 (fun idx -> fields.[idx] )
+        |> matchExclussivePresence superRows superColumns 2 (fun idx -> fields.[idx] )
 
-    let apply (presence: ExclusivePresence) (options: Possibilities) : Possibilities =
+    let apply (superRows: int) (superColumns: int) (presence: ExclusivePresence) (options: Possibilities) : Possibilities =
         let total = superRows * superColumns
         [| for row in 0..(total-1) ->
             [| for col in 0..(total-1) ->

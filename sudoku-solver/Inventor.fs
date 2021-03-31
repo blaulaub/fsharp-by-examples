@@ -2,9 +2,9 @@ namespace Ch.PatchCode.SudokuSolver
 
 module Inventor =
 
-    let private apply next0 (row, col, n) =
+    let private apply (superRows: int) (superColumns: int) next0 (row, col, n) =
         next0
-        |> SolverState.applySingularOptionToState { Row = row; Col = col; Value = n}
+        |> SolverState.applySingularOptionToState superRows superColumns { Row = row; Col = col; Value = n}
 
 
     let private nextStateAndPick (superRows: int) (superColumns: int) (rnd: int -> int) state =
@@ -13,7 +13,7 @@ module Inventor =
 
         let next0 =
             state
-            |> SolverState.solve
+            |> SolverState.solve superRows superColumns
 
         let undet = [|
             for row in 0..(total-1) do
@@ -35,15 +35,15 @@ module Inventor =
         match nextStateAndPick superRows superColumns rnd state with
         | (next0, Some pick) ->
             yield pick
-            yield! getHints superRows superColumns rnd (apply next0 pick)
+            yield! getHints superRows superColumns rnd (apply superRows superColumns next0 pick)
         | (_, None) -> ()
     }
 
     let invent (superRows: int) (superColumns: int) (nextRandom: int -> int) =
 
-        let initialState () = Board.empty superRows superColumns |> SolverState.fromBoard
+        let initialState () = Board.empty superRows superColumns |> SolverState.fromBoard superRows superColumns
 
         initialState ()
         |> getHints superRows superColumns nextRandom
-        |> Seq.fold apply (initialState ())
+        |> Seq.fold (apply superRows superColumns) (initialState ())
         |> (fun state -> state.Board)

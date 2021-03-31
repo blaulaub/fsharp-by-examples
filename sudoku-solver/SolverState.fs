@@ -4,10 +4,10 @@ type SolverState = { Board: Board; Options: Possibilities }
 
 module SolverState =
 
-    let fromBoard (sudoku: Board): SolverState =
+    let fromBoard (superRows: int) (superColumns: int) (sudoku: Board): SolverState =
         {
-            Board = Board.empty 3 3
-            Options = Possibilities.fromBoard 3 3 sudoku
+            Board = Board.empty superRows superColumns
+            Options = Possibilities.fromBoard superRows superColumns sudoku
         }
 
     /// <summary>
@@ -18,14 +18,15 @@ module SolverState =
     | ExclusiveInGroup of ExclusivePresence
     | AbsentInGroup of ConclusiveAbsence
 
-    let applySingularOptionToState { Row = targetRow; Col = targetCol; Value = num } oldState =
+    let applySingularOptionToState (superRows: int) (superColumns: int) { Row = targetRow; Col = targetCol; Value = num } oldState =
+        let total = superRows * superColumns
         let oldBoard = oldState.Board
         let newBoard =
-            [| for row in 0..8 ->
+            [| for row in 0..(total-1) ->
                 if row <> targetRow
                 then oldBoard.[row]
                 else
-                    [| for col in 0..8 ->
+                    [| for col in 0..(total-1) ->
                         if col <> targetCol
                         then oldBoard.[row].[col]
                         else Some (num+1)
@@ -34,47 +35,47 @@ module SolverState =
         let oldOptions = oldState.Options
         let newOptions =
             oldOptions
-            |> SingularOption.apply 3 3 { Row = targetRow; Col = targetCol; Value = num }
+            |> SingularOption.apply superRows superColumns { Row = targetRow; Col = targetCol; Value = num }
         { Board = newBoard; Options = newOptions }
 
-    let applyExlussivePresenceToState (presence: ExclusivePresence) oldState = {
+    let applyExlussivePresenceToState (superRows: int) (superColumns: int) (presence: ExclusivePresence) oldState = {
         Board = oldState.Board  // board is not updated
-        Options = oldState.Options |> ExclusivePresence.apply presence
+        Options = oldState.Options |> ExclusivePresence.apply superRows superColumns presence
     }
 
-    let applyConclusiveAbsenceToState (absence: ConclusiveAbsence) oldState = {
+    let applyConclusiveAbsenceToState (superRows: int) (superColumns: int) (absence: ConclusiveAbsence) oldState = {
         Board = oldState.Board  // board is not updated
-        Options = oldState.Options |> ConclusiveAbsence.apply 3 3 absence
+        Options = oldState.Options |> ConclusiveAbsence.apply superRows superColumns absence
     }
 
-    let applyStep (oldState: SolverState) (step: SolutionStep): SolverState =
+    let applyStep (superRows: int) (superColumns: int) (oldState: SolverState) (step: SolutionStep): SolverState =
         match step with
         | ApplySingularOption option ->
-            applySingularOptionToState option oldState
+            applySingularOptionToState superRows superColumns option oldState
         | ExclusiveInGroup presence ->
-            applyExlussivePresenceToState presence oldState
+            applyExlussivePresenceToState superRows superColumns presence oldState
         | AbsentInGroup absence ->
-            applyConclusiveAbsenceToState absence oldState
+            applyConclusiveAbsenceToState superRows superColumns absence oldState
 
-    let steps options = seq {
+    let steps (superRows: int) (superColumns: int) options = seq {
         // first try eliminating singular options
-        yield! options |> SingularOption.find 3 3 |> Seq.map ApplySingularOption
+        yield! options |> SingularOption.find superRows superColumns |> Seq.map ApplySingularOption
         // next try checking niner groups
-        for group in RuleGroup.groups 3 3 do
-            yield! options |> ExclusivePresence.find group |> Seq.map ExclusiveInGroup
+        for group in RuleGroup.groups superRows superColumns do
+            yield! options |> ExclusivePresence.find superRows superColumns group |> Seq.map ExclusiveInGroup
         // next try checking cross groups
-        for group in CrossGroup.singularCrossGroups 3 3 do
+        for group in CrossGroup.singularCrossGroups superRows superColumns do
             yield! options |> ConclusiveAbsence.find group |> Seq.map AbsentInGroup
     }
 
-    let rec solveWithPreAction preAction state =
+    let rec solveWithPreAction (superRows: int) (superColumns: int) preAction state =
         preAction state
         let next =
-            steps state.Options
+            steps superRows superColumns state.Options
             |> Seq.tryHead
-            |> Option.map (applyStep state)
+            |> Option.map (applyStep superRows superColumns state)
         match next with
-        | Some newState -> solveWithPreAction preAction newState
+        | Some newState -> solveWithPreAction superRows superColumns preAction newState
         | None -> state
 
-    let solve state = solveWithPreAction (ignore) state
+    let solve (superRows: int) (superColumns: int) state = solveWithPreAction superRows superColumns (ignore) state

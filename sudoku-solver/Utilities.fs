@@ -16,6 +16,6 @@ module Utilities =
     /// </summary>
     let toString = boardToString (fun x ->
         match x with
-        | Some value -> sprintf " %d " value
-        | None -> "   "
+        | Some value -> sprintf " %2d " value
+        | None -> "    "
         )
