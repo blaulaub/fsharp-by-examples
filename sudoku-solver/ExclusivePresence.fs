@@ -18,43 +18,12 @@ module ExclusivePresence =
 
     let present upper lower (presence: int list array) = seq { for idx in lower..upper do if presence.[idx].Length > 0 then yield idx }
 
-    let groups (presence: int list array) (total: int) (depth: int) =
-        let rec _groups lower upper (presence: int list array) (soFar: int list) n = seq {
-            if n > 0 then
-                for first in (presence |> present upper lower) do
-                    yield first :: soFar
-
-                for first in (presence |> present upper lower) do
-                    yield! _groups (first+1) upper presence (first :: soFar) (n-1)
-        }
-        _groups 0 (total-1) presence [] depth
-
-    let g (presence: int list array) (total: int) (depth: int) = seq {
+    let groups (presence: int list array) (total: int) (depth: int) = seq {
         let l = present (total-1) 0 presence |> Seq.toList
 
-        let g0 (l: int list) = seq {
-            yield []
-        }
+        let g0 (l: int list) = seq { yield [] }
 
-        let rec g1 (l: int list) = seq {
-            match l with
-            | [] -> ()
-            | f :: r ->
-                for b in g0 r do
-                yield f :: b
-                yield! g1 r
-        }
-
-        let rec g2 (l: int list) = seq {
-            match l with
-            | [] -> ()
-            | f :: r ->
-                for b in g1 r do
-                    yield f :: b
-                yield! g2 r
-        }
-
-        let rec gx g1 (l: int list) = seq {
+        let rec gx (g1: int list -> int list seq) (l: int list) = seq {
             match l with
             | [] -> ()
             | f :: r ->
@@ -63,9 +32,13 @@ module ExclusivePresence =
                 yield! gx g1 r
         }
 
-        yield! gx g0 l
-        yield! gx (gx g0) l
-        yield! gx (gx (gx g0)) l
+        let rec eval (gy: int list -> int list seq) (l: int list) (n: int) = seq {
+            if (n>0) then
+                yield! gy l
+                yield! eval (gx gy) l (n-1)
+        }
+
+        yield! eval (gx g0) l depth
     }
 
 
