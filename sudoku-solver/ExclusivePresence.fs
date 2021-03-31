@@ -18,6 +18,43 @@ module ExclusivePresence =
 
     let present upper lower (presence: int list array) = seq { for idx in lower..upper do if presence.[idx].Length > 0 then yield idx }
 
+    let groups (presence: int list array) (total: int) (depth: int) =
+        let rec _groups lower upper (presence: int list array) (soFar: int list) n = seq {
+            if n > 0 then
+                for first in (presence |> present upper lower) do
+                    yield first :: soFar
+
+                for first in (presence |> present upper lower) do
+                    yield! _groups (first+1) upper presence (first :: soFar) (n-1)
+        }
+        _groups 0 (total-1) presence [] depth
+
+    let g (presence: int list array) (total: int) (depth: int) = seq {
+        let l = present (total-1) 0 presence |> Seq.toList
+
+        let rec g1 (l: int list) = seq {
+            match l with
+            | [] -> ()
+            | f :: r ->
+                yield f :: []
+                yield! g1 r
+        }
+
+        let rec g2 (l: int list) = seq {
+            match l with
+            | [] -> ()
+            | f :: r ->
+                for v1 in g1 r do
+                    yield f :: v1
+                yield! g2 r
+        }
+
+        yield! g1 l
+        yield! g2 l
+    }
+
+
+
     let private commonPlaces (individualPlaces: int list seq) =
         individualPlaces
         |> Seq.fold (fun s p ->
@@ -27,7 +64,7 @@ module ExclusivePresence =
                 ) s
             ) []
 
-    let canEliminateOthers (presence: int list array) (places: int list) (exceptIncluded: int seq -> int seq) =
+    let private canEliminateOthers (presence: int list array) (places: int list) (exceptIncluded: int seq -> int seq) =
         let total = superRows * superColumns
         seq { 0..(total-1) }
         |> exceptIncluded
@@ -36,44 +73,11 @@ module ExclusivePresence =
         |> Seq.distinct
         |> Seq.exists (fun p -> places |> List.contains p)
 
-    let rec pairs lo hi (presence: int list array) (soFar: int list) = seq {
-        for first in (presence |> present hi lo) do
-            yield first :: soFar
-    }
-
     let private matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
 
         let total = superRows * superColumns
 
-        let seq1 = seq {
-            for l in pairs 0 (total-1) presence [] do
-                match l with
-                | [] -> failwith "should never match"
-                | first :: _ ->
-                    yield [ first ]
-        }
-
-        let seq2 = seq {
-            for l in pairs 0 (total-1) presence [] do
-                match l with
-                | [] -> failwith "should never match"
-                | first :: _ ->
-                    for second in (presence |> present (total-1) (first+1)) do
-                        yield [ first; second ]
-
-        }
-
-        let seq3 = seq {
-            for l in pairs 0 (total-1) presence [] do
-                match l with
-                | [] -> failwith "should never match"
-                | first :: _ ->
-                    for second in (presence |> present (total-1) (first+1)) do
-                        for third in (presence |> present (total-1) (second+1)) do
-                            yield [ first; second; third ]
-        }
-
-        for indices in seq1 do
+        for indices in groups presence total 3 do
             let places =
                 indices
                 |> Seq.map (fun x -> presence.[x])
@@ -86,35 +90,9 @@ module ExclusivePresence =
                 if canEliminateOthers presence places exceptIncluded
                 then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
 
-        for indices in seq2 do
-            let places =
-                indices
-                |> Seq.map (fun x -> presence.[x])
-                |> commonPlaces
-
-            if places.Length = indices.Length then
-
-                let exceptIncluded = Seq.filter (fun other -> not (indices |> List.contains other))
-
-                if canEliminateOthers presence places exceptIncluded
-                then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
-
-        for indices in seq3 do
-            let places =
-                indices
-                |> Seq.map (fun x -> presence.[x])
-                |> commonPlaces
-
-            if places.Length = indices.Length then
-
-                let exceptIncluded = Seq.filter (fun other -> not (indices |> List.contains other))
-
-                if canEliminateOthers presence places exceptIncluded
-                then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
     }
 
     let find (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
-        let total = superRows * superColumns
         let fields = group |> Seq.toArray
         let values = [| for (row, col) in fields -> opts.[row].[col] |]
         values
