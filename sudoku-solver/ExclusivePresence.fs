@@ -36,26 +36,41 @@ module ExclusivePresence =
         |> Seq.distinct
         |> Seq.exists (fun p -> places |> List.contains p)
 
+    let rec pairs lo hi (presence: int list array) = seq {
+        for first in (presence |> present hi lo) do
+            yield [ first ]
+    }
+
     let private matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
 
         let total = superRows * superColumns
 
         let seq1 = seq {
-            for first in (presence |> present (total-1) 0) do
-                yield [ first ]
+            for l in pairs 0 (total-1) presence do
+                match l with
+                | [] -> failwith "should never match"
+                | first :: _ ->
+                    yield [ first ]
         }
 
         let seq2 = seq {
-            for first in (presence |> present (total-1) 0) do
-                for second in (presence |> present (total-1) (first+1)) do
-                    yield [ first; second ]
+            for l in pairs 0 (total-1) presence do
+                match l with
+                | [] -> failwith "should never match"
+                | first :: _ ->
+                    for second in (presence |> present (total-1) (first+1)) do
+                        yield [ first; second ]
+
         }
 
         let seq3 = seq {
-            for first in (presence |> present (total-1) 0) do
-                for second in (presence |> present (total-1) (first+1)) do
-                    for third in (presence |> present (total-1) (second+1)) do
-                        yield [ first; second; third ]
+            for l in pairs 0 (total-1) presence do
+                match l with
+                | [] -> failwith "should never match"
+                | first :: _ ->
+                    for second in (presence |> present (total-1) (first+1)) do
+                        for third in (presence |> present (total-1) (second+1)) do
+                            yield [ first; second; third ]
         }
 
         for indices in seq1 do
