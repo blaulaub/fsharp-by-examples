@@ -16,10 +16,14 @@ module ExclusivePresence =
     let private superColumns = 3
     let private superRows = 3
 
-    let present upper lower (presence: int list array) = seq { for idx in lower..upper do if presence.[idx].Length > 0 then yield idx }
+    let present (presence: int list array) = seq {
+        for idx in 0..(presence.Length-1) do
+            if presence.[idx].Length > 0 then
+                yield idx
+    }
 
-    let groups (presence: int list array) (total: int) (depth: int) = seq {
-        let l = present (total-1) 0 presence |> Seq.toList
+    let groups (presence: int list array) (depth: int) = seq {
+        let l = present presence |> Seq.toList
 
         let g0 (l: int list) = seq { yield [] }
 
@@ -41,8 +45,6 @@ module ExclusivePresence =
         yield! eval (gx g0) l depth
     }
 
-
-
     let private commonPlaces (individualPlaces: int list seq) =
         individualPlaces
         |> Seq.fold (fun s p ->
@@ -61,11 +63,9 @@ module ExclusivePresence =
         |> Seq.distinct
         |> Seq.exists (fun p -> places |> List.contains p)
 
-    let private matchExclussivePresence (mapper: int -> (int * int)) (presence: int list array) = seq {
+    let private matchExclussivePresence (depth: int) (mapper: int -> (int * int)) (presence: int list array) = seq {
 
-        let total = superRows * superColumns
-
-        for indices in groups presence total 3 do
+        for indices in groups presence depth do
             let places =
                 indices
                 |> Seq.map (fun x -> presence.[x])
@@ -85,7 +85,7 @@ module ExclusivePresence =
         let values = [| for (row, col) in fields -> opts.[row].[col] |]
         values
         |> Possibilities.toOrderedPresence superRows superColumns
-        |> matchExclussivePresence (fun idx -> fields.[idx] )
+        |> matchExclussivePresence 1 (fun idx -> fields.[idx] )
 
     let apply (presence: ExclusivePresence) (options: Possibilities) : Possibilities =
         let total = superRows * superColumns
