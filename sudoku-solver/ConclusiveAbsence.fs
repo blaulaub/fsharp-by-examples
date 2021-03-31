@@ -10,10 +10,6 @@ type ConclusiveAbsence = {
 
 module ConclusiveAbsence =
 
-    // this code is still limited to a 9x9 (3x3) Sudoku
-    let private superColumns = 3
-    let private superRows = 3
-
     /// Returns the list of numbers present in the given fields.
     let private findPossibilities (opts: Possibilities) (fields: (int*int) seq) =
         fields
@@ -29,7 +25,7 @@ module ConclusiveAbsence =
         |> Seq.filter (fun possibilities -> not (group.Source |> findPossibilities opts |> List.contains possibilities))
         |> Seq.map (fun value -> { Numbers = [value]; RowsAndColumns = group.Target |> Seq.toList })
 
-    let apply (absence: ConclusiveAbsence) (options: Possibilities) : Possibilities =
+    let apply (superRows: int) (superColumns: int) (absence: ConclusiveAbsence) (options: Possibilities) : Possibilities =
 
         let total = superRows * superColumns
 

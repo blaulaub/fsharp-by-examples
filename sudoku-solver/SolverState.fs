@@ -44,7 +44,7 @@ module SolverState =
 
     let applyConclusiveAbsenceToState (absence: ConclusiveAbsence) oldState = {
         Board = oldState.Board  // board is not updated
-        Options = oldState.Options |> ConclusiveAbsence.apply absence
+        Options = oldState.Options |> ConclusiveAbsence.apply 3 3 absence
     }
 
     let applyStep (oldState: SolverState) (step: SolutionStep): SolverState =
