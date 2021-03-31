@@ -57,6 +57,32 @@ let difficultSudoku2Solution =
         [| Some 5; Some 3; Some 2; Some 1; Some 4; Some 7; Some 8; Some 6; Some 9 |]
     |]
 
+let difficultSudoku3 =
+    [|
+        [| Some 4; None  ; None  ; Some 3; Some 1; None  ; None  ; None  ; None   |];
+        [| Some 3; None  ; None  ; None  ; None  ; None  ; Some 8; None  ; Some 4 |];
+        [| Some 5; Some 9; None  ; None  ; None  ; Some 6; Some 3; None  ; Some 1 |];
+        [| None  ; None  ; Some 4; None  ; Some 6; Some 5; None  ; Some 3; None   |];
+        [| Some 9; None  ; None  ; None  ; None  ; Some 3; None  ; None  ; None   |];
+        [| None  ; None  ; Some 5; None  ; Some 7; None  ; Some 1; None  ; None   |];
+        [| Some 2; Some 8; None  ; None  ; Some 4; None  ; None  ; None  ; Some 3 |];
+        [| Some 6; None  ; None  ; None  ; None  ; Some 1; Some 4; None  ; Some 9 |];
+        [| None  ; None  ; None  ; None  ; Some 9; None  ; Some 5; Some 8; None   |]
+    |]
+
+let difficultSudoku3Solution =
+    [|
+        [| Some 4; Some 7; Some 6; Some 3; Some 1; Some 8; Some 9; Some 5; Some 2 |];
+        [| Some 3; Some 2; Some 1; Some 7; Some 5; Some 9; Some 8; Some 6; Some 4 |];
+        [| Some 5; Some 9; Some 8; Some 4; Some 2; Some 6; Some 3; Some 7; Some 1 |];
+        [| Some 7; Some 1; Some 4; Some 9; Some 6; Some 5; Some 2; Some 3; Some 8 |];
+        [| Some 9; Some 6; Some 2; Some 1; Some 8; Some 3; Some 7; Some 4; Some 5 |];
+        [| Some 8; Some 3; Some 5; Some 2; Some 7; Some 4; Some 1; Some 9; Some 6 |];
+        [| Some 2; Some 8; Some 9; Some 5; Some 4; Some 7; Some 6; Some 1; Some 3 |];
+        [| Some 6; Some 5; Some 7; Some 8; Some 3; Some 1; Some 4; Some 2; Some 9 |];
+        [| Some 1; Some 4; Some 3; Some 6; Some 9; Some 2; Some 5; Some 8; Some 7 |]
+    |]
+
 // Sample data for an easy Sudoku
 let easySudoku =
     [|
@@ -152,9 +178,14 @@ let tests =
             Expect.equal finalState.Board difficultSudoku2Solution ""
         }
 
+        test "solve difficult board 3" {
+            let finalState = difficultSudoku3 |> SolverState.fromBoard |> SolverState.solve
+            Expect.equal finalState.Board difficultSudoku3Solution ""
+        }
+
         test "try solve some board" {
             let initialState =
-                SolverState.fromBoard difficultSudoku2
+                SolverState.fromBoard difficultSudoku3
 
             initialState
             |> SolverState.solveWithPreAction (fun state ->
