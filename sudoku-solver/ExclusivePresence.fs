@@ -32,11 +32,16 @@ module ExclusivePresence =
     let g (presence: int list array) (total: int) (depth: int) = seq {
         let l = present (total-1) 0 presence |> Seq.toList
 
+        let g0 (l: int list) = seq {
+            yield []
+        }
+
         let rec g1 (l: int list) = seq {
             match l with
             | [] -> ()
             | f :: r ->
-                yield f :: []
+                for b in g0 r do
+                yield f :: b
                 yield! g1 r
         }
 
@@ -44,13 +49,23 @@ module ExclusivePresence =
             match l with
             | [] -> ()
             | f :: r ->
-                for v1 in g1 r do
-                    yield f :: v1
+                for b in g1 r do
+                    yield f :: b
                 yield! g2 r
         }
 
-        yield! g1 l
-        yield! g2 l
+        let rec gx g1 (l: int list) = seq {
+            match l with
+            | [] -> ()
+            | f :: r ->
+                for b in g1 r do
+                    yield f :: b
+                yield! gx g1 r
+        }
+
+        yield! gx g0 l
+        yield! gx (gx g0) l
+        yield! gx (gx (gx g0)) l
     }
 
 
