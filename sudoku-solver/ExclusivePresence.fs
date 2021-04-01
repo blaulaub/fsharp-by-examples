@@ -64,7 +64,7 @@ module ExclusivePresence =
         let fields = group |> Seq.toArray
         let values = [| for (row, col) in fields -> opts.[row].[col] |]
         values
-        |> Possibilities.toOrderedPresence total
+        |> Possibilities.toOrderedPresence
         |> matchExclussivePresenceDownToDepth total depth (fun idx -> fields.[idx] )
 
     let apply (total: int) (presence: ExclusivePresence) (options: Possibilities) : Possibilities =

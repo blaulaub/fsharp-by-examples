@@ -22,8 +22,9 @@ module Possibilities =
     /// <summary>
     /// Reversal: Instead of telling where what is possible, tell what is possible where.
     /// </summary>
-    let toOrderedPresence (total: int) (values: int list array) : int list array =
+    let toOrderedPresence (values: int list array) : int list array =
 
+        let total = values.Length
         let initialState = ((total-1), [| for _ in 0..(total-1) -> [] |])
 
         values
