@@ -18,6 +18,12 @@ module ExclusivePresence =
                 yield idx
     }
 
+    let private groupsAtDepth (depth: int) (presence: int list array) =
+        presence
+        |> nonEmptyIndices
+        |> Seq.toList
+        |> MathCombinations.combinationsAtDepth depth
+
     let private groupsDownToDepth (depth: int) (presence: int list array) =
         presence
         |> nonEmptyIndices
@@ -57,8 +63,18 @@ module ExclusivePresence =
                 then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
     }
 
+    let private matchExclussivePresenceAtDepth (depth: int) (mapper: int -> (int * int)) (presence: int list array) =
+        matchExclussivePresence (groupsAtDepth depth) mapper presence
+
     let private matchExclussivePresenceDownToDepth (depth: int) (mapper: int -> (int * int)) (presence: int list array) =
         matchExclussivePresence (groupsDownToDepth depth) mapper presence
+
+    let findAtDepth (depth: int) (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
+        let fields = group |> Seq.toArray
+        let values = [| for (row, col) in fields -> opts.[row].[col] |]
+        values
+        |> Possibilities.toOrderedPresence
+        |> matchExclussivePresenceAtDepth depth (fun idx -> fields.[idx] )
 
     let findDownToDepth (depth: int) (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
         let fields = group |> Seq.toArray
