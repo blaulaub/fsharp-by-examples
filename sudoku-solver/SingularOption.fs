@@ -12,7 +12,8 @@ module SingularOption =
     /// Find and return all fields that have a
     /// single possible solution.
     /// </summary>
-    let find (total: int) (opts: Possibilities): SingularOption seq = seq {
+    let find (opts: Possibilities): SingularOption seq = seq {
+        let total = opts.Length
         for row in 0..(total-1) do
         for col in 0..(total-1) do
         match opts.[row].[col] with

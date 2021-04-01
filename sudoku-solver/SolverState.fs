@@ -57,8 +57,8 @@ module SolverState =
         | AbsentInGroup absence ->
             applyConclusiveAbsenceToState absence oldState
 
-    let singularOptionEliminationSteps (total: int) options : SolutionStep seq =
-        options |> SingularOption.find total |> Seq.map ApplySingularOption
+    let singularOptionEliminationSteps options : SolutionStep seq =
+        options |> SingularOption.find |> Seq.map ApplySingularOption
 
     let exclusivePresenceDetectionSteps (superRows: int) (superColumns: int) (depth: int) options : SolutionStep seq = seq {
         for group in RuleGroup.groups superRows superColumns do
@@ -66,7 +66,7 @@ module SolverState =
     }
 
     let steps (superRows: int) (superColumns: int) options = seq {
-        yield! singularOptionEliminationSteps (superRows*superColumns) options
+        yield! singularOptionEliminationSteps options
         yield! exclusivePresenceDetectionSteps superRows superColumns 1 options
         let crossGroups = CrossGroup.singularCrossGroups superRows superColumns
         for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 1 group |> Seq.map AbsentInGroup
