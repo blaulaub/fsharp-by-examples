@@ -33,15 +33,15 @@ module ExclusivePresence =
                 ) s
             ) []
 
-    let private canEliminateOthers (total: int) (presence: int list array) (places: int list) (exceptIncluded: int seq -> int seq) =
-        seq { 0..(total-1) }
+    let private canEliminateOthers (presence: int list array) (places: int list) (exceptIncluded: int seq -> int seq) =
+        seq { 0..(presence.Length-1) }
         |> exceptIncluded
         |> Seq.map (fun other -> presence.[other])
         |> Seq.concat
         |> Seq.distinct
         |> Seq.exists (fun p -> places |> List.contains p)
 
-    let private matchExclussivePresence (total: int) (groupFinder: int list array -> int list seq) (mapper: int -> (int * int)) (presence: int list array) = seq {
+    let private matchExclussivePresence (groupFinder: int list array -> int list seq) (mapper: int -> (int * int)) (presence: int list array) = seq {
 
         for indices in groupFinder presence do
             let places =
@@ -53,19 +53,19 @@ module ExclusivePresence =
 
                 let exceptIncluded = Seq.filter (fun other -> not (indices |> List.contains other))
 
-                if canEliminateOthers total presence places exceptIncluded
+                if canEliminateOthers presence places exceptIncluded
                 then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
     }
 
-    let private matchExclussivePresenceDownToDepth (total: int) (depth: int) (mapper: int -> (int * int)) (presence: int list array) =
-        matchExclussivePresence total (groupsDownToDepth depth) mapper presence
+    let private matchExclussivePresenceDownToDepth (depth: int) (mapper: int -> (int * int)) (presence: int list array) =
+        matchExclussivePresence (groupsDownToDepth depth) mapper presence
 
-    let findDownToDepth (total: int) (depth: int) (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
+    let findDownToDepth (depth: int) (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
         let fields = group |> Seq.toArray
         let values = [| for (row, col) in fields -> opts.[row].[col] |]
         values
         |> Possibilities.toOrderedPresence
-        |> matchExclussivePresenceDownToDepth total depth (fun idx -> fields.[idx] )
+        |> matchExclussivePresenceDownToDepth depth (fun idx -> fields.[idx] )
 
     let apply (presence: ExclusivePresence) (options: Possibilities) : Possibilities =
         let total = options.Length
