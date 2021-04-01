@@ -65,15 +65,11 @@ module SolverState =
             yield! options |> ExclusivePresence.findDownToDepth superRows superColumns depth group |> Seq.map ExclusiveInGroup
     }
 
-    let conclusiveAbsenceDetectionSteps (superRows: int) (superColumns: int) (depth: int) options : SolutionStep seq = seq {
-        for group in CrossGroup.singularCrossGroups superRows superColumns do
-            yield! options |> ConclusiveAbsence.findDownToDepth depth group |> Seq.map AbsentInGroup
-    }
-
     let steps (superRows: int) (superColumns: int) options = seq {
         yield! singularOptionEliminationSteps superRows superColumns options
         yield! exclusivePresenceDetectionSteps superRows superColumns 1 options
-        yield! conclusiveAbsenceDetectionSteps superRows superColumns 1 options
+        let crossGroups = CrossGroup.singularCrossGroups superRows superColumns
+        for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 1 group |> Seq.map AbsentInGroup
     }
 
     let rec solveWithPreAction (superRows: int) (superColumns: int) preAction state =
