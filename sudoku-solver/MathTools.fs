@@ -2,7 +2,7 @@ namespace Ch.PatchCode.SudokuSolver
 
 module MathTools =
 
-    let combinations maxCount totality = seq {
+    let combinationsDownToDepth maxCount totality = seq {
 
         let g0 (l: 'a list) = seq { yield [] }
 

@@ -18,10 +18,10 @@ module ConclusiveAbsence =
         |> Seq.distinct
         |> Seq.toList
 
-    let find (depth: int) (group: SingularCrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
+    let findDownToDepth (depth: int) (group: SingularCrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
         group.Intersection
         |> findPossibilities opts
-        |> MathTools.combinations depth
+        |> MathTools.combinationsDownToDepth depth
         |> Seq.filter (fun values ->      group.Target |> findPossibilities opts |> (fun present -> values |> Seq.forall (fun value -> present |> List.contains value)))
         |> Seq.filter (fun values -> not (group.Source |> findPossibilities opts |> (fun present -> values |> Seq.forall (fun value -> present |> List.contains value))))
         |> Seq.map (fun values -> { Numbers = values; RowsAndColumns = group.Target |> Seq.toList })

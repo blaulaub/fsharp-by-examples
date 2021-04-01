@@ -21,7 +21,7 @@ module ExclusivePresence =
     let private groups (presence: int list array) (depth: int) =
         present presence
         |> Seq.toList
-        |> MathTools.combinations depth
+        |> MathTools.combinationsDownToDepth depth
 
     let private commonPlaces (individualPlaces: int list seq) =
         individualPlaces

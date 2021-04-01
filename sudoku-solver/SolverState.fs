@@ -67,7 +67,7 @@ module SolverState =
 
     let conclusiveAbsenceDetectionSteps (superRows: int) (superColumns: int) (depth: int) options : SolutionStep seq = seq {
         for group in CrossGroup.singularCrossGroups superRows superColumns do
-            yield! options |> ConclusiveAbsence.find depth group |> Seq.map AbsentInGroup
+            yield! options |> ConclusiveAbsence.findDownToDepth depth group |> Seq.map AbsentInGroup
     }
 
     let steps (superRows: int) (superColumns: int) options = seq {

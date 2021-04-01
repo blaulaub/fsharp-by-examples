@@ -223,7 +223,7 @@ let tests =
         test "try invent some board" {
 
             let superRows = 4
-            let superCols = 4
+            let superCols = 3
 
             let rnd = System.Random()
             let nextRandom upperEx = rnd.Next(upperEx)
