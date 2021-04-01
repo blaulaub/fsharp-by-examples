@@ -41,7 +41,7 @@ module Inventor =
 
     let invent (superRows: int) (superColumns: int) (nextRandom: int -> int) =
 
-        let initialState () = Board.empty superRows superColumns |> SolverState.fromBoard superRows superColumns
+        let initialState () = Board.empty (superRows*superColumns) |> SolverState.fromBoard (superRows*superColumns)
 
         initialState ()
         |> getHints superRows superColumns nextRandom

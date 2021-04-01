@@ -138,7 +138,7 @@ let tests =
             let board = [| for row in 0..8 -> [| for col in 0..8 -> None |] |]
             board.[1].[2] <- Some 3
 
-            let opts = Possibilities.fromBoard 3 3 board
+            let opts = Possibilities.fromBoard 9 board
 
             for row in 0..8 do
             for col in 0..8 do
@@ -153,7 +153,7 @@ let tests =
             let board = [| for row in 0..8 -> [| for col in 0..8 -> None |] |]
             board.[1].[2] <- Some 3
 
-            let opts = Possibilities.fromBoard 3 3 board
+            let opts = Possibilities.fromBoard 9 board
 
             let singularOptions = opts |> SingularOption.find 9 |> Seq.map SolverState.ApplySingularOption |> Seq.toArray
 
@@ -184,33 +184,33 @@ let tests =
         }
 
         test "solve easy board" {
-            let finalState = easySudoku |> SolverState.fromBoard 3 3 |> SolverState.solve 3 3
+            let finalState = easySudoku |> SolverState.fromBoard 9 |> SolverState.solve 3 3
             Expect.equal finalState.Board easySudokuSolution ""
         }
 
         test "solve difficult board" {
-            let finalState = difficultSudoku |> SolverState.fromBoard 3 3 |> SolverState.solve 3 3
+            let finalState = difficultSudoku |> SolverState.fromBoard 9 |> SolverState.solve 3 3
             Expect.equal finalState.Board difficultSudokuSolution ""
         }
 
         test "solve difficult board 2" {
-            let finalState = difficultSudoku2 |> SolverState.fromBoard 3 3 |> SolverState.solve 3 3
+            let finalState = difficultSudoku2 |> SolverState.fromBoard 9 |> SolverState.solve 3 3
             Expect.equal finalState.Board difficultSudoku2Solution ""
         }
 
         test "solve difficult board 3" {
-            let finalState = difficultSudoku3 |> SolverState.fromBoard 3 3 |> SolverState.solve 3 3
+            let finalState = difficultSudoku3 |> SolverState.fromBoard 9 |> SolverState.solve 3 3
             Expect.equal finalState.Board difficultSudoku3Solution ""
         }
 
         ptest "solve 16x16 board" {
-            let finalState = sudoku16by16with98hints |> SolverState.fromBoard 3 3 |> SolverState.solve 3 3
+            let finalState = sudoku16by16with98hints |> SolverState.fromBoard 9 |> SolverState.solve 3 3
             Expect.equal finalState.Board difficultSudoku3Solution ""
         }
 
         ptest "try solve some board" {
             let initialState =
-                SolverState.fromBoard 4 4 sudoku16by16with98hints
+                SolverState.fromBoard 16 sudoku16by16with98hints
 
             initialState
             |> SolverState.solveWithPreAction 4 4 (fun state ->
@@ -224,6 +224,7 @@ let tests =
 
             let superRows = 4
             let superCols = 3
+            let total = superRows * superCols
 
             let rnd = System.Random()
             let nextRandom upperEx = rnd.Next(upperEx)
@@ -239,7 +240,7 @@ let tests =
             printfn "---"
             Utilities.toString board |> printfn "%s"
             printfn "---"
-            SolverState.fromBoard superRows superCols board
+            SolverState.fromBoard total board
             |> SolverState.solve superRows superCols
             |> (fun state -> state.Board)
             |> Utilities.toString

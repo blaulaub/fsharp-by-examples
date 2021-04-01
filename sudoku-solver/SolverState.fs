@@ -4,10 +4,10 @@ type SolverState = { Board: Board; Options: Possibilities }
 
 module SolverState =
 
-    let fromBoard (superRows: int) (superColumns: int) (sudoku: Board): SolverState =
+    let fromBoard (total: int) (sudoku: Board): SolverState =
         {
-            Board = Board.empty superRows superColumns
-            Options = Possibilities.fromBoard superRows superColumns sudoku
+            Board = Board.empty total
+            Options = Possibilities.fromBoard total sudoku
         }
 
     /// <summary>
