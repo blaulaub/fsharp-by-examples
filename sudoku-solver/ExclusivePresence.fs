@@ -18,7 +18,7 @@ module ExclusivePresence =
                 yield idx
     }
 
-    let private groups (presence: int list array) (depth: int) =
+    let private groupsDownToDepth (depth: int) (presence: int list array) =
         present presence
         |> Seq.toList
         |> MathTools.combinationsDownToDepth depth
@@ -43,7 +43,7 @@ module ExclusivePresence =
 
     let private matchExclussivePresence (superRows: int) (superColumns: int) (depth: int) (mapper: int -> (int * int)) (presence: int list array) = seq {
 
-        for indices in groups presence depth do
+        for indices in groupsDownToDepth depth presence do
             let places =
                 indices
                 |> Seq.map (fun x -> presence.[x])
@@ -58,7 +58,7 @@ module ExclusivePresence =
 
     }
 
-    let find (superRows: int) (superColumns: int) (depth: int) (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
+    let findDownToDepth (superRows: int) (superColumns: int) (depth: int) (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
         let fields = group |> Seq.toArray
         let values = [| for (row, col) in fields -> opts.[row].[col] |]
         values

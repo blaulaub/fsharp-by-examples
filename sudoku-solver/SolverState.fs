@@ -62,7 +62,7 @@ module SolverState =
 
     let exclusivePresenceDetectionSteps (superRows: int) (superColumns: int) (depth: int) options : SolutionStep seq = seq {
         for group in RuleGroup.groups superRows superColumns do
-            yield! options |> ExclusivePresence.find superRows superColumns depth group |> Seq.map ExclusiveInGroup
+            yield! options |> ExclusivePresence.findDownToDepth superRows superColumns depth group |> Seq.map ExclusiveInGroup
     }
 
     let conclusiveAbsenceDetectionSteps (superRows: int) (superColumns: int) (depth: int) options : SolutionStep seq = seq {
