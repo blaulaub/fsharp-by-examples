@@ -62,7 +62,7 @@ module SolverState =
         yield! options |> SingularOption.find superRows superColumns |> Seq.map ApplySingularOption
         // next try checking niner groups
         for group in RuleGroup.groups superRows superColumns do
-            yield! options |> ExclusivePresence.find superRows superColumns group |> Seq.map ExclusiveInGroup
+            yield! options |> ExclusivePresence.find superRows superColumns 3 group |> Seq.map ExclusiveInGroup
         // next try checking cross groups
         for group in CrossGroup.singularCrossGroups superRows superColumns do
             yield! options |> ConclusiveAbsence.find group |> Seq.map AbsentInGroup

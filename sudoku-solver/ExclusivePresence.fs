@@ -56,12 +56,12 @@ module ExclusivePresence =
 
     }
 
-    let find (superRows: int) (superColumns: int) (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
+    let find (superRows: int) (superColumns: int) (depth: int) (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
         let fields = group |> Seq.toArray
         let values = [| for (row, col) in fields -> opts.[row].[col] |]
         values
         |> Possibilities.toOrderedPresence superRows superColumns
-        |> matchExclussivePresence superRows superColumns 2 (fun idx -> fields.[idx] )
+        |> matchExclussivePresence superRows superColumns depth (fun idx -> fields.[idx] )
 
     let apply (superRows: int) (superColumns: int) (presence: ExclusivePresence) (options: Possibilities) : Possibilities =
         let total = superRows * superColumns
