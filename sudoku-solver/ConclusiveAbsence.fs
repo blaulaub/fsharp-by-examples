@@ -32,7 +32,8 @@ module ConclusiveAbsence =
     let findDownToDepth (depth: int) (group: SingularCrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
         findWith group opts (MathCombinations.combinationsDownToDepth depth)
 
-    let apply (total: int) (absence: ConclusiveAbsence) (options: Possibilities) : Possibilities =
+    let apply (absence: ConclusiveAbsence) (options: Possibilities) : Possibilities =
+        let total = options.Length
         [| for row in 0..(total-1) ->
             [| for col in 0..(total-1) ->
                 if absence.RowsAndColumns |> List.contains (row, col)
