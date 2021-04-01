@@ -18,12 +18,13 @@ module ConclusiveAbsence =
         |> Seq.distinct
         |> Seq.toList
 
-    let find (group: SingularCrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
+    let find (depth: int) (group: SingularCrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
         group.Intersection
         |> findPossibilities opts
-        |> Seq.filter (fun possibilities ->      group.Target |> findPossibilities opts |> List.contains possibilities)
-        |> Seq.filter (fun possibilities -> not (group.Source |> findPossibilities opts |> List.contains possibilities))
-        |> Seq.map (fun value -> { Numbers = [value]; RowsAndColumns = group.Target |> Seq.toList })
+        |> MathTools.combinations depth
+        |> Seq.filter (fun values ->      group.Target |> findPossibilities opts |> (fun present -> values |> Seq.forall (fun value -> present |> List.contains value)))
+        |> Seq.filter (fun values -> not (group.Source |> findPossibilities opts |> (fun present -> values |> Seq.forall (fun value -> present |> List.contains value))))
+        |> Seq.map (fun values -> { Numbers = values; RowsAndColumns = group.Target |> Seq.toList })
 
     let apply (superRows: int) (superColumns: int) (absence: ConclusiveAbsence) (options: Possibilities) : Possibilities =
 

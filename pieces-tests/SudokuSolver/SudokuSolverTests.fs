@@ -222,10 +222,13 @@ let tests =
 
         test "try invent some board" {
 
+            let superRows = 4
+            let superCols = 4
+
             let rnd = System.Random()
             let nextRandom upperEx = rnd.Next(upperEx)
 
-            let board = Inventor.invent 4 3 nextRandom
+            let board = Inventor.invent superRows superCols nextRandom
 
             let hintCount (board: Board) =
                 board
@@ -236,8 +239,8 @@ let tests =
             printfn "---"
             Utilities.toString board |> printfn "%s"
             printfn "---"
-            SolverState.fromBoard 4 3 board
-            |> SolverState.solve 4 3
+            SolverState.fromBoard superRows superCols board
+            |> SolverState.solve superRows superCols
             |> (fun state -> state.Board)
             |> Utilities.toString
             |> printfn "%s"

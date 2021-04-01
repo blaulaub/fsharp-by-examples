@@ -57,15 +57,23 @@ module SolverState =
         | AbsentInGroup absence ->
             applyConclusiveAbsenceToState superRows superColumns absence oldState
 
-    let steps (superRows: int) (superColumns: int) options = seq {
-        // first try eliminating singular options
-        yield! options |> SingularOption.find superRows superColumns |> Seq.map ApplySingularOption
-        // next try checking niner groups
+    let singularOptionEliminationSteps (superRows: int) (superColumns: int) options : SolutionStep seq =
+        options |> SingularOption.find superRows superColumns |> Seq.map ApplySingularOption
+
+    let exclusivePresenceDetectionSteps (superRows: int) (superColumns: int) (depth: int) options : SolutionStep seq = seq {
         for group in RuleGroup.groups superRows superColumns do
-            yield! options |> ExclusivePresence.find superRows superColumns 3 group |> Seq.map ExclusiveInGroup
-        // next try checking cross groups
+            yield! options |> ExclusivePresence.find superRows superColumns depth group |> Seq.map ExclusiveInGroup
+    }
+
+    let conclusiveAbsenceDetectionSteps (superRows: int) (superColumns: int) (depth: int) options : SolutionStep seq = seq {
         for group in CrossGroup.singularCrossGroups superRows superColumns do
-            yield! options |> ConclusiveAbsence.find group |> Seq.map AbsentInGroup
+            yield! options |> ConclusiveAbsence.find depth group |> Seq.map AbsentInGroup
+    }
+
+    let steps (superRows: int) (superColumns: int) options = seq {
+        yield! singularOptionEliminationSteps superRows superColumns options
+        yield! exclusivePresenceDetectionSteps superRows superColumns 1 options
+        yield! conclusiveAbsenceDetectionSteps superRows superColumns 1 options
     }
 
     let rec solveWithPreAction (superRows: int) (superColumns: int) preAction state =
