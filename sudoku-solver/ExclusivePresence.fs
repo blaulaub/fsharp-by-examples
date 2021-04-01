@@ -12,14 +12,15 @@ type ExclusivePresence = {
 
 module ExclusivePresence =
 
-    let private present (presence: int list array) = seq {
+    let private nonEmptyIndices (presence: int list array) = seq {
         for idx in 0..(presence.Length-1) do
             if presence.[idx].Length > 0 then
                 yield idx
     }
 
     let private groupsDownToDepth (depth: int) (presence: int list array) =
-        present presence
+        presence
+        |> nonEmptyIndices
         |> Seq.toList
         |> MathCombinations.combinationsDownToDepth depth
 
