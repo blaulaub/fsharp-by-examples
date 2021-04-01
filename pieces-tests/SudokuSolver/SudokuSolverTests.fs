@@ -110,26 +110,6 @@ let easySudokuSolution =
         [| Some 3; Some 5; Some 2; Some 6; Some 4; Some 1; Some 9; Some 7; Some 8 |]
     |]
 
-let sudoku16by16with98hints =
-    [|
-        [| Some 11; None   ; None   ; None   ; None   ; None   ; None   ; None   ; None   ; None   ; Some 10; None   ; Some 16; None   ; None   ; None    |];
-        [| None   ; Some  3; None   ; None   ; None   ; None   ; None   ; None   ; None   ; None   ; None   ; None   ; Some  1; None   ; None   ; None    |];
-        [| None   ; Some 16; Some  4; None   ; Some 14; None   ; None   ; None   ; None   ; None   ; Some 13; None   ; Some 12; Some  2; None   ; Some  8 |];
-        [| Some  5; Some 13; Some  7; Some  1; Some  6; None   ; None   ; Some 12; None   ; None   ; Some  2; None   ; Some 11; Some 14; None   ; None    |];
-        [| Some 12; Some  6; None   ; None   ; Some 11; None   ; Some 15; Some  8; Some 16; None   ; Some 14; None   ; None   ; Some  4; Some 10; None    |];
-        [| None   ; None   ; None   ; Some  2; None   ; Some 10; None   ; None   ; Some  9; None   ; Some  3; None   ; Some 15; Some 16; None   ; None    |];
-        [| None   ; None   ; Some  3; None   ; None   ; None   ; None   ; None   ; Some  1; None   ; None   ; None   ; None   ; None   ; Some 11; None    |];
-        [| None   ; None   ; None   ; Some 15; Some  2; None   ; Some 13; None   ; Some 11; Some  4; Some  8; Some  6; None   ; None   ; None   ; Some 14 |];
-        [| None   ; Some  8; None   ; None   ; None   ; Some 12; Some  5; None   ; None   ; None   ; None   ; None   ; None   ; Some  9; Some  1; None    |];
-        [| None   ; None   ; None   ; None   ; None   ; None   ; None   ; None   ; None   ; Some 10; Some 15; None   ; None   ; None   ; None   ; None    |];
-        [| Some  2; None   ; None   ; Some 11; Some  1; None   ; None   ; Some  7; Some 12; None   ; None   ; Some 13; Some 14; Some  5; None   ; Some  6 |];
-        [| Some  6; Some  1; None   ; Some 16; Some  9; Some  4; Some 14; None   ; Some  5; None   ; None   ; None   ; None   ; Some  3; Some  7; None    |];
-        [| None   ; None   ; Some 14; Some  6; None   ; None   ; Some  7; Some  2; Some 13; None   ; None   ; Some 11; Some  9; Some 10; Some  8; None    |];
-        [| None   ; Some 11; None   ; None   ; Some  5; None   ; Some  3; None   ; None   ; None   ; None   ; None   ; Some  4; Some 12; None   ; None    |];
-        [| None   ; None   ; None   ; Some  8; Some 16; None   ; None   ; None   ; Some 15; Some  9; Some  1; Some  5; None   ; None   ; None   ; None    |];
-        [| None   ; None   ; None   ; None   ; None   ; None   ; Some 12; None   ; Some  4; None   ; None   ; None   ; Some  3; Some  7; Some  6; Some  1 |]
-    |]
-
 [<Tests>]
 let tests =
     testList "Sudoku solver tests" [
@@ -201,23 +181,6 @@ let tests =
         test "solve difficult board 3" {
             let finalState = difficultSudoku3 |> SolverState.fromBoard 9 |> SolverState.solve 3 3
             Expect.equal finalState.Board difficultSudoku3Solution ""
-        }
-
-        ptest "solve 16x16 board" {
-            let finalState = sudoku16by16with98hints |> SolverState.fromBoard 9 |> SolverState.solve 3 3
-            Expect.equal finalState.Board difficultSudoku3Solution ""
-        }
-
-        ptest "try solve some board" {
-            let initialState =
-                SolverState.fromBoard 16 sudoku16by16with98hints
-
-            initialState
-            |> SolverState.solveWithPreAction 4 4 (fun state ->
-                printfn "---------------------------"
-                Utilities.toString state.Board |> printfn "%s"
-                )
-            |> ignore
         }
 
         test "try invent some board" {
