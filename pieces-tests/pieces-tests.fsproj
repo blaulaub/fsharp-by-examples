@@ -12,6 +12,7 @@
     <Compile Include="ComputationExpressions/LikeNormalTest.fs" />
     <Compile Include="ComputationExpressions/MaybeTest.fs" />
     <Compile Include="ComputationExpressions/MaybeTest.fs" />
+    <Compile Include="SudokuSolver/MathCombinationTests.fs" />
     <Compile Include="SudokuSolver/SudokuSolverTests.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>

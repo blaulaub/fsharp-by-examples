@@ -9,7 +9,7 @@
     <Compile Include="Board.fs" />
     <Compile Include="RuleGroup.fs" />
     <Compile Include="Possibilities.fs" />
-    <Compile Include="MathTools.fs" />
+    <Compile Include="MathCombinations.fs" />
     <Compile Include="CrossGroup.fs" />
     <Compile Include="SingularOption.fs" />
     <Compile Include="ExclusivePresence.fs" />
