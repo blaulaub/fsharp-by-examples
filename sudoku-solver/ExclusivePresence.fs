@@ -41,7 +41,7 @@ module ExclusivePresence =
         |> Seq.distinct
         |> Seq.exists (fun p -> places |> List.contains p)
 
-    let private matchExclussivePresence (superRows: int) (superColumns: int) (depth: int) (mapper: int -> (int * int)) (presence: int list array) = seq {
+    let private matchExclussivePresenceDownToDepth (superRows: int) (superColumns: int) (depth: int) (mapper: int -> (int * int)) (presence: int list array) = seq {
 
         for indices in groupsDownToDepth depth presence do
             let places =
@@ -55,7 +55,6 @@ module ExclusivePresence =
 
                 if canEliminateOthers superRows superColumns presence places exceptIncluded
                 then yield { Numbers = indices; RowsAndColumns = places |> List.map mapper }
-
     }
 
     let findDownToDepth (superRows: int) (superColumns: int) (depth: int) (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
@@ -63,7 +62,7 @@ module ExclusivePresence =
         let values = [| for (row, col) in fields -> opts.[row].[col] |]
         values
         |> Possibilities.toOrderedPresence superRows superColumns
-        |> matchExclussivePresence superRows superColumns depth (fun idx -> fields.[idx] )
+        |> matchExclussivePresenceDownToDepth superRows superColumns depth (fun idx -> fields.[idx] )
 
     let apply (superRows: int) (superColumns: int) (presence: ExclusivePresence) (options: Possibilities) : Possibilities =
         let total = superRows * superColumns
