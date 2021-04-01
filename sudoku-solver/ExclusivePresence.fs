@@ -18,28 +18,8 @@ module ExclusivePresence =
                 yield idx
     }
 
-    let private groups (presence: int list array) (depth: int) = seq {
-        let l = present presence |> Seq.toList
-
-        let g0 (l: int list) = seq { yield [] }
-
-        let rec gx (g1: int list -> int list seq) (l: int list) = seq {
-            match l with
-            | [] -> ()
-            | f :: r ->
-                for b in g1 r do
-                    yield f :: b
-                yield! gx g1 r
-        }
-
-        let rec eval (gy: int list -> int list seq) (l: int list) (n: int) = seq {
-            if (n>0) then
-                yield! gy l
-                yield! eval (gx gy) l (n-1)
-        }
-
-        yield! eval (gx g0) l depth
-    }
+    let private groups (presence: int list array) (depth: int) =
+        MathTools.combinations (present presence |> Seq.toList) depth
 
     let private commonPlaces (individualPlaces: int list seq) =
         individualPlaces
