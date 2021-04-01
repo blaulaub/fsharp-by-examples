@@ -67,9 +67,10 @@ module SolverState =
 
     let steps (superRows: int) (superColumns: int) options = seq {
         yield! singularOptionEliminationSteps options
-        yield! exclusivePresenceDetectionSteps superRows superColumns 1 options
+        yield! exclusivePresenceDetectionSteps superRows superColumns 3 options
         let crossGroups = CrossGroup.singularCrossGroups superRows superColumns
         for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 1 group |> Seq.map AbsentInGroup
+        for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 2 group |> Seq.map AbsentInGroup
     }
 
     let rec solveWithPreAction (superRows: int) (superColumns: int) preAction state =
