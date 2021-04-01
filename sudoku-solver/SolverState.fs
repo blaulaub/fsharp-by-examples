@@ -43,9 +43,9 @@ module SolverState =
         Options = oldState.Options |> ExclusivePresence.apply total presence
     }
 
-    let applyConclusiveAbsenceToState (superRows: int) (superColumns: int) (absence: ConclusiveAbsence) oldState = {
+    let applyConclusiveAbsenceToState (total: int) (absence: ConclusiveAbsence) oldState = {
         Board = oldState.Board  // board is not updated
-        Options = oldState.Options |> ConclusiveAbsence.apply superRows superColumns absence
+        Options = oldState.Options |> ConclusiveAbsence.apply total absence
     }
 
     let applyStep (superRows: int) (superColumns: int) (oldState: SolverState) (step: SolutionStep): SolverState =
@@ -55,14 +55,14 @@ module SolverState =
         | ExclusiveInGroup presence ->
             applyExlussivePresenceToState (superRows*superColumns) presence oldState
         | AbsentInGroup absence ->
-            applyConclusiveAbsenceToState superRows superColumns absence oldState
+            applyConclusiveAbsenceToState (superRows*superColumns) absence oldState
 
     let singularOptionEliminationSteps (total: int) options : SolutionStep seq =
         options |> SingularOption.find total |> Seq.map ApplySingularOption
 
     let exclusivePresenceDetectionSteps (superRows: int) (superColumns: int) (depth: int) options : SolutionStep seq = seq {
         for group in RuleGroup.groups superRows superColumns do
-            yield! options |> ExclusivePresence.findDownToDepth superRows superColumns depth group |> Seq.map ExclusiveInGroup
+            yield! options |> ExclusivePresence.findDownToDepth (superRows*superColumns) depth group |> Seq.map ExclusiveInGroup
     }
 
     let steps (superRows: int) (superColumns: int) options = seq {
