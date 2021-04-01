@@ -71,9 +71,19 @@ module SolverState =
 
         let ruleGroups = RuleGroup.groups superRows superColumns
         for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 1 group |> Seq.map ExclusiveInGroup
+        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 2 group |> Seq.map ExclusiveInGroup
+        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 3 group |> Seq.map ExclusiveInGroup
+        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 4 group |> Seq.map ExclusiveInGroup
+        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 5 group |> Seq.map ExclusiveInGroup
 
         let crossGroups = CrossGroup.singularCrossGroups superRows superColumns
         for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 1 group |> Seq.map AbsentInGroup
+        for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 2 group |> Seq.map AbsentInGroup
+        for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 3 group |> Seq.map AbsentInGroup
+        for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 4 group |> Seq.map AbsentInGroup
+        for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 5 group |> Seq.map AbsentInGroup
+
+        ()
     }
 
     let rec solveWithPreAction (superRows: int) (superColumns: int) preAction state =

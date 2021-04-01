@@ -185,9 +185,8 @@ let tests =
 
         test "try invent some board" {
 
-            let superRows = 4
+            let superRows = 3
             let superCols = 3
-            let total = superRows * superCols
 
             let rnd = System.Random()
             let nextRandom upperEx = rnd.Next(upperEx)
