@@ -61,11 +61,12 @@ module ExclusivePresence =
         matchExclussivePresence total (groupsDownToDepth depth) mapper presence
 
     let findDownToDepth (superRows: int) (superColumns: int) (depth: int) (group: RuleGroup) (opts: Possibilities): ExclusivePresence seq =
+        let total = superRows * superColumns
         let fields = group |> Seq.toArray
         let values = [| for (row, col) in fields -> opts.[row].[col] |]
         values
-        |> Possibilities.toOrderedPresence superRows superColumns
-        |> matchExclussivePresenceDownToDepth (superRows*superColumns) depth (fun idx -> fields.[idx] )
+        |> Possibilities.toOrderedPresence total
+        |> matchExclussivePresenceDownToDepth total depth (fun idx -> fields.[idx] )
 
     let apply (superRows: int) (superColumns: int) (presence: ExclusivePresence) (options: Possibilities) : Possibilities =
         let total = superRows * superColumns
