@@ -68,8 +68,7 @@ module ExclusivePresence =
         |> Possibilities.toOrderedPresence total
         |> matchExclussivePresenceDownToDepth total depth (fun idx -> fields.[idx] )
 
-    let apply (superRows: int) (superColumns: int) (presence: ExclusivePresence) (options: Possibilities) : Possibilities =
-        let total = superRows * superColumns
+    let apply (total: int) (presence: ExclusivePresence) (options: Possibilities) : Possibilities =
         [| for row in 0..(total-1) ->
             [| for col in 0..(total-1) ->
                 if presence.RowsAndColumns |> List.contains (row, col)

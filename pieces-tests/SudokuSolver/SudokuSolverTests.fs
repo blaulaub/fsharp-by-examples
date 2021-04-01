@@ -155,7 +155,7 @@ let tests =
 
             let opts = Possibilities.fromBoard 3 3 board
 
-            let singularOptions = opts |> SingularOption.find 3 3 |> Seq.map SolverState.ApplySingularOption |> Seq.toArray
+            let singularOptions = opts |> SingularOption.find 9 |> Seq.map SolverState.ApplySingularOption |> Seq.toArray
 
             Expect.equal 1 singularOptions.Length "have only one singular option"
             Expect.equal (SolverState.ApplySingularOption { Row = 1; Col = 2; Value = 2}) singularOptions.[0] "singular option matches"

@@ -38,9 +38,9 @@ module SolverState =
             |> SingularOption.apply superRows superColumns { Row = targetRow; Col = targetCol; Value = num }
         { Board = newBoard; Options = newOptions }
 
-    let applyExlussivePresenceToState (superRows: int) (superColumns: int) (presence: ExclusivePresence) oldState = {
+    let applyExlussivePresenceToState (total: int) (presence: ExclusivePresence) oldState = {
         Board = oldState.Board  // board is not updated
-        Options = oldState.Options |> ExclusivePresence.apply superRows superColumns presence
+        Options = oldState.Options |> ExclusivePresence.apply total presence
     }
 
     let applyConclusiveAbsenceToState (superRows: int) (superColumns: int) (absence: ConclusiveAbsence) oldState = {
@@ -53,12 +53,12 @@ module SolverState =
         | ApplySingularOption option ->
             applySingularOptionToState superRows superColumns option oldState
         | ExclusiveInGroup presence ->
-            applyExlussivePresenceToState superRows superColumns presence oldState
+            applyExlussivePresenceToState (superRows*superColumns) presence oldState
         | AbsentInGroup absence ->
             applyConclusiveAbsenceToState superRows superColumns absence oldState
 
-    let singularOptionEliminationSteps (superRows: int) (superColumns: int) options : SolutionStep seq =
-        options |> SingularOption.find superRows superColumns |> Seq.map ApplySingularOption
+    let singularOptionEliminationSteps (total: int) options : SolutionStep seq =
+        options |> SingularOption.find total |> Seq.map ApplySingularOption
 
     let exclusivePresenceDetectionSteps (superRows: int) (superColumns: int) (depth: int) options : SolutionStep seq = seq {
         for group in RuleGroup.groups superRows superColumns do
@@ -66,7 +66,7 @@ module SolverState =
     }
 
     let steps (superRows: int) (superColumns: int) options = seq {
-        yield! singularOptionEliminationSteps superRows superColumns options
+        yield! singularOptionEliminationSteps (superRows*superColumns) options
         yield! exclusivePresenceDetectionSteps superRows superColumns 1 options
         let crossGroups = CrossGroup.singularCrossGroups superRows superColumns
         for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 1 group |> Seq.map AbsentInGroup
