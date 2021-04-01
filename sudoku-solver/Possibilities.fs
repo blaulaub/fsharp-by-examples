@@ -7,9 +7,9 @@ module Possibilities =
     /// <summary>
     /// Derives initial options from a given <see cref="Board"/> setup.
     /// </summary>
-    let fromBoard (total: int) (board: Board): Possibilities =
+    let fromBoard (board: Board): Possibilities =
 
-        let initialGuess = [0..(total-1)]
+        let initialGuess = [0..(board.Length-1)]
 
         [| for row in board ->
             [| for field in row ->
