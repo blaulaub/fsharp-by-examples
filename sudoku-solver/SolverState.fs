@@ -43,9 +43,9 @@ module SolverState =
         Options = oldState.Options |> ExclusivePresence.apply presence
     }
 
-    let applyConclusiveAbsenceToState (total: int) (absence: ConclusiveAbsence) oldState = {
+    let applyConclusiveAbsenceToState (absence: ConclusiveAbsence) (oldState: SolverState) = {
         Board = oldState.Board  // board is not updated
-        Options = oldState.Options |> ConclusiveAbsence.apply total absence
+        Options = oldState.Options |> ConclusiveAbsence.apply (oldState.Board.Length) absence
     }
 
     let applyStep (superRows: int) (superColumns: int) (oldState: SolverState) (step: SolutionStep): SolverState =
@@ -55,7 +55,7 @@ module SolverState =
         | ExclusiveInGroup presence ->
             applyExlussivePresenceToState presence oldState
         | AbsentInGroup absence ->
-            applyConclusiveAbsenceToState (superRows*superColumns) absence oldState
+            applyConclusiveAbsenceToState absence oldState
 
     let singularOptionEliminationSteps (total: int) options : SolutionStep seq =
         options |> SingularOption.find total |> Seq.map ApplySingularOption
