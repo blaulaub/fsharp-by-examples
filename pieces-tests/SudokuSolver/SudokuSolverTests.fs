@@ -115,7 +115,7 @@ let tests =
     testList "Sudoku solver tests" [
 
         test "verify options" {
-            let board = [| for row in 0..8 -> [| for col in 0..8 -> None |] |]
+            let board = Board.empty 9
             board.[1].[2] <- Some 3
 
             let opts = Possibilities.fromBoard board
@@ -130,7 +130,7 @@ let tests =
         }
 
         test "find singular options" {
-            let board = [| for row in 0..8 -> [| for col in 0..8 -> None |] |]
+            let board = Board.empty 9
             board.[1].[2] <- Some 3
 
             let opts = Possibilities.fromBoard board
