@@ -38,9 +38,9 @@ module SolverState =
             |> SingularOption.apply superRows superColumns { Row = targetRow; Col = targetCol; Value = num }
         { Board = newBoard; Options = newOptions }
 
-    let applyExlussivePresenceToState (total: int) (presence: ExclusivePresence) oldState = {
+    let applyExlussivePresenceToState (presence: ExclusivePresence) oldState = {
         Board = oldState.Board  // board is not updated
-        Options = oldState.Options |> ExclusivePresence.apply total presence
+        Options = oldState.Options |> ExclusivePresence.apply presence
     }
 
     let applyConclusiveAbsenceToState (total: int) (absence: ConclusiveAbsence) oldState = {
@@ -53,7 +53,7 @@ module SolverState =
         | ApplySingularOption option ->
             applySingularOptionToState superRows superColumns option oldState
         | ExclusiveInGroup presence ->
-            applyExlussivePresenceToState (superRows*superColumns) presence oldState
+            applyExlussivePresenceToState presence oldState
         | AbsentInGroup absence ->
             applyConclusiveAbsenceToState (superRows*superColumns) absence oldState
 
