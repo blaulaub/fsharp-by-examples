@@ -18,17 +18,14 @@ module ConclusiveAbsence =
         |> Seq.distinct
         |> Seq.toList
 
-    let private findWith (group: CrossGroup) (opts: Possibilities) (finder: int list -> int list seq) : ConclusiveAbsence seq =
+    let find (group: CrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
         group.Intersections
-        |> Seq.concat
+        |> Seq.concat   // TODO: each intersection must contain the number searched for
         |> findPossibilities opts
-        |> finder
+        |> MathCombinations.combinationsAtDepth 1
         |> Seq.filter (fun values ->      group.Target |> findPossibilities opts |> (fun present -> values |> Seq.forall (fun value -> present |> List.contains value)))
         |> Seq.filter (fun values -> not (group.Source |> findPossibilities opts |> (fun present -> values |> Seq.forall (fun value -> present |> List.contains value))))
         |> Seq.map (fun values -> { Numbers = values; RowsAndColumns = group.Target |> Seq.toList })
-
-    let find (group: CrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
-        findWith group opts (MathCombinations.combinationsAtDepth 1)
 
     let apply (absence: ConclusiveAbsence) (options: Possibilities) : Possibilities =
         let total = options.Length
