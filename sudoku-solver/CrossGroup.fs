@@ -12,7 +12,7 @@ type SingularCrossGroup = {
 
 module CrossGroup =
 
-    let singularCrossGroups (superRows: int) (superColumns: int): SingularCrossGroup seq = seq {
+    let groups (superRows: int) (superColumns: int): SingularCrossGroup seq = seq {
 
         let total = superRows * superColumns
 
