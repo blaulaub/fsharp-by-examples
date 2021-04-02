@@ -29,9 +29,9 @@ module CrossGroup =
                         }
                     }
                     Source = seq {
-                        for subRow in 0..(superColumns-1) do
+                        for subRow in subRows do
                         for col in 0..(total-1) do
-                        if (subRows |> List.contains subRow) && not (supCols |> List.contains(col/superRows))
+                        if not (supCols |> List.contains(col/superRows))
                         then yield (supRow*superColumns + subRow, col)
                     }
                     Target = seq {
@@ -60,9 +60,9 @@ module CrossGroup =
                         }
                     }
                     Source = seq {
-                        for subCol in 0..(superRows-1) do
+                        for subCol in subCols do
                         for row in 0..(total-1) do
-                        if (subCols |> List.contains subCol) && not (supRows |> List.contains (row/superColumns))
+                        if not (supRows |> List.contains (row/superColumns))
                         then yield (row, supCol*superRows+subCol)
                     }
                     Target = seq {
