@@ -9,8 +9,7 @@ type SingularCrossGroup = {
     Intersection: (int*int) seq
     Target: (int*int) seq
 }
-
-module CrossGroup =
+module SingularCrossGroup =
 
     let groups (superRows: int) (superColumns: int): SingularCrossGroup seq = seq {
 

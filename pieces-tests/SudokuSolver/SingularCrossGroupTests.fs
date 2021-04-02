@@ -18,7 +18,7 @@ let tests =
     testList "Sudoku CrossGroup tests" [
 
         test "2 by 2 corner group" {
-            Expect.isTrue (CrossGroup.groups 2 2 |> groupsContain {
+            Expect.isTrue (SingularCrossGroup.groups 2 2 |> groupsContain {
                 Source = seq [(0, 2); (0, 3)]
                 Intersection = seq [(0, 0); (0, 1)]
                 Target = seq [(1, 0); (1, 1)]
@@ -26,6 +26,6 @@ let tests =
         }
 
         test "2 by 2 group count" {
-            Expect.equal (CrossGroup.groups 2 2 |> Seq.length) 16 "first row"
+            Expect.equal (SingularCrossGroup.groups 2 2 |> Seq.length) 16 "first row"
         }
     ]
