@@ -32,4 +32,8 @@ let tests =
         test "3 by 3 group count" {
             Expect.equal (SingularCrossGroup.groups 3 3 |> Seq.length) 54 "all 3x3 groups"
         }
+
+        test "4 by 4 group count" {
+            Expect.equal (SingularCrossGroup.groups 4 4 |> Seq.length) (2 * 4*4*4) "all 4x4 groups"
+        }
     ]
