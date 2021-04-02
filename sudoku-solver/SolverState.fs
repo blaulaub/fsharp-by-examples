@@ -66,20 +66,20 @@ module SolverState =
             yield! options |> ExclusivePresence.findDownToDepth depth group |> Seq.map ExclusiveInGroup
     }
 
-    let steps (superRows: int) (superColumns: int) options = seq {
+    let steps (superRows: int) (superColumns: int) (possibilities: Possibilities) : SolutionStep seq = seq {
 
-        yield! singularOptionEliminationSteps options
+        yield! singularOptionEliminationSteps possibilities
 
         let total = superRows * superColumns
 
         let ruleGroups = RuleGroup.groups superRows superColumns
         for depth in 1..(total-1) do
-            for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth depth group |> Seq.map ExclusiveInGroup
+            for group in ruleGroups do yield! possibilities |> ExclusivePresence.findAtDepth depth group |> Seq.map ExclusiveInGroup
 
         let min a b = if a < b then a else b
         for depth in 1..((min superRows superColumns)/2) do
             let crossGroups = CrossGroup.groupsAtLevel superRows superColumns depth
-            for group in crossGroups do yield! options |> ConclusiveAbsence.find group |> Seq.map AbsentInGroup
+            for group in crossGroups do yield! possibilities |> ConclusiveAbsence.find group |> Seq.map AbsentInGroup
 
         ()
     }
