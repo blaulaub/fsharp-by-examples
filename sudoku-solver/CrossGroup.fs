@@ -7,7 +7,7 @@ namespace Ch.PatchCode.SudokuSolver
 type CrossGroup = {
     Level: int
     Source: (int*int) seq
-    Intersection: (int*int) seq
+    Intersections: (int*int) seq
     Target: (int*int) seq
 }
 module CrossGroup =
@@ -21,7 +21,7 @@ module CrossGroup =
             for supRow in 0..(superRows-1) do
                 yield {
                     Level = superColumnLevel
-                    Intersection = seq {
+                    Intersections = seq {
                         for subRow in 0..(superColumns-1) do
                         for col in 0..(total-1) do
                         if (subRows |> List.contains subRow) && (supCols |> List.contains (col/superRows))
@@ -51,7 +51,7 @@ module CrossGroup =
             for supCol in 0..(superColumns-1) do
                 yield {
                     Level = superRowLevel
-                    Intersection = seq {
+                    Intersections = seq {
                         for subCol in 0..(superRows-1) do
                         for row in 0..(total-1) do
                         if (subCols |> List.contains subCol) && (supRows |> List.contains (row/superColumns))
