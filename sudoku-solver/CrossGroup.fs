@@ -22,8 +22,8 @@ module CrossGroup =
                 yield {
                     Level = superColumnLevel
                     Intersections = seq { seq {
-                        for subRow in 0..(superColumns-1) do
                         for col in 0..(total-1) do
+                        for subRow in 0..(superColumns-1) do
                         if (subRows |> List.contains subRow) && (supCols |> List.contains (col/superRows))
                         then yield (supRow*superColumns + subRow, col)
                         }
@@ -53,8 +53,8 @@ module CrossGroup =
                 yield {
                     Level = superRowLevel
                     Intersections = seq { seq {
-                        for subCol in 0..(superRows-1) do
                         for row in 0..(total-1) do
+                        for subCol in 0..(superRows-1) do
                         if (subCols |> List.contains subCol) && (supRows |> List.contains (row/superColumns))
                         then yield (row, supCol*superRows+subCol)
                         }
