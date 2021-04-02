@@ -40,4 +40,10 @@ let tests =
         test "4 by 4 group count" {
             Expect.equal (CrossGroup.groupsAtLevel 4 4 1 |> Seq.length) (2 * 4*4*4) "all 4x4 groups"
         }
+
+        test "4 by 4 group count at level 2" {
+            let twoOutOfFour = 6
+            // note: wrong on purpose, the underlying impl is not complete yet
+            Expect.equal (CrossGroup.groupsAtLevel 4 4 2 |> Seq.length) (2 * 4*4*twoOutOfFour) "all 4x4 groups at level 2"
+        }
     ]
