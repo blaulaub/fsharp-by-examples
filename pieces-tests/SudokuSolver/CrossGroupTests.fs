@@ -19,8 +19,6 @@ let tests =
     testList "Sudoku CrossGroup tests" [
 
         test "2 by 2 corner group" {
-            for x in CrossGroup.groupsAtLevel 2 2 1 do
-                printfn "l:%d i:%A s:%A t:%A" x.Level x.Intersection x.Source x.Target
             Expect.isTrue (CrossGroup.groupsAtLevel 2 2 1 |> groupsContain {
                 Level = 1
                 Source = seq [(0, 2); (0, 3)]
@@ -46,4 +44,16 @@ let tests =
             // note: wrong on purpose, the underlying impl is not complete yet
             Expect.equal (CrossGroup.groupsAtLevel 4 4 2 |> Seq.length) (2 * 4*4*twoOutOfFour) "all 4x4 groups at level 2"
         }
+
+        test "4 by 4 level 1 corner group" {
+            for x in CrossGroup.groupsAtLevel 4 4 1 do
+                printfn "l:%d i:%A s:%A t:%A" x.Level x.Intersection x.Source x.Target
+            Expect.isTrue (CrossGroup.groupsAtLevel 4 4 1 |> groupsContain {
+                Level = 1
+                Intersection = seq { for col in 0..3 -> (0, col)}
+                Source = seq { for col in 4..15 -> (0, col)}
+                Target = seq { for row in 1..3 do for col in 0..3 -> (row, col)}
+            }) "first row"
+        }
+
     ]
