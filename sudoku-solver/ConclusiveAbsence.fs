@@ -18,7 +18,7 @@ module ConclusiveAbsence =
         |> Seq.distinct
         |> Seq.toList
 
-    let private findWith (group: SingularCrossGroup) (opts: Possibilities) (finder: int list -> int list seq) : ConclusiveAbsence seq =
+    let private findWithSingular (group: SingularCrossGroup) (opts: Possibilities) (finder: int list -> int list seq) : ConclusiveAbsence seq =
         group.Intersection
         |> findPossibilities opts
         |> finder
@@ -27,10 +27,10 @@ module ConclusiveAbsence =
         |> Seq.map (fun values -> { Numbers = values; RowsAndColumns = group.Target |> Seq.toList })
 
     let findAtDepth (depth: int) (group: SingularCrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
-        findWith group opts (MathCombinations.combinationsAtDepth depth)
+        findWithSingular group opts (MathCombinations.combinationsAtDepth depth)
 
     let findDownToDepth (depth: int) (group: SingularCrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
-        findWith group opts (MathCombinations.combinationsDownToDepth depth)
+        findWithSingular group opts (MathCombinations.combinationsDownToDepth depth)
 
     let apply (absence: ConclusiveAbsence) (options: Possibilities) : Possibilities =
         let total = options.Length
