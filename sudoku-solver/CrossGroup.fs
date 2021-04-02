@@ -10,14 +10,16 @@ type CrossGroup = {
     Intersections: (int*int) seq seq
     Target: (int*int) seq
 }
+
 module CrossGroup =
 
     let private superColumnGroupsAtLevel (superRows: int) (superColumns: int) (superColumnLevel: int) = seq {
 
         let total = superRows * superColumns
+        let superColumnCombinations = MathCombinations.combinationsAtDepth superColumnLevel [0..(superColumns-1)]
 
-        for supCols in MathCombinations.combinationsAtDepth superColumnLevel [0..(superColumns-1)] do
-            for subRows in MathCombinations.combinationsAtDepth superColumnLevel [0..(superColumns-1)] do
+        for supCols in superColumnCombinations do
+            for subRows in superColumnCombinations do
             for supRow in 0..(superRows-1) do
                 yield {
                     Level = superColumnLevel
@@ -46,9 +48,10 @@ module CrossGroup =
     let private superRowGroupsAtLevel (superRows: int) (superColumns: int) (superRowLevel: int) = seq {
 
         let total = superRows * superColumns
+        let superRowCombinations = MathCombinations.combinationsAtDepth superRowLevel [0..(superRows-1)]
 
-        for supRows in MathCombinations.combinationsAtDepth superRowLevel [0..(superRows-1)] do
-            for subCols in MathCombinations.combinationsAtDepth superRowLevel [0..(superRows-1)] do
+        for supRows in superRowCombinations do
+            for subCols in superRowCombinations do
             for supCol in 0..(superColumns-1) do
                 yield {
                     Level = superRowLevel
