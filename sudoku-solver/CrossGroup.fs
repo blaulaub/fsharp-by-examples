@@ -17,23 +17,26 @@ module CrossGroup =
         let total = superRows * superColumns
 
         for row in 0..(total-1) do
-            for supCol in 0..(superColumns-1) do
+            for supCols in MathCombinations.combinationsAtDepth superColumnLevel [0..(superColumns-1)] do
                 yield {
                     Level = superColumnLevel
                     Intersection = seq {
                         for subRow in 0..(superColumns-1) do
                         for col in 0..(total-1) do
-                        if (row%superColumns = subRow) && (col/superRows = supCol) then yield ((row/superColumns)*superColumns+subRow, col)
+                        if (row%superColumns = subRow) && (supCols |> List.contains (col/superRows))
+                        then yield ((row/superColumns)*superColumns+subRow, col)
                     }
                     Source = seq {
                         for subRow in 0..(superColumns-1) do
                         for col in 0..(total-1) do
-                        if (row%superColumns = subRow) && (col/superRows <> supCol) then yield ((row/superColumns)*superColumns+subRow, col)
+                        if (row%superColumns = subRow) && not (supCols |> List.contains(col/superRows))
+                        then yield ((row/superColumns)*superColumns+subRow, col)
                     }
                     Target = seq {
                         for col in 0..(total-1) do
                         for subRow in 0..(superColumns-1) do
-                        if (row%superColumns <> subRow) && (col/superRows = supCol) then yield ((row/superColumns)*superColumns+subRow, col)
+                        if (row%superColumns <> subRow) && (supCols |> List.contains (col/superRows))
+                        then yield ((row/superColumns)*superColumns+subRow, col)
                     }
                 }
     }
@@ -42,23 +45,26 @@ module CrossGroup =
 
         let total = superRows * superColumns
         for col in 0..(total-1) do
-            for supRow in 0..(superRows-1) do
+            for supRows in MathCombinations.combinationsAtDepth superRowLevel [0..(superRows-1)] do
                 yield {
                     Level = superRowLevel
                     Intersection = seq {
                         for subCol in 0..(superRows-1) do
                         for row in 0..(total-1) do
-                        if (col%superRows = subCol) && (row/superColumns = supRow) then yield (row, (col/superRows)*superRows+subCol)
+                        if (col%superRows = subCol) && (supRows |> List.contains (row/superColumns))
+                        then yield (row, (col/superRows)*superRows+subCol)
                     }
                     Source = seq {
                         for subCol in 0..(superRows-1) do
                         for row in 0..(total-1) do
-                        if (col%superRows = subCol) && (row/superColumns <> supRow) then yield (row, (col/superRows)*superRows+subCol)
+                        if (col%superRows = subCol) && not (supRows |> List.contains (row/superColumns))
+                        then yield (row, (col/superRows)*superRows+subCol)
                     }
                     Target = seq {
                         for row in 0..(total-1) do
                         for subCol in 0..(superRows-1) do
-                        if (col%superRows <> subCol) && (row/superColumns = supRow) then yield (row, (col/superRows)*superRows+subCol)
+                        if (col%superRows <> subCol) && (supRows |> List.contains (row/superColumns))
+                        then yield (row, (col/superRows)*superRows+subCol)
                     }
                 }
     }
