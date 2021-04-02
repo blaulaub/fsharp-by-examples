@@ -30,6 +30,10 @@ let tests =
         }
 
         test "2 by 2 group count" {
-            Expect.equal (CrossGroup.groupsAtLevel 2 2 1 |> Seq.length) 16 "first row"
+            Expect.equal (CrossGroup.groupsAtLevel 2 2 1 |> Seq.length) 16 "all 2x2 groups"
+        }
+
+        test "3 by 3 group count" {
+            Expect.equal (CrossGroup.groupsAtLevel 3 3 1 |> Seq.length) 54 "all 3x3 groups"
         }
     ]
