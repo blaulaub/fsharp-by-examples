@@ -60,12 +60,6 @@ module SolverState =
     let singularOptionEliminationSteps options : SolutionStep seq =
         options |> SingularOption.find |> Seq.map ApplySingularOption
 
-    let exclusivePresenceDetectionSteps (superRows: int) (superColumns: int) (depth: int) options : SolutionStep seq = seq {
-        let ruleGroups = RuleGroup.groups superRows superColumns
-        for group in ruleGroups do
-            yield! options |> ExclusivePresence.findDownToDepth depth group |> Seq.map ExclusiveInGroup
-    }
-
     let steps (superRows: int) (superColumns: int) (possibilities: Possibilities) : SolutionStep seq = seq {
 
         yield! singularOptionEliminationSteps possibilities
