@@ -57,23 +57,31 @@ module SolverState =
         | AbsentInGroup absence ->
             applyConclusiveAbsenceToState absence oldState
 
-    let singularOptionEliminationSteps options : SolutionStep seq =
-        options |> SingularOption.find |> Seq.map ApplySingularOption
-
     let steps (superRows: int) (superColumns: int) (possibilities: Possibilities) : SolutionStep seq = seq {
 
-        yield! singularOptionEliminationSteps possibilities
+        yield!
+            possibilities
+            |> SingularOption.find
+            |> Seq.map ApplySingularOption
 
         let total = superRows * superColumns
 
         let ruleGroups = RuleGroup.groups superRows superColumns
         for depth in 1..(total-1) do
-            for group in ruleGroups do yield! possibilities |> ExclusivePresence.findAtDepth depth group |> Seq.map ExclusiveInGroup
+            for group in ruleGroups do
+                yield!
+                    possibilities
+                    |> ExclusivePresence.findAtDepth depth group
+                    |> Seq.map ExclusiveInGroup
 
         let min a b = if a < b then a else b
         for depth in 1..((min superRows superColumns)/2) do
             let crossGroups = CrossGroup.groupsAtLevel superRows superColumns depth
-            for group in crossGroups do yield! possibilities |> ConclusiveAbsence.find group |> Seq.map AbsentInGroup
+            for group in crossGroups do
+                yield!
+                    possibilities
+                    |> ConclusiveAbsence.find group
+                    |> Seq.map AbsentInGroup
 
         ()
     }
