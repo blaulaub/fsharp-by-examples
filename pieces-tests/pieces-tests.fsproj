@@ -14,6 +14,7 @@
     <Compile Include="ComputationExpressions/MaybeTest.fs" />
     <Compile Include="SudokuSolver/MathCombinationTests.fs" />
     <Compile Include="SudokuSolver/RuleGroupTests.fs" />
+    <Compile Include="SudokuSolver/CrossGroupTests.fs" />
     <Compile Include="SudokuSolver/SudokuSolverTests.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
