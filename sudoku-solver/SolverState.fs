@@ -75,6 +75,9 @@ module SolverState =
         for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 3 group |> Seq.map ExclusiveInGroup
         for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 4 group |> Seq.map ExclusiveInGroup
         for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 5 group |> Seq.map ExclusiveInGroup
+        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 6 group |> Seq.map ExclusiveInGroup
+        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 7 group |> Seq.map ExclusiveInGroup
+        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 8 group |> Seq.map ExclusiveInGroup
 
         let crossGroups = CrossGroup.groupsAtLevel superRows superColumns 1
         for group in crossGroups do yield! options |> ConclusiveAbsence.find group |> Seq.map AbsentInGroup
