@@ -78,10 +78,6 @@ module SolverState =
 
         let crossGroups = CrossGroup.groups superRows superColumns
         for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 1 group |> Seq.map AbsentInGroup
-        for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 2 group |> Seq.map AbsentInGroup
-        for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 3 group |> Seq.map AbsentInGroup
-        for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 4 group |> Seq.map AbsentInGroup
-        for group in crossGroups do yield! options |> ConclusiveAbsence.findAtDepth 5 group |> Seq.map AbsentInGroup
 
         ()
     }
