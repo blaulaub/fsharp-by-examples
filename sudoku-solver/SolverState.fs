@@ -67,17 +67,14 @@ module SolverState =
     }
 
     let steps (superRows: int) (superColumns: int) options = seq {
+
         yield! singularOptionEliminationSteps options
 
+        let total = superRows * superColumns
+
         let ruleGroups = RuleGroup.groups superRows superColumns
-        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 1 group |> Seq.map ExclusiveInGroup
-        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 2 group |> Seq.map ExclusiveInGroup
-        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 3 group |> Seq.map ExclusiveInGroup
-        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 4 group |> Seq.map ExclusiveInGroup
-        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 5 group |> Seq.map ExclusiveInGroup
-        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 6 group |> Seq.map ExclusiveInGroup
-        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 7 group |> Seq.map ExclusiveInGroup
-        for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth 8 group |> Seq.map ExclusiveInGroup
+        for depth in 1..(total-1) do
+            for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth depth group |> Seq.map ExclusiveInGroup
 
         let crossGroups = CrossGroup.groupsAtLevel superRows superColumns 1
         for group in crossGroups do yield! options |> ConclusiveAbsence.find group |> Seq.map AbsentInGroup
