@@ -83,13 +83,23 @@ let tests =
         }
 
         test "4 by 4 level 1 corner group" {
-            for x in CrossGroup.groupsAtLevel 4 4 1 do
-                printfn "l:%d i:%A s:%A t:%A" x.Level x.Intersections x.Source x.Target
             Expect.isTrue (CrossGroup.groupsAtLevel 4 4 1 |> groupsContain {
                 Level = 1
                 Intersections = seq { seq { for col in 0..3 -> (0, col)}}
                 Source = seq { for col in 4..15 -> (0, col)}
                 Target = seq { for row in 1..3 do for col in 0..3 -> (row, col)}
+            }) "first row"
+        }
+
+        test "4 by 4 level 2 corner group" {
+            Expect.isTrue (CrossGroup.groupsAtLevel 4 4 2 |> groupsContain {
+                Level = 2
+                Intersections = seq {
+                    seq { for col in 0..3 do for row in 0..1 -> (row, col)}
+                    seq { for col in 4..7 do for row in 0..1 -> (row, col)}
+                }
+                Source = seq { for row in 0..1 do for col in 8..15 -> (row, col)}
+                Target = seq { for row in 2..3 do for col in 0..7 -> (row, col)}
             }) "first row"
         }
 
