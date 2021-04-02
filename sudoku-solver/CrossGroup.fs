@@ -23,11 +23,11 @@ module CrossGroup =
             for supRow in 0..(superRows-1) do
                 yield {
                     Level = superColumnLevel
-                    Intersections = seq { seq {
-                        for supCol in supCols do
-                        for subCol in 0..(superRows-1) do
-                        for subRow in subRows do
-                        yield (supRow*superColumns+subRow, supCol*superRows+subCol)
+                    Intersections = seq {
+                        for supCol in supCols -> seq {
+                            for subCol in 0..(superRows-1) do
+                            for subRow in subRows do
+                            yield (supRow*superColumns+subRow, supCol*superRows+subCol)
                         }
                     }
                     Source = seq {
@@ -56,11 +56,11 @@ module CrossGroup =
             for supCol in 0..(superColumns-1) do
                 yield {
                     Level = superRowLevel
-                    Intersections = seq { seq {
-                        for supRow in supRows do
-                        for subRow in 0..(superColumns-1) do
-                        for subCol in subCols do
-                        yield (supRow*superColumns+subRow, supCol*superRows+subCol)
+                    Intersections = seq {
+                        for supRow in supRows -> seq {
+                            for subRow in 0..(superColumns-1) do
+                            for subCol in subCols do
+                            yield (supRow*superColumns+subRow, supCol*superRows+subCol)
                         }
                     }
                     Source = seq {
