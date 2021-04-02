@@ -17,7 +17,9 @@ module CrossGroup =
         let total = superRows * superColumns
 
         for supCols in MathCombinations.combinationsAtDepth superColumnLevel [0..(superColumns-1)] do
-            for row in 0..(total-1) do
+            for supRow in 0..(superRows-1) do
+            for subRow in 0..(superColumns-1) do
+                let row = supRow * superColumns + subRow
                 yield {
                     Level = superColumnLevel
                     Intersection = seq {
@@ -46,7 +48,9 @@ module CrossGroup =
         let total = superRows * superColumns
 
         for supRows in MathCombinations.combinationsAtDepth superRowLevel [0..(superRows-1)] do
-            for col in 0..(total-1) do
+            for supCol in 0..(superColumns-1) do
+            for subCol in 0..(superRows-1) do
+                let col = supCol*superRows + subCol
                 yield {
                     Level = superRowLevel
                     Intersection = seq {
