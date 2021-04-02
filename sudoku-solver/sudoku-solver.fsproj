@@ -11,6 +11,7 @@
     <Compile Include="Possibilities.fs" />
     <Compile Include="MathCombinations.fs" />
     <Compile Include="SingularCrossGroup.fs" />
+    <Compile Include="CrossGroup.fs" />
     <Compile Include="SingularOption.fs" />
     <Compile Include="ExclusivePresence.fs" />
     <Compile Include="ConclusiveAbsence.fs" />
