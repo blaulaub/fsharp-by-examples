@@ -18,14 +18,6 @@ module ConclusiveAbsence =
         |> Seq.distinct
         |> Seq.toList
 
-    let private findWithSingular (group: SingularCrossGroup) (opts: Possibilities) (finder: int list -> int list seq) : ConclusiveAbsence seq =
-        group.Intersection
-        |> findPossibilities opts
-        |> finder
-        |> Seq.filter (fun values ->      group.Target |> findPossibilities opts |> (fun present -> values |> Seq.forall (fun value -> present |> List.contains value)))
-        |> Seq.filter (fun values -> not (group.Source |> findPossibilities opts |> (fun present -> values |> Seq.forall (fun value -> present |> List.contains value))))
-        |> Seq.map (fun values -> { Numbers = values; RowsAndColumns = group.Target |> Seq.toList })
-
     let private findWith (group: CrossGroup) (opts: Possibilities) (finder: int list -> int list seq) : ConclusiveAbsence seq =
         group.Intersections
         |> Seq.concat
@@ -34,12 +26,6 @@ module ConclusiveAbsence =
         |> Seq.filter (fun values ->      group.Target |> findPossibilities opts |> (fun present -> values |> Seq.forall (fun value -> present |> List.contains value)))
         |> Seq.filter (fun values -> not (group.Source |> findPossibilities opts |> (fun present -> values |> Seq.forall (fun value -> present |> List.contains value))))
         |> Seq.map (fun values -> { Numbers = values; RowsAndColumns = group.Target |> Seq.toList })
-
-    let findAtDepth (depth: int) (group: SingularCrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
-        findWithSingular group opts (MathCombinations.combinationsAtDepth depth)
-
-    let findDownToDepth (depth: int) (group: SingularCrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
-        findWithSingular group opts (MathCombinations.combinationsDownToDepth depth)
 
     let find (group: CrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
         findWith group opts (MathCombinations.combinationsAtDepth 1)
