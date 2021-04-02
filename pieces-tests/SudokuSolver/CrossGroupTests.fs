@@ -102,5 +102,4 @@ let tests =
                 Target = seq { for row in 2..3 do for col in 0..7 -> (row, col)}
             }) "first row"
         }
-
     ]

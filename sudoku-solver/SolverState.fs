@@ -76,8 +76,10 @@ module SolverState =
         for depth in 1..(total-1) do
             for group in ruleGroups do yield! options |> ExclusivePresence.findAtDepth depth group |> Seq.map ExclusiveInGroup
 
-        let crossGroups = CrossGroup.groupsAtLevel superRows superColumns 1
-        for group in crossGroups do yield! options |> ConclusiveAbsence.find group |> Seq.map AbsentInGroup
+        let min a b = if a < b then a else b
+        for depth in 1..((min superRows superColumns)/2) do
+            let crossGroups = CrossGroup.groupsAtLevel superRows superColumns depth
+            for group in crossGroups do yield! options |> ConclusiveAbsence.find group |> Seq.map AbsentInGroup
 
         ()
     }
