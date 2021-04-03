@@ -26,6 +26,48 @@ module Solver =
                 yield (depth, group)
     }
 
+    let findExclusiveInGroup (possibilities: Possibilities) (input: (int*RuleGroup)seq) = async {
+        return
+            input
+            |> Seq.map (fun (depth, group) ->
+                possibilities
+                |> ExclusivePresence.findAtDepth depth group
+                |> Seq.map ExclusiveInGroup
+                |> Seq.tryHead
+                )
+            |> Seq.filter Option.isSome
+            |> Seq.tryHead
+            |> Option.flatten
+    }
+
+    let conclusiveAbsenceIterator (superRows: int) (superColumns: int) = seq {
+        let min a b = if a < b then a else b
+        for depth in 1..((min superRows superColumns)/2) do
+            let crossGroups = CrossGroup.groupsAtLevel superRows superColumns depth
+            for group in crossGroups do
+                yield group
+    }
+
+    let findAbsentInGroup (possibilities: Possibilities) (input: CrossGroup seq) = async {
+        return
+            input
+            |> Seq.map (fun group ->
+                possibilities
+                |> ConclusiveAbsence.find group
+                |> Seq.map AbsentInGroup
+                |> Seq.tryHead
+                )
+            |> Seq.filter Option.isSome
+            |> Seq.tryHead
+            |> Option.flatten
+    }
+
+    let split (groups: int) (input: 'a seq): 'a list array =
+        input
+        |> Seq.fold (fun (c, l) v -> ((c+1)%groups, (c, v) :: l)) (0, [])
+        |> snd
+        |> Seq.fold (fun (s: 'a list array) (c, v) -> s.[c] <- s.[c]; s) [| for _ in 1..groups -> [] |]
+
     let private steps (superRows: int) (superColumns: int) (possibilities: Possibilities) : SolutionStep seq = seq {
 
         yield!
@@ -34,20 +76,17 @@ module Solver =
             |> Seq.map ApplySingularOption
 
         let maxDepth = superRows * superColumns - 1
-        for (depth, group) in exclusivePresenceIterator superRows superColumns maxDepth do
-            yield!
-                possibilities
-                |> ExclusivePresence.findAtDepth depth group
-                |> Seq.map ExclusiveInGroup
+        let iter1 = exclusivePresenceIterator superRows superColumns maxDepth
+        let res1 = iter1 |> findExclusiveInGroup possibilities |> Async.RunSynchronously
+        match res1 with
+        | Some result -> yield result
+        | None -> ()
 
-        let min a b = if a < b then a else b
-        for depth in 1..((min superRows superColumns)/2) do
-            let crossGroups = CrossGroup.groupsAtLevel superRows superColumns depth
-            for group in crossGroups do
-                yield!
-                    possibilities
-                    |> ConclusiveAbsence.find group
-                    |> Seq.map AbsentInGroup
+        let iter2 = conclusiveAbsenceIterator superRows superColumns
+        let res2 = iter2 |> findAbsentInGroup possibilities |> Async.RunSynchronously
+        match res2 with
+        | Some result -> yield result
+        | None -> ()
 
         ()
     }
