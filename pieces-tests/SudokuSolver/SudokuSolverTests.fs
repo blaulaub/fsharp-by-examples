@@ -135,10 +135,10 @@ let tests =
 
             let opts = Possibilities.fromBoard board
 
-            let singularOptions = opts |> SingularOption.find |> Seq.map SolverState.ApplySingularOption |> Seq.toArray
+            let singularOptions = opts |> SingularOption.find |> Seq.map Solver.ApplySingularOption |> Seq.toArray
 
             Expect.equal 1 singularOptions.Length "have only one singular option"
-            Expect.equal (SolverState.ApplySingularOption { Row = 1; Col = 2; Value = 2}) singularOptions.[0] "singular option matches"
+            Expect.equal (Solver.ApplySingularOption { Row = 1; Col = 2; Value = 2}) singularOptions.[0] "singular option matches"
         }
 
         test "verify applySingularOption" {
@@ -164,22 +164,22 @@ let tests =
         }
 
         test "solve easy board" {
-            let finalState = easySudoku |> SolverState.fromBoard |> SolverState.solve 3 3
+            let finalState = easySudoku |> SolverState.fromBoard |> Solver.solve 3 3
             Expect.equal finalState.Board easySudokuSolution ""
         }
 
         test "solve difficult board" {
-            let finalState = difficultSudoku |> SolverState.fromBoard |> SolverState.solve 3 3
+            let finalState = difficultSudoku |> SolverState.fromBoard |> Solver.solve 3 3
             Expect.equal finalState.Board difficultSudokuSolution ""
         }
 
         test "solve difficult board 2" {
-            let finalState = difficultSudoku2 |> SolverState.fromBoard |> SolverState.solve 3 3
+            let finalState = difficultSudoku2 |> SolverState.fromBoard |> Solver.solve 3 3
             Expect.equal finalState.Board difficultSudoku2Solution ""
         }
 
         test "solve difficult board 3" {
-            let finalState = difficultSudoku3 |> SolverState.fromBoard |> SolverState.solve 3 3
+            let finalState = difficultSudoku3 |> SolverState.fromBoard |> Solver.solve 3 3
             Expect.equal finalState.Board difficultSudoku3Solution ""
         }
 
@@ -203,7 +203,7 @@ let tests =
             Utilities.toString board |> printfn "%s"
             printfn "---"
             SolverState.fromBoard board
-            |> SolverState.solve superRows superCols
+            |> Solver.solve superRows superCols
             |> (fun state -> state.Board)
             |> Utilities.toString
             |> printfn "%s"

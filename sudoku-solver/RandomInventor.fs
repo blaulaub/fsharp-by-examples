@@ -13,7 +13,7 @@ module RandomInventor =
 
         let next0 =
             state
-            |> SolverState.solve superRows superColumns
+            |> Solver.solve superRows superColumns
 
         let undet = [|
             for row in 0..(total-1) do
