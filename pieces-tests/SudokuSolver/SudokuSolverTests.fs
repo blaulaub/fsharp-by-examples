@@ -191,7 +191,7 @@ let tests =
             let rnd = System.Random()
             let nextRandom upperEx = rnd.Next(upperEx)
 
-            let board = Inventor.invent superRows superCols nextRandom
+            let board = RandomInventor.invent superRows superCols (fun x -> 0)
 
             let hintCount (board: Board) =
                 board

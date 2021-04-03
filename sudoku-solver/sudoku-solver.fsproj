@@ -15,7 +15,7 @@
     <Compile Include="ExclusivePresence.fs" />
     <Compile Include="ConclusiveAbsence.fs" />
     <Compile Include="SolverState.fs" />
-    <Compile Include="Inventor.fs" />
+    <Compile Include="RandomInventor.fs" />
     <Compile Include="Utilities.fs" />
   </ItemGroup>
 
