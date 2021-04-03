@@ -19,6 +19,13 @@ module Solver =
         | AbsentInGroup absence ->
             SolverState.applyConclusiveAbsenceToState absence oldState
 
+    let exclusivePresenceIterator (superRows: int) (superColumns: int) (maxDepth: int) = seq {
+        let ruleGroups = RuleGroup.groups superRows superColumns
+        for depth in 1..maxDepth do
+            for group in ruleGroups do
+                yield (depth, group)
+    }
+
     let private steps (superRows: int) (superColumns: int) (possibilities: Possibilities) : SolutionStep seq = seq {
 
         yield!
@@ -26,15 +33,12 @@ module Solver =
             |> SingularOption.find
             |> Seq.map ApplySingularOption
 
-        let total = superRows * superColumns
-
-        let ruleGroups = RuleGroup.groups superRows superColumns
-        for depth in 1..(total-1) do
-            for group in ruleGroups do
-                yield!
-                    possibilities
-                    |> ExclusivePresence.findAtDepth depth group
-                    |> Seq.map ExclusiveInGroup
+        let maxDepth = superRows * superColumns - 1
+        for (depth, group) in exclusivePresenceIterator superRows superColumns maxDepth do
+            yield!
+                possibilities
+                |> ExclusivePresence.findAtDepth depth group
+                |> Seq.map ExclusiveInGroup
 
         let min a b = if a < b then a else b
         for depth in 1..((min superRows superColumns)/2) do
