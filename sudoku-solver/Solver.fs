@@ -70,7 +70,7 @@ module Solver =
 
     let private steps (superRows: int) (superColumns: int) (possibilities: Possibilities) : SolutionStep seq = seq {
 
-        let cores = 2
+        let cores = System.Environment.ProcessorCount
 
         yield!
             possibilities
