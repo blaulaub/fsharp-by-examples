@@ -78,20 +78,22 @@ module Solver =
 
     let private steps (superRows: int) (superColumns: int) (possibilities: Possibilities) : SolutionStep seq = seq {
 
+        let cores = 2
+
         yield!
             possibilities
             |> SingularOption.find
             |> Seq.map ApplySingularOption
 
         let maxDepth = superRows * superColumns - 1
-        let iters1 = exclusivePresenceIterator superRows superColumns maxDepth |> split 1
+        let iters1 = exclusivePresenceIterator superRows superColumns maxDepth |> split cores
         let actions1 = iters1 |> Array.map (findExclusiveInGroup possibilities)
         let res1 = actions1 |> any |> Async.RunSynchronously
         match res1 with
         | Some result -> yield result
         | _ -> ()
 
-        let iters2 = conclusiveAbsenceIterator superRows superColumns |> split 1
+        let iters2 = conclusiveAbsenceIterator superRows superColumns |> split cores
         let actions2 = iters2 |> Array.map (findAbsentInGroup possibilities)
         let res2 = actions2 |> any |> Async.RunSynchronously
         match res2 with
