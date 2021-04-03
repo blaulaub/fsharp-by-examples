@@ -66,7 +66,7 @@ module Solver =
         input
         |> Seq.fold (fun (c, l) v -> ((c+1)%groups, (c, v) :: l)) (0, [])
         |> snd
-        |> Seq.fold (fun (s: 'a list array) (c, v) -> s.[c] <- s.[c]; s) [| for _ in 1..groups -> [] |]
+        |> Seq.fold (fun (s: 'a list array) (c, v) -> s.[c] <- v :: s.[c]; s) [| for _ in 1..groups -> [] |]
 
     let private steps (superRows: int) (superColumns: int) (possibilities: Possibilities) : SolutionStep seq = seq {
 
@@ -76,17 +76,17 @@ module Solver =
             |> Seq.map ApplySingularOption
 
         let maxDepth = superRows * superColumns - 1
-        let iter1 = exclusivePresenceIterator superRows superColumns maxDepth
-        let res1 = iter1 |> findExclusiveInGroup possibilities |> Async.RunSynchronously
+        let iters1 = exclusivePresenceIterator superRows superColumns maxDepth |> split 1
+        let res1 = iters1 |> Array.map (findExclusiveInGroup possibilities) |> Async.Parallel |> Async.RunSynchronously
         match res1 with
-        | Some result -> yield result
-        | None -> ()
+        | [| Some result |] -> yield result
+        | _ -> ()
 
-        let iter2 = conclusiveAbsenceIterator superRows superColumns
-        let res2 = iter2 |> findAbsentInGroup possibilities |> Async.RunSynchronously
+        let iters2 = conclusiveAbsenceIterator superRows superColumns |> split 1
+        let res2 = iters2 |> Array.map (findAbsentInGroup possibilities) |> Async.Parallel |> Async.RunSynchronously
         match res2 with
-        | Some result -> yield result
-        | None -> ()
+        | [| Some result |] -> yield result
+        | _ -> ()
 
         ()
     }
