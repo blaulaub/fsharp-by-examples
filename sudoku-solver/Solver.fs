@@ -68,14 +68,6 @@ module Solver =
         |> snd
         |> Seq.fold (fun (s: 'a list array) (c, v) -> s.[c] <- v :: s.[c]; s) [| for _ in 1..groups -> [] |]
 
-    let any asyncs = async {
-        let t =
-            asyncs
-            |> Seq.map Async.StartAsTask
-            |> System.Threading.Tasks.Task.WhenAny
-        return t.Result.Result
-    }
-
     let private steps (superRows: int) (superColumns: int) (possibilities: Possibilities) : SolutionStep seq = seq {
 
         let cores = 2
@@ -88,17 +80,19 @@ module Solver =
         let maxDepth = superRows * superColumns - 1
         let iters1 = exclusivePresenceIterator superRows superColumns maxDepth |> split cores
         let actions1 = iters1 |> Array.map (findExclusiveInGroup possibilities)
-        let res1 = actions1 |> any |> Async.RunSynchronously
-        match res1 with
-        | Some result -> yield result
-        | _ -> ()
+        let res1 = actions1 |> Async.Parallel |> Async.RunSynchronously
+        for res in res1 do
+            match res with
+            | Some result -> yield result
+            | None -> ()
 
         let iters2 = conclusiveAbsenceIterator superRows superColumns |> split cores
         let actions2 = iters2 |> Array.map (findAbsentInGroup possibilities)
-        let res2 = actions2 |> any |> Async.RunSynchronously
-        match res2 with
-        | Some result -> yield result
-        | None -> ()
+        let res2 = actions2 |> Async.Parallel |> Async.RunSynchronously
+        for res in res2 do
+            match res with
+            | Some result -> yield result
+            | None -> ()
 
         ()
     }
