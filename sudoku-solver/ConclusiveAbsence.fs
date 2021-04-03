@@ -18,10 +18,16 @@ module ConclusiveAbsence =
         |> Seq.distinct
         |> Seq.toList
 
+    let private common (data: 'a list seq) =
+        match data |> Seq.toList with
+        | [single] -> single
+        | first :: rest -> [ for x in first do if rest |> List.forall (List.contains x) then x ]
+        | _ -> []
+
     let find (group: CrossGroup) (opts: Possibilities) : ConclusiveAbsence seq =
         group.Intersections
-        |> Seq.concat   // TODO: each intersection must contain the number searched for
-        |> findPossibilities opts
+        |> Seq.map (findPossibilities opts)
+        |> common
         |> MathCombinations.combinationsAtDepth 1
         |> Seq.filter (fun values ->      group.Target |> findPossibilities opts |> (fun present -> values |> Seq.forall (fun value -> present |> List.contains value)))
         |> Seq.filter (fun values -> not (group.Source |> findPossibilities opts |> (fun present -> values |> Seq.forall (fun value -> present |> List.contains value))))

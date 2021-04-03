@@ -2,40 +2,43 @@ namespace Ch.PatchCode.SudokuSolver
 
 module RandomInventor =
 
-    let private apply (superRows: int) (superColumns: int) next0 (row, col, n) =
-        next0
-        |> SolverState.applySingularOptionToState superRows superColumns { Row = row; Col = col; Value = n}
-
-
-    let private nextStateAndPick (superRows: int) (superColumns: int) (naturalBelow: int -> int) state =
-
-        let total = superRows * superColumns
-
-        let next0 =
-            state
-            |> Solver.solve superRows superColumns
+    let private pickOneRemainingPossibility (naturalBelow: int -> int) (possibilities: Possibilities) : SingularOption option =
 
         let undet = [|
-            for row in 0..(total-1) do
-            for col in 0..(total-1) do
-            if next0.Options.[row].[col].Length > 0
+            for row in 0..(possibilities.Length-1) do
+            for col in 0..(possibilities.[row].Length-1) do
+            if possibilities.[row].[col].Length > 0
             then yield (row, col)
         |]
 
         if undet.Length > 0
         then
             let (row, col) = undet.[naturalBelow undet.Length]
-            let l = naturalBelow next0.Options.[row].[col].Length
-            let n = next0.Options.[row].[col].[l]
-            (next0, Some (row, col, n))
+            let l = naturalBelow possibilities.[row].[col].Length
+            let n = possibilities.[row].[col].[l]
+            Some { Row = row; Col = col; Value = n}
         else
-            (next0, None)
+            None
+
+    let private nextStateAndPick (superRows: int) (superColumns: int) (naturalBelow: int -> int) state =
+
+        let nextState =
+            state
+            |> Solver.solve superRows superColumns
+
+        (nextState, nextState.Options |> pickOneRemainingPossibility naturalBelow)
+
+    let private apply (superRows: int) (superColumns: int) state singularOption =
+        state |> SolverState.applySingularOptionToState superRows superColumns singularOption
 
     let rec private getHints (superRows: int) (superColumns: int) (naturalBelow: int -> int) state = seq {
         match nextStateAndPick superRows superColumns naturalBelow state with
-        | (next0, Some pick) ->
-            yield pick
-            yield! getHints superRows superColumns naturalBelow (apply superRows superColumns next0 pick)
+        | (solutionSoFar, Some nextHint) ->
+            yield nextHint
+            yield!
+                solutionSoFar
+                |> SolverState.applySingularOptionToState superRows superColumns nextHint
+                |> getHints superRows superColumns naturalBelow
         | (_, None) -> ()
     }
 
