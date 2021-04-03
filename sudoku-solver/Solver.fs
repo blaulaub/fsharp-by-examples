@@ -92,10 +92,11 @@ module Solver =
         | _ -> ()
 
         let iters2 = conclusiveAbsenceIterator superRows superColumns |> split 1
-        let res2 = iters2 |> Array.map (findAbsentInGroup possibilities) |> Async.Parallel |> Async.RunSynchronously
+        let actions2 = iters2 |> Array.map (findAbsentInGroup possibilities)
+        let res2 = actions2 |> any |> Async.RunSynchronously
         match res2 with
-        | [| Some result |] -> yield result
-        | _ -> ()
+        | Some result -> yield result
+        | None -> ()
 
         ()
     }
