@@ -19,13 +19,13 @@ module Elimination =
     let private othersInRowColumnAndBlock (supRows: int) (supCols: int) (value: SingularOption) = seq {
         let total = supRows * supCols
         for x in 0..(total-1) do
-            if x <> value.Row then yield { value with Col = x }
-            if x <> value.Col then yield { value with Row = x }
+            if x <> value.Row then yield { value with Row = x }
+            if x <> value.Col then yield { value with Col = x }
         let R = (value.Row/supRows)*supRows
         let C = (value.Col/supCols)*supCols
         for r in 0..(supCols-1) do
             for c in 0..(supRows-1) do
-                yield { value with Row = R+r; Col = C+c }
+                if R+r <> value.Row && C+c <> value.Col then yield { value with Row = R+r; Col = C+c }
     }
 
     let rec eliminate (supRows: int) (supCols: int) (possibilities: Possibilities) (value: SingularOption) : Possibilities =

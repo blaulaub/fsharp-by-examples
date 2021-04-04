@@ -30,4 +30,28 @@ let tests =
 
             Expect.equal after expected "only in field 0 0 should 0 be missing"
         }
+
+        test "remove last of many" {
+            let before =
+                [|
+                    [| [0..1]; [0..3]; [0..3]; [0..3] |];
+                    [| [0..3]; [0..3]; [0..3]; [0..3] |];
+                    [| [0..3]; [0..3]; [0..3]; [0..3] |];
+                    [| [0..3]; [0..3]; [0..3]; [0..3] |]
+                |]
+
+            let after =
+                {Row = 0; Col = 0; Value = 1}
+                |> Elimination.eliminate 2 2 before
+
+            let expected =
+                [|
+                    [| [0..0]; [1..3]; [1..3]; [1..3] |];
+                    [| [1..3]; [1..3]; [0..3]; [0..3] |];
+                    [| [1..3]; [0..3]; [0..3]; [0..3] |];
+                    [| [1..3]; [0..3]; [0..3]; [0..3] |]
+                |]
+
+            Expect.equal after expected "only in field 0 0 should 0 be missing"
+        }
     ]
