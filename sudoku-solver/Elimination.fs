@@ -12,7 +12,8 @@ module Elimination =
                     let c = r.[col]
                     if (col <> value.Col)
                     then c
-                    else [ for x in c do if x <> value.Value then x ]
+                    else
+                        [ for x in c do if x <> value.Value then x ]
                 |]
         |]
 
