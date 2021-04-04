@@ -1,0 +1,33 @@
+module EliminationTests
+
+open Expecto
+open Ch.PatchCode.SudokuSolver
+
+[<Tests>]
+let tests =
+    testList "Sudoku Elimination tests" [
+
+        test "remove first of many" {
+            let before =
+                [|
+                    [| [0..3]; [0..3]; [0..3]; [0..3] |];
+                    [| [0..3]; [0..3]; [0..3]; [0..3] |];
+                    [| [0..3]; [0..3]; [0..3]; [0..3] |];
+                    [| [0..3]; [0..3]; [0..3]; [0..3] |]
+                |]
+
+            let after =
+                {Row = 0; Col = 0; Value = 0}
+                |> Elimination.eliminate 2 2 before
+
+            let expected =
+                [|
+                    [| [1..3]; [0..3]; [0..3]; [0..3] |];
+                    [| [0..3]; [0..3]; [0..3]; [0..3] |];
+                    [| [0..3]; [0..3]; [0..3]; [0..3] |];
+                    [| [0..3]; [0..3]; [0..3]; [0..3] |]
+                |]
+
+            Expect.equal after expected "only in field 0 0 should 0 be missing"
+        }
+    ]
