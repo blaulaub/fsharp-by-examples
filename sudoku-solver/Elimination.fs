@@ -53,7 +53,7 @@ module Elimination =
 
                     // if there is only a single option left in the field, then cleanup row, column and block
                     |> fun possibilities ->
-                        let extracted = fun (eliminations: SingularOption list) (elimination: SingularOption) -> elimination :: eliminations
+                        let extracted (eliminations: SingularOption list) (elimination: SingularOption) = elimination :: eliminations
                         match possibilities.[value.Row].[value.Col] with
                         | [ single ] ->
                             othersInRowColumnAndBlock supRows supCols { value with Value = single }
