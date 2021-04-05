@@ -55,10 +55,11 @@ module Elimination =
                     |> fun possibilities ->
                         let append (eliminations: SingularOption list) (elimination: SingularOption) = elimination :: eliminations
                         let merge (eliminations: SingularOption list) (elimination: SingularOption) = append eliminations elimination
+                        let extracted = Seq.fold merge remainingEliminations
                         match possibilities.[value.Row].[value.Col] with
                         | [ single ] ->
                             othersInRowColumnAndBlock supRows supCols { value with Value = single }
-                            |> Seq.fold merge remainingEliminations
+                            |> extracted
                         | _ -> remainingEliminations
 
                     // if this is exclussive, remove others
