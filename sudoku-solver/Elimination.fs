@@ -1,5 +1,10 @@
 namespace Ch.PatchCode.SudokuSolver
 
+type EliminationState = {
+    Possibilities: Possibilities
+    Eliminations: SingularOption list
+}
+
 module Elimination =
 
     let private remove (value: SingularOption) (possibilities: Possibilities) =
@@ -29,23 +34,32 @@ module Elimination =
                 if R+r <> value.Row && C+c <> value.Col then yield { value with Row = R+r; Col = C+c }
     }
 
-    let rec eliminate (supRows: int) (supCols: int) (possibilities: Possibilities) (value: SingularOption) : Possibilities =
-        if not (possibilities.[value.Row].[value.Col] |> List.contains value.Value)
-        then
-            possibilities  // not present -> do nothing
-        else
-            possibilities
+    let rec eliminate (supRows: int) (supCols: int) (state: EliminationState) : EliminationState =
+        match state with
+        | { Eliminations = []} -> state
+        | {
+            Possibilities = possibilities
+            Eliminations = value :: remainingEliminations
+          } ->
+            if not (possibilities.[value.Row].[value.Col] |> List.contains value.Value)
+            then
+                { Possibilities = possibilities; Eliminations = remainingEliminations }  // not present (anymore) -> do nothing
+            else
+                let newPossibilities = possibilities |> remove value
 
-            // remove the value from its field
-            |> remove value
+                let newEliminations =
 
-            // if there is only a single option left in the field, then cleanup row, column and block
-            |> fun possibilities ->
-                match possibilities.[value.Row].[value.Col] with
-                | [ single ] ->
-                    othersInRowColumnAndBlock supRows supCols { value with Value = single }
-                    |> Seq.fold (fun possibilities -> eliminate supRows supCols possibilities) possibilities
-                | _ -> possibilities
+                    newPossibilities
 
-            // if this is exclussive, remove others
-            // if absence can be cross-appied, apply
+                    // if there is only a single option left in the field, then cleanup row, column and block
+                    |> fun possibilities ->
+                        match possibilities.[value.Row].[value.Col] with
+                        | [ single ] ->
+                            othersInRowColumnAndBlock supRows supCols { value with Value = single }
+                            |> Seq.fold (fun (eliminations: SingularOption list) (elimination: SingularOption) -> elimination :: eliminations) remainingEliminations
+                        | _ -> remainingEliminations
+
+                    // if this is exclussive, remove others
+                    // if absence can be cross-appied, apply
+
+                { Possibilities = newPossibilities; Eliminations = newEliminations }

@@ -17,8 +17,12 @@ let tests =
                 |]
 
             let after =
+                // the elimination
                 {Row = 0; Col = 0; Value = 0}
-                |> Elimination.eliminate 2 2 before
+                // the processing
+                |> fun x -> { Possibilities = before; Eliminations = [ x ] }
+                |> Elimination.eliminate 2 2
+                |> fun x -> x.Possibilities
 
             let expected =
                 [|
@@ -41,8 +45,12 @@ let tests =
                 |]
 
             let after =
+                // the elimination
                 {Row = 0; Col = 0; Value = 1}
-                |> Elimination.eliminate 2 2 before
+                // the processing
+                |> fun x -> { Possibilities = before; Eliminations = [ x ] }
+                |> Elimination.eliminate 2 2
+                |> fun x -> x.Possibilities
 
             let expected =
                 [|
@@ -65,8 +73,12 @@ let tests =
                 |]
 
             let after =
+                // the elimination
                 {Row = 0; Col = 0; Value = 1}
-                |> Elimination.eliminate 2 2 before
+                // the processing
+                |> fun x -> { Possibilities = before; Eliminations = [ x ] }
+                |> Elimination.eliminate 2 2
+                |> fun x -> x.Possibilities
 
             let expected =
                 [|
