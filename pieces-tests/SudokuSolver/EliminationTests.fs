@@ -50,6 +50,7 @@ let tests =
                 // the processing
                 |> fun x -> { Possibilities = before; Eliminations = [ x ] }
                 |> Elimination.eliminate 2 2
+                |> Elimination.meltDown 2 2  // this reduces the work item list to zero
                 |> fun x -> x.Possibilities
 
             let expected =
@@ -78,6 +79,7 @@ let tests =
                 // the processing
                 |> fun x -> { Possibilities = before; Eliminations = [ x ] }
                 |> Elimination.eliminate 2 2
+                |> Elimination.meltDown 2 2  // this reduces the work item list to zero
                 |> fun x -> x.Possibilities
 
             let expected =

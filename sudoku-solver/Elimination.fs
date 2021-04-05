@@ -34,7 +34,7 @@ module Elimination =
                 if R+r <> value.Row && C+c <> value.Col then yield { value with Row = R+r; Col = C+c }
     }
 
-    let rec eliminate (supRows: int) (supCols: int) (state: EliminationState) : EliminationState =
+    let eliminate (supRows: int) (supCols: int) (state: EliminationState) : EliminationState =
         match state with
         | { Eliminations = []} -> state
         | {
@@ -63,3 +63,10 @@ module Elimination =
                     // if absence can be cross-appied, apply
 
                 { Possibilities = newPossibilities; Eliminations = newEliminations }
+
+    let rec meltDown (supRows: int) (supCols: int) (state: EliminationState) : EliminationState =
+        match state with
+        | { Eliminations = []} -> state
+        | someState ->
+            eliminate supRows supCols someState
+            |> meltDown supRows supCols
