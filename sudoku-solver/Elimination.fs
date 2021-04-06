@@ -37,6 +37,7 @@ module Elimination =
     let append (eliminations: SingularOption list) (elimination: SingularOption) = elimination :: eliminations
 
     let mergeOneInto (eliminations: SingularOption list) (newElimination: SingularOption) = append eliminations newElimination
+
     let mergeAllInto (eliminations: SingularOption list) (newEliminations: SingularOption seq) = Seq.fold mergeOneInto eliminations newEliminations
 
     let eliminate (supRows: int) (supCols: int) (state: EliminationState) : EliminationState =
@@ -44,30 +45,30 @@ module Elimination =
         | { Eliminations = []} -> state
         | {
             Possibilities = possibilities
-            Eliminations = value :: remainingEliminations
+            Eliminations = eliminationAtHand :: remainingEliminations
           } ->
-            if not (possibilities.[value.Row].[value.Col] |> List.contains value.Value)
+            if not (possibilities.[eliminationAtHand.Row].[eliminationAtHand.Col] |> List.contains eliminationAtHand.Value)
             then
                 { Possibilities = possibilities; Eliminations = remainingEliminations }  // not present (anymore) -> do nothing
             else
-                let newPossibilities = possibilities |> remove value
+                let updatedPossibilities = possibilities |> remove eliminationAtHand
 
                 let newEliminations =
 
-                    newPossibilities
+                    updatedPossibilities
 
                     // if there is only a single option left in the field, then cleanup row, column and block
                     |> fun possibilities ->
-                        match possibilities.[value.Row].[value.Col] with
+                        match possibilities.[eliminationAtHand.Row].[eliminationAtHand.Col] with
                         | [ aSinglePossibleValue ] ->
-                            othersInRowColumnAndBlock supRows supCols { value with Value = aSinglePossibleValue }
+                            othersInRowColumnAndBlock supRows supCols { eliminationAtHand with Value = aSinglePossibleValue }
                             |> mergeAllInto remainingEliminations
                         | _ -> remainingEliminations
 
                     // if this is exclussive, remove others
                     // if absence can be cross-appied, apply
 
-                { Possibilities = newPossibilities; Eliminations = newEliminations }
+                { Possibilities = updatedPossibilities; Eliminations = newEliminations }
 
     let rec meltDown (supRows: int) (supCols: int) (state: EliminationState) : EliminationState =
         match state with
