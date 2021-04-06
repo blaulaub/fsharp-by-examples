@@ -34,6 +34,11 @@ module Elimination =
                 if R+r <> value.Row && C+c <> value.Col then yield { value with Row = R+r; Col = C+c }
     }
 
+    let append (eliminations: SingularOption list) (elimination: SingularOption) = elimination :: eliminations
+
+    let mergeOneInto (eliminations: SingularOption list) (newElimination: SingularOption) = append eliminations newElimination
+    let mergeAllInto (eliminations: SingularOption list) (newEliminations: SingularOption seq) = Seq.fold mergeOneInto eliminations newEliminations
+
     let eliminate (supRows: int) (supCols: int) (state: EliminationState) : EliminationState =
         match state with
         | { Eliminations = []} -> state
@@ -53,13 +58,10 @@ module Elimination =
 
                     // if there is only a single option left in the field, then cleanup row, column and block
                     |> fun possibilities ->
-                        let append (eliminations: SingularOption list) (elimination: SingularOption) = elimination :: eliminations
-                        let merge (eliminations: SingularOption list) (elimination: SingularOption) = append eliminations elimination
-                        let extracted = Seq.fold merge remainingEliminations
                         match possibilities.[value.Row].[value.Col] with
-                        | [ single ] ->
-                            othersInRowColumnAndBlock supRows supCols { value with Value = single }
-                            |> extracted
+                        | [ aSinglePossibleValue ] ->
+                            othersInRowColumnAndBlock supRows supCols { value with Value = aSinglePossibleValue }
+                            |> mergeAllInto remainingEliminations
                         | _ -> remainingEliminations
 
                     // if this is exclussive, remove others
